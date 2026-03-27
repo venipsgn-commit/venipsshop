@@ -4,6 +4,7 @@ import { CartProvider } from '@/context/CartContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CartSidebar from '@/components/CartSidebar';
+import DeliveryAlert from '@/components/DeliveryAlert';
 
 export const metadata: Metadata = {
   title: 'VenipShop – Ordinateurs, Téléphones & Accessoires',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CartSidebar />
           <main>{children}</main>
           <Footer />
+          <DeliveryAlert />
         </CartProvider>
       </body>
     </html>
