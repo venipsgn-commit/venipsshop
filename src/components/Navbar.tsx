@@ -32,6 +32,9 @@ export default function Navbar() {
             <Link href="/categorie/accessoires" className="px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium flex items-center gap-1">
               🎧 Accessoires
             </Link>
+            <Link href="/commandes" className="px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium flex items-center gap-1">
+              📦 Mes commandes
+            </Link>
           </nav>
 
           {/* Actions */}
@@ -82,6 +85,9 @@ export default function Navbar() {
             </Link>
             <Link href="/categorie/accessoires" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
               🎧 Accessoires
+            </Link>
+            <Link href="/commandes" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+              📦 Mes commandes
             </Link>
           </div>
         )}

@@ -213,8 +213,8 @@ export default function CommandePage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nom du transiteur / livreur *
-                    <span className="ml-1 text-xs text-gray-400 font-normal">(personne ou société chargée de la livraison)</span>
+                    Nom du transiteur / livreur
+                    <span className="ml-1 text-xs text-gray-400 font-normal">(optionnel — personne ou société chargée de la livraison)</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -224,7 +224,6 @@ export default function CommandePage() {
                     </span>
                     <input
                       type="text"
-                      required
                       value={form.transiteur}
                       onChange={(e) => setForm({ ...form, transiteur: e.target.value })}
                       className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
