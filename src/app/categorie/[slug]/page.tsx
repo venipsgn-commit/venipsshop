@@ -57,16 +57,18 @@ export default async function CategoryPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Subcategory filters */}
         {subcategories.length > 1 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            <span className="text-sm font-medium text-gray-500 self-center mr-2">Filtrer :</span>
-            {subcategories.map((sub) => (
-              <span
-                key={sub}
-                className="px-4 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-gray-600 shadow-sm"
-              >
-                {sub} ({allProducts.filter((p) => p.subcategory === sub).length})
-              </span>
-            ))}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
+              <span className="text-sm font-medium text-gray-500 flex-shrink-0">Filtrer :</span>
+              {subcategories.map((sub) => (
+                <span
+                  key={sub}
+                  className="flex-shrink-0 px-3 sm:px-4 py-1.5 rounded-full bg-white border border-gray-200 text-xs sm:text-sm text-gray-600 shadow-sm whitespace-nowrap"
+                >
+                  {sub} ({allProducts.filter((p) => p.subcategory === sub).length})
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
@@ -79,7 +81,7 @@ export default async function CategoryPage({ params }: PageProps) {
                 {sub}
                 <span className="ml-2 text-sm font-normal text-gray-400">({subProducts.length} produits)</span>
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
                 {subProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

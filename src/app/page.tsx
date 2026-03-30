@@ -101,7 +101,7 @@ export default function HomePage() {
       {/* Categories */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Nos Catégories</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 md:grid-cols-3 gap-3 sm:gap-6">
           {(Object.entries(categoryInfo) as [string, typeof categoryInfo[keyof typeof categoryInfo]][]).map(([key, info]) => {
             const bgMap: Record<string, string> = {
               blue: 'bg-blue-50 hover:bg-blue-100',
@@ -113,12 +113,12 @@ export default function HomePage() {
               <Link
                 key={key}
                 href={`/categorie/${key}`}
-                className={`${bgMap[info.color]} rounded-2xl p-8 flex flex-col items-center text-center transition-colors group`}
+                className={`${bgMap[info.color]} rounded-xl sm:rounded-2xl p-4 sm:p-8 flex flex-col items-center text-center transition-colors group`}
               >
-                <span className="text-5xl mb-4 group-hover:scale-110 transition-transform inline-block">{info.icon}</span>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">{info.label}</h3>
-                <p className="text-gray-500 text-sm mb-3">{info.description}</p>
-                <span className="text-xs font-semibold text-gray-400 bg-white px-3 py-1 rounded-full">
+                <span className="text-3xl sm:text-5xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform inline-block">{info.icon}</span>
+                <h3 className="text-sm sm:text-xl font-bold text-gray-900 mb-0.5 sm:mb-1">{info.label}</h3>
+                <p className="text-gray-500 text-[10px] sm:text-sm hidden sm:block mb-3">{info.description}</p>
+                <span className="text-[10px] sm:text-xs font-semibold text-gray-400 bg-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mt-1">
                   {count} produits
                 </span>
               </Link>
@@ -135,7 +135,7 @@ export default function HomePage() {
               <h2 className="text-2xl font-bold text-gray-900">Nouveautés</h2>
               <p className="text-gray-500 text-sm">Les derniers produits arrivés en stock</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
               {newArrivals.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -150,7 +150,7 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-gray-900">Produits à la Une</h2>
           <p className="text-gray-500 text-sm">Sélection de nos meilleures offres</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           {featured.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
