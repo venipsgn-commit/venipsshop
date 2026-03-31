@@ -1,125 +1,86 @@
 'use client';
+import { createContext, useContext, useEffect, useReducer } from 'react';
+import { CartItem, Product } from '@/lib/types';
 
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { Product } from '@/lib/products';
+interface State { items: CartItem[]; isOpen: boolean; }
+type Action =
+  | { type: 'ADD'; product: Product }
+  | { type: 'REMOVE'; id: string }
+  | { type: 'SET_QTY'; id: string; qty: number }
+  | { type: 'CLEAR' }
+  | { type: 'TOGGLE' }
+  | { type: 'CLOSE' };
 
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
-interface CartState {
-  items: CartItem[];
-  isOpen: boolean;
-}
-
-type CartAction =
-  | { type: 'ADD_ITEM'; product: Product }
-  | { type: 'REMOVE_ITEM'; productId: string }
-  | { type: 'UPDATE_QUANTITY'; productId: string; quantity: number }
-  | { type: 'CLEAR_CART' }
-  | { type: 'TOGGLE_CART' }
-  | { type: 'CLOSE_CART' };
-
-const cartReducer = (state: CartState, action: CartAction): CartState => {
-  switch (action.type) {
-    case 'ADD_ITEM': {
-      const existing = state.items.find((i) => i.product.id === action.product.id);
-      if (existing) {
-        return {
-          ...state,
-          items: state.items.map((i) =>
-            i.product.id === action.product.id
-              ? { ...i, quantity: i.quantity + 1 }
-              : i
-          ),
-          isOpen: true,
-        };
-      }
-      return { ...state, items: [...state.items, { product: action.product, quantity: 1 }], isOpen: true };
+const reduce = (s: State, a: Action): State => {
+  switch (a.type) {
+    case 'ADD': {
+      const ex = s.items.find(i => i.product.id === a.product.id);
+      return { ...s, isOpen: true, items: ex
+        ? s.items.map(i => i.product.id === a.product.id ? { ...i, quantity: i.quantity + 1 } : i)
+        : [...s.items, { product: a.product, quantity: 1 }] };
     }
-    case 'REMOVE_ITEM':
-      return { ...state, items: state.items.filter((i) => i.product.id !== action.productId) };
-    case 'UPDATE_QUANTITY':
-      if (action.quantity <= 0) {
-        return { ...state, items: state.items.filter((i) => i.product.id !== action.productId) };
-      }
-      return {
-        ...state,
-        items: state.items.map((i) =>
-          i.product.id === action.productId ? { ...i, quantity: action.quantity } : i
-        ),
-      };
-    case 'CLEAR_CART':
-      return { ...state, items: [] };
-    case 'TOGGLE_CART':
-      return { ...state, isOpen: !state.isOpen };
-    case 'CLOSE_CART':
-      return { ...state, isOpen: false };
-    default:
-      return state;
+    case 'REMOVE': return { ...s, items: s.items.filter(i => i.product.id !== a.id) };
+    case 'SET_QTY':
+      if (a.qty <= 0) return { ...s, items: s.items.filter(i => i.product.id !== a.id) };
+      return { ...s, items: s.items.map(i => i.product.id === a.id ? { ...i, quantity: a.qty } : i) };
+    case 'CLEAR': return { ...s, items: [] };
+    case 'TOGGLE': return { ...s, isOpen: !s.isOpen };
+    case 'CLOSE': return { ...s, isOpen: false };
+    default: return s;
   }
 };
 
-interface CartContextType {
-  items: CartItem[];
-  isOpen: boolean;
-  addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+interface CartCtx {
+  items: CartItem[]; isOpen: boolean;
+  addItem: (p: Product) => void;
+  removeItem: (id: string) => void;
+  setQty: (id: string, qty: number) => void;
   clearCart: () => void;
-  toggleCart: () => void;
-  closeCart: () => void;
+  toggle: () => void;
+  close: () => void;
   totalItems: number;
   totalPrice: number;
 }
 
-const CartContext = createContext<CartContextType | null>(null);
+const Ctx = createContext<CartCtx | null>(null);
 
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(reduce, { items: [], isOpen: false });
 
   useEffect(() => {
-    const saved = localStorage.getItem('venipsshop-cart');
-    if (saved) {
-      const parsed = JSON.parse(saved) as CartItem[];
-      parsed.forEach((item) => {
-        for (let i = 0; i < item.quantity; i++) {
-          dispatch({ type: 'ADD_ITEM', product: item.product });
-        }
+    try {
+      const saved = JSON.parse(localStorage.getItem('vshop_cart') ?? '[]') as CartItem[];
+      saved.forEach(item => {
+        for (let i = 0; i < item.quantity; i++) dispatch({ type: 'ADD', product: item.product });
       });
-    }
+    } catch {}
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('venipsshop-cart', JSON.stringify(state.items));
+    localStorage.setItem('vshop_cart', JSON.stringify(state.items));
   }, [state.items]);
 
-  const totalItems = state.items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = state.items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+  const totalItems = state.items.reduce((s, i) => s + i.quantity, 0);
+  const totalPrice = state.items.reduce((s, i) => s + i.product.price * i.quantity, 0);
 
   return (
-    <CartContext.Provider
-      value={{
-        items: state.items,
-        isOpen: state.isOpen,
-        addItem: (product) => dispatch({ type: 'ADD_ITEM', product }),
-        removeItem: (productId) => dispatch({ type: 'REMOVE_ITEM', productId }),
-        updateQuantity: (productId, quantity) => dispatch({ type: 'UPDATE_QUANTITY', productId, quantity }),
-        clearCart: () => dispatch({ type: 'CLEAR_CART' }),
-        toggleCart: () => dispatch({ type: 'TOGGLE_CART' }),
-        closeCart: () => dispatch({ type: 'CLOSE_CART' }),
-        totalItems,
-        totalPrice,
-      }}
-    >
+    <Ctx.Provider value={{
+      items: state.items, isOpen: state.isOpen,
+      addItem: p => dispatch({ type: 'ADD', product: p }),
+      removeItem: id => dispatch({ type: 'REMOVE', id }),
+      setQty: (id, qty) => dispatch({ type: 'SET_QTY', id, qty }),
+      clearCart: () => dispatch({ type: 'CLEAR' }),
+      toggle: () => dispatch({ type: 'TOGGLE' }),
+      close: () => dispatch({ type: 'CLOSE' }),
+      totalItems, totalPrice,
+    }}>
       {children}
-    </CartContext.Provider>
+    </Ctx.Provider>
   );
-};
+}
 
 export const useCart = () => {
-  const ctx = useContext(CartContext);
+  const ctx = useContext(Ctx);
   if (!ctx) throw new Error('useCart must be used within CartProvider');
   return ctx;
 };

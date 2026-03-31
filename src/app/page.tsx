@@ -1,77 +1,83 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { products, getFeaturedProducts, categoryInfo, formatPrice } from '@/lib/products';
-import ProductCard from '@/components/ProductCard';
+import { products, getFeaturedProducts, getNewProducts } from '@/lib/data/products';
+import ProductCard from '@/components/ui/ProductCard';
+import { formatPrice } from '@/lib/storage';
+
+const CATEGORIES = [
+  { key: 'telephones',  label: 'Téléphones',  icon: '📱', desc: 'Smartphones dernière génération', color: 'from-blue-500 to-blue-700' },
+  { key: 'ordinateurs', label: 'Ordinateurs', icon: '💻', desc: 'Laptops & PC de bureau',          color: 'from-violet-500 to-violet-700' },
+  { key: 'accessoires', label: 'Accessoires', icon: '🎧', desc: 'Écouteurs, chargeurs & plus',     color: 'from-emerald-500 to-emerald-700' },
+  { key: 'gaming',      label: 'Gaming',      icon: '🎮', desc: 'Consoles & jeux vidéo',          color: 'from-red-500 to-red-700' },
+  { key: 'tv-audio',   label: 'TV & Audio',  icon: '📺', desc: 'Télévisions & enceintes',        color: 'from-orange-500 to-orange-700' },
+];
+
+const TESTIMONIALS = [
+  { name: 'Mamadou Diallo', role: 'Entrepreneur', note: 5, text: 'Livraison ultra rapide, produit conforme à la description. Je recommande VenipShop à 100% !', avatar: 'M' },
+  { name: 'Fatou Sow',      role: 'Étudiante',    note: 5, text: 'Mon iPhone est arrivé en parfait état, emballage soigné. Service client très réactif.', avatar: 'F' },
+  { name: 'Ibrahima Kane',  role: 'Ingénieur',    note: 5, text: 'J\'ai commandé un MacBook Pro, tout s\'est passé parfaitement. Prix compétitif !', avatar: 'I' },
+  { name: 'Aïssatou Ndiaye',role: 'Médecin',      note: 4, text: 'Bonne expérience d\'achat en ligne. Paiement facile via Wave. Produits authentiques.', avatar: 'A' },
+];
 
 export default function HomePage() {
-  const featured = getFeaturedProducts();
-  const newArrivals = products.filter((p) => p.badge === 'Nouveau');
+  const featured = getFeaturedProducts().slice(0, 8);
+  const newArrivals = getNewProducts().slice(0, 4);
+  const promoProducts = products.filter(p => p.originalPrice).slice(0, 4);
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-20 w-96 h-96 bg-indigo-300 rounded-full blur-3xl" />
+      {/* ─── HERO ─── */}
+      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="inline-block bg-blue-500/30 border border-blue-400/30 text-blue-100 text-sm px-3 py-1 rounded-full mb-4">
-                🎉 Livraison gratuite dès 150 000 FCFA
+              <span className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs sm:text-sm px-3 py-1.5 rounded-full mb-5 font-medium">
+                🎉 Livraison gratuite dès 100 000 FCFA
               </span>
-              <h1 className="text-4xl sm:text-5xl font-extrabold leading-tight mb-6">
-                La tech à votre portée,<br />
-                <span className="text-blue-200">au meilleur prix</span>
+              <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-5">
+                La tech à votre portée,
+                <span className="block text-orange-400 mt-1">au meilleur prix</span>
               </h1>
-              <p className="text-lg text-blue-100 mb-8 leading-relaxed">
-                Ordinateurs, téléphones et accessoires high-tech de qualité. Large gamme de produits, livraison rapide et service client disponible.
+              <p className="text-gray-400 text-base sm:text-lg mb-8 leading-relaxed max-w-lg">
+                Téléphones, ordinateurs et accessoires high-tech de qualité. Large gamme de produits authentiques avec livraison rapide au Sénégal.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/categorie/ordinateurs"
-                  className="bg-white text-blue-700 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 transition-colors shadow-lg"
-                >
-                  Explorer les produits
+                <Link href="/catalogue" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25 active:scale-95">
+                  Explorer le catalogue
                 </Link>
-                <Link
-                  href="/categorie/telephones"
-                  className="border border-white/40 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition-colors"
-                >
+                <Link href="/catalogue?cat=telephones" className="border border-gray-600 hover:border-orange-500 hover:text-orange-400 text-gray-300 px-6 py-3 rounded-xl font-semibold transition-all">
                   Voir les téléphones
                 </Link>
               </div>
-              <div className="flex flex-wrap gap-4 mt-8 text-sm text-blue-200">
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
-                  Produits authentiques
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
-                  Garantie constructeur
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
-                  Retours 30 jours
-                </span>
+              <div className="flex flex-wrap gap-5 mt-8">
+                {[['✓','Produits authentiques'],['✓','Garantie constructeur'],['✓','Retours 30 jours']].map(([icon,txt]) => (
+                  <span key={txt} className="flex items-center gap-1.5 text-sm text-gray-400">
+                    <span className="text-orange-400 font-bold">{icon}</span>{txt}
+                  </span>
+                ))}
               </div>
             </div>
+            {/* Hero images grid */}
             <div className="hidden lg:grid grid-cols-2 gap-4">
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden h-48 relative shadow-xl">
-                  <Image src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&q=80" alt="MacBook" fill className="object-cover" unoptimized />
+                <div className="rounded-2xl overflow-hidden h-52 relative shadow-2xl ring-1 ring-white/10">
+                  <Image src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80" alt="MacBook" fill className="object-cover" unoptimized />
                 </div>
-                <div className="rounded-2xl overflow-hidden h-36 relative shadow-xl">
-                  <Image src="https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&q=80" alt="AirPods" fill className="object-cover" unoptimized />
+                <div className="rounded-2xl overflow-hidden h-40 relative shadow-2xl ring-1 ring-white/10">
+                  <Image src="https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&q=80" alt="Écouteurs" fill className="object-cover" unoptimized />
                 </div>
               </div>
-              <div className="space-y-4 mt-8">
-                <div className="rounded-2xl overflow-hidden h-36 relative shadow-xl">
+              <div className="space-y-4 mt-10">
+                <div className="rounded-2xl overflow-hidden h-40 relative shadow-2xl ring-1 ring-white/10">
                   <Image src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80" alt="iPhone" fill className="object-cover" unoptimized />
                 </div>
-                <div className="rounded-2xl overflow-hidden h-48 relative shadow-xl">
-                  <Image src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80" alt="Samsung" fill className="object-cover" unoptimized />
+                <div className="rounded-2xl overflow-hidden h-52 relative shadow-2xl ring-1 ring-white/10">
+                  <Image src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&q=80" alt="Samsung" fill className="object-cover" unoptimized />
                 </div>
               </div>
             </div>
@@ -79,134 +85,192 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { value: '500+', label: 'Produits disponibles' },
-              { value: '50+', label: 'Marques référencées' },
-              { value: '10 000+', label: 'Clients satisfaits' },
-              { value: '4.8★', label: 'Note moyenne' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-2xl font-bold text-blue-600">{stat.value}</p>
-                <p className="text-sm text-gray-500">{stat.label}</p>
+      {/* ─── STATS ─── */}
+      <section className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            {[['500+','Produits disponibles'],['50+','Marques référencées'],['10 000+','Clients satisfaits'],['4.8★','Note moyenne']].map(([val,lbl]) => (
+              <div key={lbl} className="py-2">
+                <p className="text-2xl sm:text-3xl font-extrabold text-orange-500">{val}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{lbl}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categories */}
+      {/* ─── CATEGORIES ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Nos Catégories</h2>
-        <div className="grid grid-cols-3 md:grid-cols-3 gap-3 sm:gap-6">
-          {(Object.entries(categoryInfo) as [string, typeof categoryInfo[keyof typeof categoryInfo]][]).map(([key, info]) => {
-            const bgMap: Record<string, string> = {
-              blue: 'bg-blue-50 hover:bg-blue-100',
-              purple: 'bg-purple-50 hover:bg-purple-100',
-              emerald: 'bg-emerald-50 hover:bg-emerald-100',
-            };
-            const count = products.filter((p) => p.category === key).length;
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Nos Catégories</h2>
+          <p className="text-gray-500 mt-2 text-sm">Trouvez exactement ce dont vous avez besoin</p>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {CATEGORIES.map(cat => {
+            const count = products.filter(p => p.category === cat.key).length;
             return (
-              <Link
-                key={key}
-                href={`/categorie/${key}`}
-                className={`${bgMap[info.color]} rounded-xl sm:rounded-2xl p-4 sm:p-8 flex flex-col items-center text-center transition-colors group`}
-              >
-                <span className="text-3xl sm:text-5xl mb-2 sm:mb-4 group-hover:scale-110 transition-transform inline-block">{info.icon}</span>
-                <h3 className="text-sm sm:text-xl font-bold text-gray-900 mb-0.5 sm:mb-1">{info.label}</h3>
-                <p className="text-gray-500 text-[10px] sm:text-sm hidden sm:block mb-3">{info.description}</p>
-                <span className="text-[10px] sm:text-xs font-semibold text-gray-400 bg-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mt-1">
-                  {count} produits
-                </span>
+              <Link key={cat.key} href={`/catalogue?cat=${cat.key}`}
+                className="group relative overflow-hidden rounded-2xl bg-gray-900 text-white p-4 sm:p-6 flex flex-col items-center text-center hover:scale-105 transition-transform shadow-sm">
+                <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-20 group-hover:opacity-30 transition-opacity`} />
+                <span className="text-3xl sm:text-4xl mb-2 relative z-10">{cat.icon}</span>
+                <h3 className="font-bold text-sm sm:text-base relative z-10">{cat.label}</h3>
+                <p className="text-gray-400 text-[10px] sm:text-xs mt-1 relative z-10 hidden sm:block">{cat.desc}</p>
+                <span className="mt-2 text-[10px] sm:text-xs bg-white/10 px-2 py-0.5 rounded-full relative z-10">{count} produits</span>
               </Link>
             );
           })}
         </div>
       </section>
 
-      {/* New Arrivals */}
+      {/* ─── NOUVEAUTÉS ─── */}
       {newArrivals.length > 0 && (
         <section className="bg-white py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">Nouveautés</h2>
-              <p className="text-gray-500 text-sm">Les derniers produits arrivés en stock</p>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-extrabold text-gray-900">Nouveautés</h2>
+                <p className="text-gray-500 text-sm mt-1">Les derniers arrivages en stock</p>
+              </div>
+              <Link href="/catalogue?badge=Nouveau" className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+                Voir tout →
+              </Link>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-              {newArrivals.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+              {newArrivals.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
           </div>
         </section>
       )}
 
-      {/* Featured */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Produits à la Une</h2>
-          <p className="text-gray-500 text-sm">Sélection de nos meilleures offres</p>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
-          {featured.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
-
-      {/* Promo Banner */}
-      <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-14">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-            <div>
-              <span className="text-orange-400 font-semibold text-sm uppercase tracking-wider">Offre spéciale</span>
-              <h2 className="text-3xl font-bold mt-2 mb-4">
-                Jusqu&apos;à <span className="text-orange-400">-25%</span> sur les accessoires
-              </h2>
-              <p className="text-gray-400 mb-6">Profitez de nos promotions sur une large sélection d&apos;accessoires pour ordinateurs et téléphones.</p>
-              <Link
-                href="/categorie/accessoires"
-                className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
-              >
-                Voir les offres
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+      {/* ─── PROMO BANNER ─── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-3xl overflow-hidden relative">
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          </div>
+          <div className="relative z-10 px-6 sm:px-12 py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="text-white text-center sm:text-left">
+              <p className="text-sm font-semibold uppercase tracking-widest text-orange-100">Offre spéciale</p>
+              <h2 className="text-2xl sm:text-4xl font-extrabold mt-1">Jusqu&apos;à <span className="text-white">-25%</span></h2>
+              <p className="text-orange-100 mt-1">Utilisez le code <strong className="bg-white/20 px-2 py-0.5 rounded font-mono">NOEL25</strong> à la caisse</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              {products.filter((p) => p.category === 'accessoires' && p.originalPrice).slice(0, 4).map((product) => (
-                <div key={product.id} className="bg-gray-800 rounded-xl p-3">
-                  <div className="relative h-24 rounded-lg overflow-hidden mb-2">
-                    <Image src={product.image} alt={product.name} fill className="object-cover" unoptimized />
-                  </div>
-                  <p className="text-xs font-medium truncate text-gray-200">{product.name}</p>
-                  <p className="text-orange-400 text-sm font-bold">{formatPrice(product.price)}</p>
-                </div>
-              ))}
-            </div>
+            <Link href="/catalogue" className="bg-white text-orange-600 hover:bg-orange-50 font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg whitespace-nowrap">
+              Profiter de l&apos;offre
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { icon: '🚚', title: 'Livraison Rapide', desc: 'Livraison en 24-48h sur Dakar, 3-5 jours en région' },
-            { icon: '🔒', title: 'Paiement Sécurisé', desc: 'Transactions sécurisées via Orange Money, Wave et CB' },
-            { icon: '↩️', title: 'Retours Gratuits', desc: '30 jours pour retourner un produit sans frais' },
-            { icon: '💬', title: 'Support 7j/7', desc: 'Notre équipe est disponible pour vous aider' },
-          ].map((f) => (
-            <div key={f.title} className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-100">
-              <div className="text-4xl mb-3">{f.icon}</div>
-              <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
-              <p className="text-sm text-gray-500">{f.desc}</p>
+      {/* ─── PRODUITS VEDETTES ─── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-14">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-extrabold text-gray-900">Produits Populaires</h2>
+            <p className="text-gray-500 text-sm mt-1">Les meilleures ventes du moment</p>
+          </div>
+          <Link href="/catalogue" className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+            Voir tout →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
+          {featured.map(p => <ProductCard key={p.id} product={p} />)}
+        </div>
+      </section>
+
+      {/* ─── PROMOTIONS ─── */}
+      {promoProducts.length > 0 && (
+        <section className="bg-gray-900 py-14">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-extrabold text-white">Promotions</h2>
+                <p className="text-gray-400 text-sm mt-1">Offres à durée limitée</p>
+              </div>
+              <Link href="/catalogue?badge=Promo" className="text-sm font-semibold text-orange-400 hover:text-orange-300">Voir tout →</Link>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {promoProducts.map(p => {
+                const disc = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
+                return (
+                  <Link key={p.id} href={`/produit/${p.id}`} className="bg-gray-800 hover:bg-gray-700 rounded-2xl p-3 sm:p-4 transition-colors group">
+                    <div className="relative h-32 sm:h-40 rounded-xl overflow-hidden mb-3">
+                      <Image src={p.images[0]} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
+                      {disc > 0 && <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{disc}%</span>}
+                    </div>
+                    <p className="text-xs font-semibold text-orange-400 uppercase mb-0.5">{p.brand}</p>
+                    <p className="text-white text-sm font-semibold line-clamp-2 mb-2">{p.name}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-orange-400 font-bold text-sm">{formatPrice(p.price)}</span>
+                      {p.originalPrice && <span className="text-gray-500 text-xs line-through">{formatPrice(p.originalPrice)}</span>}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── AVIS CLIENTS ─── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Ce que disent nos clients</h2>
+          <p className="text-gray-500 mt-2 text-sm">Plus de 10 000 clients satisfaits</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {TESTIMONIALS.map(t => (
+            <div key={t.name} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div className="flex gap-0.5 mb-3">
+                {[1,2,3,4,5].map(s => (
+                  <svg key={s} className={`w-4 h-4 ${s <= t.note ? 'text-yellow-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                ))}
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{t.avatar}</div>
+                <div>
+                  <p className="font-semibold text-sm text-gray-900">{t.name}</p>
+                  <p className="text-xs text-gray-400">{t.role}</p>
+                </div>
+              </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ─── FEATURES ─── */}
+      <section className="bg-white border-t border-gray-100 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: '🚚', title: 'Livraison Rapide', desc: '24-48h sur Dakar, 3-5 jours partout au Sénégal' },
+              { icon: '🔒', title: 'Paiement Sécurisé', desc: 'Wave, Orange Money, carte bancaire' },
+              { icon: '↩️', title: 'Retours Gratuits', desc: '30 jours pour retourner sans frais' },
+              { icon: '💬', title: 'Support 7j/7', desc: 'Équipe disponible par chat et téléphone' },
+            ].map(f => (
+              <div key={f.title} className="flex items-start gap-4">
+                <span className="text-3xl flex-shrink-0">{f.icon}</span>
+                <div>
+                  <p className="font-bold text-gray-900 text-sm">{f.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── NEWSLETTER ─── */}
+      <section className="bg-gray-50 py-14 border-t border-gray-100">
+        <div className="max-w-xl mx-auto px-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 mb-2">Restez informé des offres</h2>
+          <p className="text-gray-500 text-sm mb-6">Recevez nos meilleures promotions directement dans votre boîte mail.</p>
+          <form onSubmit={e => e.preventDefault()} className="flex gap-2">
+            <input type="email" placeholder="Votre adresse email" className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" />
+            <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl font-semibold transition-colors text-sm whitespace-nowrap">S&apos;abonner</button>
+          </form>
         </div>
       </section>
     </div>
