@@ -79,12 +79,13 @@ export const saveAdminProducts = (products: Product[]) => set('vshop_products', 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
 
 export const formatPrice = (price: number) =>
-  new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', maximumFractionDigits: 0 }).format(price);
+  new Intl.NumberFormat('fr-GN', { maximumFractionDigits: 0 }).format(price) + ' GNF';
 
 export const formatPriceShort = (price: number) => {
-  if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(1).replace('.0', '')}M FCFA`;
-  if (price >= 1_000) return `${Math.round(price / 1_000)}K FCFA`;
-  return `${price} FCFA`;
+  if (price >= 1_000_000_000) return `${(price / 1_000_000_000).toFixed(1).replace('.0', '')}Md GNF`;
+  if (price >= 1_000_000) return `${(price / 1_000_000).toFixed(1).replace('.0', '')}M GNF`;
+  if (price >= 1_000) return `${Math.round(price / 1_000)}K GNF`;
+  return `${price} GNF`;
 };
 
 export const getStatusLabel = (status: Order['status']) => ({

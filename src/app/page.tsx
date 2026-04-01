@@ -37,7 +37,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <span className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs sm:text-sm px-3 py-1.5 rounded-full mb-5 font-medium">
-                🎉 Livraison gratuite dès 100 000 FCFA
+                🎉 Livraison gratuite dès 100 000 GNF
               </span>
               <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-5">
                 La tech à votre portée,

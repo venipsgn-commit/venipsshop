@@ -175,7 +175,7 @@ export default function AdminProduits() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Prix (FCFA) *</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Prix (GNF) *</label>
                     <input type="number" value={form.price || ''} onChange={e => setForm(prev => ({ ...prev, price: Number(e.target.value) }))}
                       placeholder="150000"
                       className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />

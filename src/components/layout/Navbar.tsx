@@ -40,7 +40,7 @@ export default function Navbar() {
       {/* Top bar */}
       <div className="border-b border-gray-800 hidden sm:block">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-8 text-xs text-gray-400">
-          <span>🚚 Livraison gratuite dès 100 000 FCFA</span>
+          <span>🚚 Livraison gratuite dès 100 000 GNF</span>
           <div className="flex gap-4">
             <Link href="/catalogue" className="hover:text-orange-400 transition-colors">Catalogue</Link>
             {user?.role === 'admin' && <Link href="/admin" className="hover:text-orange-400 transition-colors text-orange-400">⚙️ Admin</Link>}
