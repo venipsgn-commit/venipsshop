@@ -5,8 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { formatPrice, formatPriceShort, createOrder } from '@/lib/storage';
-import { PROMO_CODES } from '@/lib/data/products';
+import { formatPrice, formatPriceShort } from '@/lib/storage';
 import type { Address } from '@/lib/types';
 
 type Step = 'adresse' | 'paiement' | 'confirmation';
@@ -26,6 +25,8 @@ export default function CheckoutPage() {
   const [promoApplied, setPromoApplied] = useState('');
   const [promoError, setPromoError] = useState('');
   const [orderDone, setOrderDone] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const [addr, setAddr] = useState<Address>({
     id: '',
@@ -67,10 +68,13 @@ export default function CheckoutPage() {
     );
   }
 
+  // Known promo codes (display only — server validates on submit)
+  const KNOWN_PROMOS: Record<string, number> = { 'GUINEE10': 10, 'BIENVENUE': 5 };
+
   const applyPromo = () => {
     const code = promoInput.trim().toUpperCase();
-    const pct = PROMO_CODES[code];
-    if (!pct) { setPromoError('Code invalide.'); return; }
+    const pct = KNOWN_PROMOS[code];
+    if (!pct) { setPromoError('Code promo invalide.'); return; }
     setPromoDiscount(pct);
     setPromoApplied(code);
     setPromoError('');
@@ -87,30 +91,31 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     if (!user) { router.push('/auth/connexion?redirect=/paiement'); return; }
-    const order = createOrder({
-      userId: user.id,
-      items: items.map(i => ({
-        productId: i.product.id,
-        productName: i.product.name,
-        productImage: i.product.images[0],
-        quantity: i.quantity,
-        price: i.product.price,
-      })),
-      subtotal: total,
-      shippingCost,
-      discount: discountAmt,
-      total: grandTotal,
-      status: 'en_attente',
-      promoCode: promoApplied || undefined,
-      address: { ...addr, id: `adr_${Date.now()}` },
-      paymentMethod: payMethod,
-      estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    });
-    clearCart();
-    setOrderDone(order.id);
-    setStep('confirmation');
+    setSubmitting(true);
+    setSubmitError('');
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({ productId: i.product.id, quantity: i.quantity })),
+          address: { ...addr, id: `adr_${Date.now()}` },
+          paymentMethod: payMethod,
+          promoCode: promoApplied || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setSubmitError(data.error ?? 'Erreur lors de la commande.'); return; }
+      clearCart();
+      setOrderDone(data.order.id);
+      setStep('confirmation');
+    } catch {
+      setSubmitError('Erreur réseau. Veuillez réessayer.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Confirmation screen
@@ -249,9 +254,13 @@ export default function CheckoutPage() {
                 <button onClick={() => setStep('adresse')} className="text-sm text-gray-500 hover:text-gray-700 transition-colors">← Retour</button>
               </div>
 
-              <button onClick={placeOrder}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25 text-base">
-                Confirmer la commande – {formatPrice(grandTotal)}
+              {submitError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{submitError}</div>
+              )}
+
+              <button onClick={placeOrder} disabled={submitting}
+                className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25 text-base">
+                {submitting ? 'Traitement en cours...' : `Confirmer la commande – ${formatPrice(grandTotal)}`}
               </button>
 
               <p className="text-xs text-gray-400 text-center mt-3">🔒 Paiement sécurisé SSL. Vos données sont protégées.</p>

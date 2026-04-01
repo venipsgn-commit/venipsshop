@@ -1,20 +1,26 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { getUsers, getUserOrders, formatPrice } from '@/lib/storage';
-import type { User } from '@/lib/types';
+import { formatPrice } from '@/lib/storage';
+
+interface ClientRow {
+  id: string; nom: string; prenom: string; email: string;
+  telephone: string; role: 'user' | 'admin'; createdAt: string;
+  orderCount: number; totalSpent: number;
+}
 
 export default function AdminClients() {
+  const [users, setUsers] = useState<ClientRow[]>([]);
   const [search, setSearch] = useState('');
-  const users = getUsers();
+
+  useEffect(() => {
+    fetch('/api/admin/users').then(r => r.json()).then(({ users }) => setUsers(users ?? []));
+  }, []);
 
   const filtered = users.filter(u => {
     const q = search.toLowerCase();
-    return !q ||
-      u.nom.toLowerCase().includes(q) ||
-      u.prenom.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q) ||
-      u.telephone.includes(q);
+    return !q || u.nom.toLowerCase().includes(q) || u.prenom.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) || u.telephone.includes(q);
   });
 
   return (
@@ -29,9 +35,7 @@ export default function AdminClients() {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-            Aucun client trouvé.
-          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">Aucun client trouvé.</div>
         ) : (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
@@ -47,34 +51,30 @@ export default function AdminClients() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {filtered.map((u: User) => {
-                    const userOrders = getUserOrders(u.id);
-                    const spent = userOrders.filter(o => o.status === 'livre').reduce((s, o) => s + o.total, 0);
-                    return (
-                      <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-5 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                              {u.prenom[0]}{u.nom[0]}
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">{u.prenom} {u.nom}</p>
-                              <p className="text-xs text-gray-400">Depuis {new Date(u.createdAt).toLocaleDateString('fr-FR')}</p>
-                            </div>
+                  {filtered.map(u => (
+                    <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            {u.prenom[0]}{u.nom[0]}
                           </div>
-                        </td>
-                        <td className="px-5 py-3 text-gray-500 hidden sm:table-cell">{u.email}</td>
-                        <td className="px-5 py-3 text-gray-500 hidden md:table-cell">{u.telephone}</td>
-                        <td className="px-5 py-3 text-center font-semibold text-gray-900">{userOrders.length}</td>
-                        <td className="px-5 py-3 text-right font-bold text-gray-900">{formatPrice(spent)}</td>
-                        <td className="px-5 py-3 text-center">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>
-                            {u.role === 'admin' ? 'Admin' : 'Client'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          <div>
+                            <p className="font-semibold text-gray-900">{u.prenom} {u.nom}</p>
+                            <p className="text-xs text-gray-400">Depuis {new Date(u.createdAt).toLocaleDateString('fr-FR')}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 text-gray-500 hidden sm:table-cell">{u.email}</td>
+                      <td className="px-5 py-3 text-gray-500 hidden md:table-cell">{u.telephone}</td>
+                      <td className="px-5 py-3 text-center font-semibold text-gray-900">{u.orderCount}</td>
+                      <td className="px-5 py-3 text-right font-bold text-gray-900">{formatPrice(u.totalSpent)}</td>
+                      <td className="px-5 py-3 text-center">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>
+                          {u.role === 'admin' ? 'Admin' : 'Client'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

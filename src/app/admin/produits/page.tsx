@@ -1,16 +1,9 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { products as defaultProducts } from '@/lib/data/products';
-import { getAdminProducts, saveAdminProducts, formatPrice } from '@/lib/storage';
+import { formatPrice } from '@/lib/storage';
 import type { Product, Category } from '@/lib/types';
-
-function getProducts(): Product[] {
-  const admin = getAdminProducts();
-  return admin || defaultProducts;
-}
 
 const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'telephones', label: 'Téléphones' },
@@ -21,61 +14,61 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'smart-home', label: 'Smart Home' },
 ];
 
-const EMPTY_PRODUCT: Omit<Product, 'id'> = {
-  name: '', brand: '', category: 'telephones', subcategory: '',
-  price: 0, originalPrice: undefined, description: '', shortDesc: '',
-  features: [], specs: {}, images: [''], stock: 0,
-  rating: 5, reviewCount: 0, reviews: [],
-  badge: undefined, isNew: false, isFeatured: false,
+const EMPTY_FORM = {
+  name: '', brand: '', category: 'telephones' as Category, subcategory: '',
+  price: 0, originalPrice: undefined as number | undefined, description: '', shortDesc: '',
+  images: [''], stock: 0, badge: undefined as Product['badge'], isFeatured: false,
 };
 
 export default function AdminProduits() {
-  const [allProducts, setAllProducts] = useState<Product[]>(() => getProducts());
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState<'all' | Category>('all');
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [form, setForm] = useState<Omit<Product, 'id'>>(EMPTY_PRODUCT);
+  const [form, setForm] = useState(EMPTY_FORM);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const loadProducts = useCallback(() => {
+    fetch('/api/products').then(r => r.json()).then(({ products }) => setAllProducts(products ?? []));
+  }, []);
+
+  useEffect(() => { loadProducts(); }, [loadProducts]);
 
   const filtered = allProducts.filter(p => {
     const matchCat = catFilter === 'all' || p.category === catFilter;
     const q = search.toLowerCase();
-    const matchSearch = !q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q);
-    return matchCat && matchSearch;
+    return matchCat && (!q || p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
   });
 
-  const saveProducts = useCallback((updated: Product[]) => {
-    saveAdminProducts(updated);
-    setAllProducts(updated);
-  }, []);
+  const openAdd = () => { setEditingProduct(null); setForm(EMPTY_FORM); setError(''); setShowModal(true); };
+  const openEdit = (p: Product) => { setEditingProduct(p); setForm({ ...EMPTY_FORM, ...p }); setError(''); setShowModal(true); };
 
-  const openAdd = () => {
-    setEditingProduct(null);
-    setForm(EMPTY_PRODUCT);
-    setShowModal(true);
-  };
-
-  const openEdit = (p: Product) => {
-    setEditingProduct(p);
-    setForm({ ...p });
-    setShowModal(true);
-  };
-
-  const handleSave = () => {
-    if (!form.name.trim() || !form.brand.trim()) return;
-    if (editingProduct) {
-      saveProducts(allProducts.map(p => p.id === editingProduct.id ? { ...form, id: editingProduct.id } : p));
-    } else {
-      const newP: Product = { ...form, id: `prod_${Date.now()}` };
-      saveProducts([newP, ...allProducts]);
+  const handleSave = async () => {
+    if (!form.name.trim() || !form.brand.trim() || !form.price || !form.stock) {
+      setError('Veuillez remplir tous les champs obligatoires.'); return;
     }
-    setShowModal(false);
+    setSaving(true); setError('');
+    try {
+      const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products';
+      const method = editingProduct ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) { const d = await res.json(); setError(d.error ?? 'Erreur'); return; }
+      loadProducts();
+      setShowModal(false);
+    } finally { setSaving(false); }
   };
 
-  const handleDelete = (id: string) => {
-    saveProducts(allProducts.filter(p => p.id !== id));
+  const handleDelete = async (id: string) => {
+    await fetch(`/api/products/${id}`, { method: 'DELETE' });
     setDeleteConfirm(null);
+    loadProducts();
   };
 
   return (
@@ -88,10 +81,8 @@ export default function AdminProduits() {
           </button>
         </div>
 
-        {/* Filters */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher..."
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..."
             className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
           <div className="flex gap-2 flex-wrap">
             <button onClick={() => setCatFilter('all')} className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${catFilter === 'all' ? 'bg-orange-500 text-white' : 'border border-gray-200 text-gray-600'}`}>Toutes</button>
@@ -101,14 +92,13 @@ export default function AdminProduits() {
           </div>
         </div>
 
-        {/* Products grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(p => (
             <div key={p.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="relative h-36 bg-gray-50">
-                <Image src={p.images[0]} alt={p.name} fill className="object-contain p-3" unoptimized />
+                {p.images[0] && <Image src={p.images[0]} alt={p.name} fill className="object-contain p-3" unoptimized />}
                 {p.badge && <span className="absolute top-2 left-2 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{p.badge}</span>}
-                <div className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${p.stock > 0 ? 'bg-green-400' : 'bg-red-400'}`} title={p.stock > 0 ? 'En stock' : 'Rupture'} />
+                <div className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${p.stock > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
               </div>
               <div className="p-4">
                 <p className="text-xs text-orange-500 font-semibold mb-0.5">{p.brand} · {CATEGORIES.find(c => c.value === p.category)?.label}</p>
@@ -119,8 +109,8 @@ export default function AdminProduits() {
                     <p className="text-xs text-gray-400">Stock : {p.stock}</p>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => openEdit(p)} className="w-8 h-8 rounded-xl border border-gray-200 hover:border-blue-400 hover:text-blue-500 flex items-center justify-center text-gray-400 transition-all text-sm">✏️</button>
-                    <button onClick={() => setDeleteConfirm(p.id)} className="w-8 h-8 rounded-xl border border-gray-200 hover:border-red-400 hover:text-red-500 flex items-center justify-center text-gray-400 transition-all text-sm">🗑️</button>
+                    <button onClick={() => openEdit(p)} className="w-8 h-8 rounded-xl border border-gray-200 hover:border-blue-400 flex items-center justify-center text-gray-400 transition-all text-sm">✏️</button>
+                    <button onClick={() => setDeleteConfirm(p.id)} className="w-8 h-8 rounded-xl border border-gray-200 hover:border-red-400 flex items-center justify-center text-gray-400 transition-all text-sm">🗑️</button>
                   </div>
                 </div>
               </div>
@@ -128,7 +118,6 @@ export default function AdminProduits() {
           ))}
         </div>
 
-        {/* Delete confirm */}
         {deleteConfirm && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
@@ -142,34 +131,32 @@ export default function AdminProduits() {
           </div>
         )}
 
-        {/* Add/Edit modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
             <div className="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl my-4">
-              <h3 className="font-extrabold text-gray-900 text-lg mb-5">
-                {editingProduct ? 'Modifier le produit' : 'Nouveau produit'}
-              </h3>
+              <h3 className="font-extrabold text-gray-900 text-lg mb-5">{editingProduct ? 'Modifier le produit' : 'Nouveau produit'}</h3>
+              {error && <p className="text-red-500 text-sm mb-3 bg-red-50 px-3 py-2 rounded-xl">{error}</p>}
               <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-2">
-                {/* Basic fields */}
                 {[
-                  { key: 'name', label: 'Nom du produit *', type: 'text', placeholder: 'iPhone 16 Pro' },
-                  { key: 'brand', label: 'Marque *', type: 'text', placeholder: 'Apple' },
-                  { key: 'subcategory', label: 'Sous-catégorie', type: 'text', placeholder: 'Smartphones' },
-                  { key: 'shortDesc', label: 'Description courte', type: 'text', placeholder: 'Résumé en 1 ligne' },
+                  { key: 'name', label: 'Nom du produit *', placeholder: 'iPhone 16 Pro' },
+                  { key: 'brand', label: 'Marque *', placeholder: 'Apple' },
+                  { key: 'subcategory', label: 'Sous-catégorie', placeholder: 'Smartphones' },
+                  { key: 'shortDesc', label: 'Description courte', placeholder: 'Résumé en 1 ligne' },
                 ].map(f => (
                   <div key={f.key}>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">{f.label}</label>
-                    <input type={f.type} value={(form as unknown as Record<string, string>)[f.key] || ''}
+                    <input type="text" value={(form as unknown as Record<string, string>)[f.key] || ''}
                       onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                       placeholder={f.placeholder}
                       className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+
                   </div>
                 ))}
 
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1.5">Description</label>
                   <textarea value={form.description} onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3} placeholder="Description complète du produit"
+                    rows={3} placeholder="Description complète"
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none" />
                 </div>
 
@@ -177,20 +164,17 @@ export default function AdminProduits() {
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Prix (GNF) *</label>
                     <input type="number" value={form.price || ''} onChange={e => setForm(prev => ({ ...prev, price: Number(e.target.value) }))}
-                      placeholder="150000"
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      placeholder="150000" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Prix original</label>
                     <input type="number" value={form.originalPrice || ''} onChange={e => setForm(prev => ({ ...prev, originalPrice: e.target.value ? Number(e.target.value) : undefined }))}
-                      placeholder="200000"
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      placeholder="200000" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Stock *</label>
                     <input type="number" value={form.stock || ''} onChange={e => setForm(prev => ({ ...prev, stock: Number(e.target.value) }))}
-                      placeholder="50"
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      placeholder="50" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Catégorie</label>
@@ -204,8 +188,7 @@ export default function AdminProduits() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1.5">URL de l&apos;image</label>
                   <input type="url" value={form.images[0] || ''} onChange={e => setForm(prev => ({ ...prev, images: [e.target.value] }))}
-                    placeholder="https://..."
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                    placeholder="https://..." className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
@@ -217,7 +200,7 @@ export default function AdminProduits() {
                       {['Nouveau','Promo','Populaire','Gaming','Best Seller','Exclusif'].map(b => <option key={b} value={b}>{b}</option>)}
                     </select>
                   </div>
-                  <div className="flex items-end pb-2.5 gap-4">
+                  <div className="flex items-end pb-2.5">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={form.isFeatured || false} onChange={e => setForm(prev => ({ ...prev, isFeatured: e.target.checked }))} className="accent-orange-500" />
                       <span className="text-xs font-semibold text-gray-700">Produit vedette</span>
@@ -227,12 +210,11 @@ export default function AdminProduits() {
               </div>
 
               <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100">
-                <button onClick={handleSave} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold text-sm transition-colors">
-                  {editingProduct ? 'Enregistrer' : 'Ajouter le produit'}
+                <button onClick={handleSave} disabled={saving}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white py-3 rounded-xl font-bold text-sm transition-colors">
+                  {saving ? 'Enregistrement...' : editingProduct ? 'Enregistrer' : 'Ajouter le produit'}
                 </button>
-                <button onClick={() => setShowModal(false)} className="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors">
-                  Annuler
-                </button>
+                <button onClick={() => setShowModal(false)} className="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors">Annuler</button>
               </div>
             </div>
           </div>

@@ -1,32 +1,42 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { getAllOrders, saveAllOrders, formatPrice, getStatusLabel } from '@/lib/storage';
+import { formatPrice, getStatusLabel } from '@/lib/storage';
 import type { Order, OrderStatus } from '@/lib/types';
 
 const ALL_STATUSES: OrderStatus[] = ['en_attente', 'confirme', 'en_preparation', 'expedie', 'livre', 'annule'];
 
 export default function AdminCommandes() {
-  const [orders, setOrders] = useState<Order[]>(() => getAllOrders().reverse());
+  const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<'all' | OrderStatus>('all');
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const updateStatus = useCallback((orderId: string, status: OrderStatus) => {
-    const updated = getAllOrders().map(o =>
-      o.id === orderId ? { ...o, status, updatedAt: new Date().toISOString() } : o
-    );
-    saveAllOrders(updated);
-    setOrders(updated.slice().reverse());
+  useEffect(() => {
+    fetch('/api/orders?all=1')
+      .then(r => r.json())
+      .then(({ orders }) => setOrders(orders ?? []));
   }, []);
 
-  const updateTransiteur = useCallback((orderId: string, transiteur: string) => {
-    const updated = getAllOrders().map(o =>
-      o.id === orderId ? { ...o, transiteur, updatedAt: new Date().toISOString() } : o
-    );
-    saveAllOrders(updated);
-    setOrders(updated.slice().reverse());
+  const updateStatus = useCallback(async (orderId: string, status: OrderStatus) => {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (res.ok) {
+      const { order } = await res.json();
+      setOrders(prev => prev.map(o => o.id === orderId ? order : o));
+    }
+  }, []);
+
+  const updateTransiteur = useCallback(async (orderId: string, transiteur: string) => {
+    await fetch(`/api/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transiteur }),
+    });
   }, []);
 
   const filtered = orders.filter(o => {
@@ -43,7 +53,6 @@ export default function AdminCommandes() {
       <div className="space-y-5">
         <h1 className="text-2xl font-extrabold text-gray-900">Gestion des commandes <span className="text-gray-400 font-normal text-lg">({filtered.length})</span></h1>
 
-        {/* Filters */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher par ID, client, téléphone..."
@@ -58,11 +67,8 @@ export default function AdminCommandes() {
           </div>
         </div>
 
-        {/* Orders list */}
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
-            Aucune commande trouvée.
-          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">Aucune commande trouvée.</div>
         ) : (
           <div className="space-y-3">
             {filtered.map(order => {
@@ -72,16 +78,14 @@ export default function AdminCommandes() {
                 <div key={order.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                   <button onClick={() => setExpanded(isOpen ? null : order.id)} className="w-full p-4 text-left">
                     <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-bold text-gray-900 text-sm">{order.id}</p>
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>{st?.label}</span>
-                          </div>
-                          <p className="text-xs text-gray-400 mt-0.5">
-                            {order.address.prenom} {order.address.nom} · {order.address.telephone} · {new Date(order.createdAt).toLocaleDateString('fr-FR')}
-                          </p>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-bold text-gray-900 text-sm">{order.id}</p>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>{st?.label}</span>
                         </div>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {order.address.prenom} {order.address.nom} · {order.address.telephone} · {new Date(order.createdAt).toLocaleDateString('fr-FR')}
+                        </p>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-extrabold text-gray-900">{formatPrice(order.total)}</span>
@@ -94,7 +98,6 @@ export default function AdminCommandes() {
 
                   {isOpen && (
                     <div className="border-t border-gray-100 p-5 space-y-5">
-                      {/* Items */}
                       <div>
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Articles</p>
                         <div className="space-y-2">
@@ -113,7 +116,6 @@ export default function AdminCommandes() {
                         </div>
                       </div>
 
-                      {/* Address */}
                       <div>
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Livraison</p>
                         <p className="text-sm text-gray-700">{order.address.prenom} {order.address.nom}</p>
@@ -124,19 +126,14 @@ export default function AdminCommandes() {
                         )}
                       </div>
 
-                      {/* Transiteur */}
                       <div>
                         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Transiteur (optionnel)</label>
-                        <input
-                          type="text"
-                          defaultValue={order.transiteur || ''}
+                        <input type="text" defaultValue={order.transiteur || ''}
                           onBlur={e => updateTransiteur(order.id, e.target.value)}
                           placeholder="Nom du livreur / transporteur"
-                          className="w-full sm:w-64 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        />
+                          className="w-full sm:w-64 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
                       </div>
 
-                      {/* Status update */}
                       <div>
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Changer le statut</p>
                         <div className="flex flex-wrap gap-2">

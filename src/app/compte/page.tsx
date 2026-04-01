@@ -1,27 +1,33 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AccountLayout from '@/components/layout/AccountLayout';
 import { useAuth } from '@/context/AuthContext';
-import { getUserOrders, formatPrice, getStatusLabel } from '@/lib/storage';
+import { formatPrice, getStatusLabel } from '@/lib/storage';
+import type { Order } from '@/lib/types';
 
 export default function CompteHome() {
   const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/orders').then(r => r.json()).then(({ orders }) => setOrders(orders ?? []));
+  }, [user]);
+
   if (!user) return null;
 
-  const orders = getUserOrders(user.id);
-  const recent = orders.slice(-3).reverse();
+  const recent = orders.slice(0, 3);
   const totalSpent = orders.filter(o => o.status === 'livre').reduce((s, o) => s + o.total, 0);
 
   return (
     <AccountLayout>
       <div className="space-y-6">
-        {/* Welcome */}
         <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
           <h1 className="text-2xl font-extrabold mb-1">Bonjour, {user.prenom} ! 👋</h1>
           <p className="text-orange-100 text-sm">Bienvenue sur votre espace personnel VenipShop.</p>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
             { icon: '📦', label: 'Commandes', value: orders.length },
@@ -36,7 +42,6 @@ export default function CompteHome() {
           ))}
         </div>
 
-        {/* Quick links */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { href: '/compte/profil', icon: '👤', label: 'Modifier profil' },
@@ -52,7 +57,6 @@ export default function CompteHome() {
           ))}
         </div>
 
-        {/* Recent orders */}
         {recent.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
@@ -69,9 +73,7 @@ export default function CompteHome() {
                       <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('fr-FR')} · {order.items.length} article{order.items.length > 1 ? 's' : ''}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>
-                        {st?.label}
-                      </span>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>{st?.label}</span>
                       <span className="font-bold text-gray-900 text-sm">{formatPrice(order.total)}</span>
                     </div>
                   </div>

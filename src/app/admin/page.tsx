@@ -1,29 +1,38 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { getAllOrders, getUsers, formatPrice } from '@/lib/storage';
-import { products } from '@/lib/data/products';
-import { getStatusLabel } from '@/lib/storage';
+import { formatPrice, getStatusLabel } from '@/lib/storage';
+import type { Order } from '@/lib/types';
 
 export default function AdminDashboard() {
-  const orders = getAllOrders();
-  const users = getUsers();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [userCount, setUserCount] = useState(0);
+  const [productCount, setProductCount] = useState(0);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/orders?all=1').then(r => r.json()),
+      fetch('/api/admin/users').then(r => r.json()),
+      fetch('/api/products').then(r => r.json()),
+    ]).then(([od, ud, pd]) => {
+      setOrders(od.orders ?? []);
+      setUserCount((ud.users ?? []).length);
+      setProductCount((pd.products ?? []).length);
+    });
+  }, []);
 
   const totalRevenue = orders.filter(o => o.status === 'livre').reduce((s, o) => s + o.total, 0);
   const pendingOrders = orders.filter(o => o.status === 'en_attente').length;
-  const todayOrders = orders.filter(o => {
-    const d = new Date(o.createdAt);
-    const now = new Date();
-    return d.toDateString() === now.toDateString();
-  }).length;
-  const recentOrders = orders.slice(-5).reverse();
+  const todayOrders = orders.filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString()).length;
+  const recentOrders = orders.slice(0, 5);
 
   const stats = [
     { icon: '💰', label: 'Revenus totaux', value: formatPrice(totalRevenue), color: 'text-green-600', bg: 'bg-green-50' },
     { icon: '📦', label: 'Total commandes', value: orders.length, color: 'text-blue-600', bg: 'bg-blue-50' },
     { icon: '⏳', label: 'En attente', value: pendingOrders, color: 'text-orange-600', bg: 'bg-orange-50' },
-    { icon: '👥', label: 'Clients', value: users.length, color: 'text-violet-600', bg: 'bg-violet-50' },
-    { icon: '🛍️', label: 'Produits', value: products.length, color: 'text-gray-700', bg: 'bg-gray-50' },
+    { icon: '👥', label: 'Clients', value: userCount, color: 'text-violet-600', bg: 'bg-violet-50' },
+    { icon: '🛍️', label: 'Produits', value: productCount, color: 'text-gray-700', bg: 'bg-gray-50' },
     { icon: '📅', label: "Commandes aujourd'hui", value: todayOrders, color: 'text-rose-600', bg: 'bg-rose-50' },
   ];
 
@@ -32,7 +41,6 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         <h1 className="text-2xl font-extrabold text-gray-900">Tableau de bord</h1>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {stats.map(s => (
             <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
@@ -43,7 +51,6 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Quick actions */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { href: '/admin/produits', icon: '➕', label: 'Ajouter un produit' },
@@ -59,7 +66,6 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Recent orders */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h2 className="font-extrabold text-gray-900">Dernières commandes</h2>
@@ -84,13 +90,9 @@ export default function AdminDashboard() {
                     return (
                       <tr key={o.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-5 py-3 font-semibold text-gray-900">{o.id}</td>
-                        <td className="px-5 py-3 text-gray-500 hidden sm:table-cell">
-                          {new Date(o.createdAt).toLocaleDateString('fr-FR')}
-                        </td>
+                        <td className="px-5 py-3 text-gray-500 hidden sm:table-cell">{new Date(o.createdAt).toLocaleDateString('fr-FR')}</td>
                         <td className="px-5 py-3">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>
-                            {st?.label}
-                          </span>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>{st?.label}</span>
                         </td>
                         <td className="px-5 py-3 text-right font-bold text-gray-900">{formatPrice(o.total)}</td>
                       </tr>

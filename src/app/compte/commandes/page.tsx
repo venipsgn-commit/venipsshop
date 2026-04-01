@@ -1,9 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import AccountLayout from '@/components/layout/AccountLayout';
 import { useAuth } from '@/context/AuthContext';
-import { getUserOrders, formatPrice, getStatusLabel, updateOrderStatus, getAllOrders, saveAllOrders } from '@/lib/storage';
+import { formatPrice, getStatusLabel } from '@/lib/storage';
 import type { Order, OrderStatus } from '@/lib/types';
 
 const STATUS_STEPS: OrderStatus[] = ['en_attente', 'confirme', 'en_preparation', 'expedie', 'livre'];
@@ -13,30 +13,24 @@ function OrderCard({ order }: { order: Order }) {
   const st = getStatusLabel(order.status);
   const stepIdx = STATUS_STEPS.indexOf(order.status);
   const isCancelled = order.status === 'annule';
-
   const estimatedDate = new Date(order.estimatedDelivery);
   const daysLeft = Math.ceil((estimatedDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      {/* Header */}
       <button onClick={() => setExpanded(!expanded)} className="w-full p-5 text-left">
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <p className="font-bold text-gray-900">{order.id}</p>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>
-                {st?.label}
-              </span>
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>{st?.label}</span>
             </div>
             <p className="text-xs text-gray-400 mt-1">
               {new Date(order.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
               {' · '}{order.items.length} article{order.items.length > 1 ? 's' : ''}
               {' · '}{order.paymentMethod === 'wave' ? 'Wave' : order.paymentMethod === 'orange_money' ? 'Orange Money' : 'Carte'}
             </p>
-            {order.transiteur && (
-              <p className="text-xs text-gray-500 mt-1">Transiteur : <span className="font-semibold text-gray-700">{order.transiteur}</span></p>
-            )}
+            {order.transiteur && <p className="text-xs text-gray-500 mt-1">Transiteur : <span className="font-semibold text-gray-700">{order.transiteur}</span></p>}
             {order.status === 'expedie' && daysLeft >= 0 && (
               <p className="text-xs text-orange-600 font-semibold mt-1">🚚 Livraison estimée : {estimatedDate.toLocaleDateString('fr-FR')} ({daysLeft > 0 ? `dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}` : 'aujourd\'hui'})</p>
             )}
@@ -50,33 +44,25 @@ function OrderCard({ order }: { order: Order }) {
         </div>
       </button>
 
-      {/* Expanded */}
       {expanded && (
         <div className="border-t border-gray-100 p-5 space-y-5">
-          {/* Progress bar */}
           {!isCancelled && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                {STATUS_STEPS.map((s, i) => {
-                  const lbl = getStatusLabel(s);
-                  const done = i <= stepIdx;
-                  return (
-                    <div key={s} className="flex flex-col items-center gap-1 flex-1">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${done ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                        {done && i < stepIdx ? '✓' : i + 1}
-                      </div>
-                      <span className="text-[10px] text-gray-500 text-center hidden sm:block">{lbl?.label}</span>
-                      {i < STATUS_STEPS.length - 1 && (
-                        <div className={`absolute mt-3 h-px ${i < stepIdx ? 'bg-orange-500' : 'bg-gray-200'}`} style={{ width: 'calc(100% / 5)' }} />
-                      )}
+            <div className="flex items-center justify-between mb-2">
+              {STATUS_STEPS.map((s, i) => {
+                const lbl = getStatusLabel(s);
+                const done = i <= stepIdx;
+                return (
+                  <div key={s} className="flex flex-col items-center gap-1 flex-1">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${done ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                      {done && i < stepIdx ? '✓' : i + 1}
                     </div>
-                  );
-                })}
-              </div>
+                    <span className="text-[10px] text-gray-500 text-center hidden sm:block">{lbl?.label}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
 
-          {/* Items */}
           <div className="space-y-3">
             {order.items.map(item => (
               <div key={item.productId} className="flex items-center gap-3">
@@ -92,7 +78,6 @@ function OrderCard({ order }: { order: Order }) {
             ))}
           </div>
 
-          {/* Address & totals */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
             <div>
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Adresse de livraison</p>
@@ -119,21 +104,23 @@ function OrderCard({ order }: { order: Order }) {
 
 export default function CommandesPage() {
   const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<'all' | OrderStatus>('all');
+
+  useEffect(() => {
+    if (!user) return;
+    fetch('/api/orders').then(r => r.json()).then(({ orders }) => setOrders(orders ?? []));
+  }, [user]);
 
   if (!user) return null;
 
-  const orders = getUserOrders(user.id).reverse();
   const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
 
   return (
     <AccountLayout>
       <div className="space-y-5">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <h1 className="text-xl font-extrabold text-gray-900">Mes commandes <span className="text-gray-400 font-normal text-base">({orders.length})</span></h1>
-        </div>
+        <h1 className="text-xl font-extrabold text-gray-900">Mes commandes <span className="text-gray-400 font-normal text-base">({orders.length})</span></h1>
 
-        {/* Filter */}
         <div className="flex gap-2 flex-wrap">
           {[['all','Toutes'],['en_attente','En attente'],['expedie','Expédiées'],['livre','Livrées'],['annule','Annulées']].map(([val,lbl]) => (
             <button key={val} onClick={() => setFilter(val as 'all' | OrderStatus)}
@@ -149,9 +136,7 @@ export default function CommandesPage() {
             <p className="text-gray-500">Aucune commande{filter !== 'all' ? ' dans cette catégorie' : ''}</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {filtered.map(o => <OrderCard key={o.id} order={o} />)}
-          </div>
+          <div className="space-y-4">{filtered.map(o => <OrderCard key={o.id} order={o} />)}</div>
         )}
       </div>
     </AccountLayout>
