@@ -3,6 +3,7 @@ import { useState, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ProductCard from '@/components/ui/ProductCard';
 import { products } from '@/lib/data/products';
+import { formatPrice } from '@/lib/storage';
 
 const CATEGORIES = [
   { id: 'all', label: 'Tout' },
@@ -71,7 +72,7 @@ function CatalogueContent() {
               <input value={q} onChange={e => setQ(e.target.value)} placeholder="Nom, marque..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3 text-sm">Prix max: {maxPrice >= 2000000 ? 'Tous' : `${Math.round(maxPrice/1000)}K GNF`}</h3>
+              <h3 className="font-semibold text-gray-900 mb-3 text-sm">Prix max: {maxPrice >= 2000000 ? 'Tous' : formatPrice(maxPrice)}</h3>
               <input type="range" min={50000} max={2000000} step={50000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full accent-orange-500" />
               <div className="flex justify-between text-xs text-gray-400 mt-1"><span>50K</span><span>2M</span></div>
             </div>
@@ -114,7 +115,7 @@ function CatalogueContent() {
             <div className="lg:hidden bg-white rounded-2xl border border-gray-100 p-5 mb-4 space-y-4">
               <input value={q} onChange={e => setQ(e.target.value)} placeholder="Rechercher..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Prix max: {maxPrice >= 2000000 ? 'Tous' : `${Math.round(maxPrice/1000)}K GNF`}</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">Prix max: {maxPrice >= 2000000 ? 'Tous' : formatPrice(maxPrice)}</p>
                 <input type="range" min={50000} max={2000000} step={50000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full accent-orange-500" />
               </div>
               <div className="flex flex-wrap gap-2">
