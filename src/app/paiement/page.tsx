@@ -207,7 +207,7 @@ export default function CheckoutPage() {
                 {[
                   { key: 'wave' as PayMethod, label: 'Wave', desc: 'Paiement instantané via Wave', icon: '🌊', color: 'bg-blue-500' },
                   { key: 'orange_money' as PayMethod, label: 'Orange Money', desc: 'Paiement via Orange Money', icon: '🟠', color: 'bg-cyan-500' },
-                  { key: 'carte' as PayMethod, label: 'Carte bancaire', desc: 'Visa / Mastercard', icon: '💳', color: 'bg-gray-700' },
+                  { key: 'carte' as PayMethod, label: 'Carte bancaire', desc: 'Visa / Mastercard', icon: '💳', color: 'bg-[#1a2080]' },
                 ].map(m => (
                   <button key={m.key} onClick={() => setPayMethod(m.key)}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${payMethod === m.key ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-gray-300'}`}>
@@ -300,7 +300,7 @@ export default function CheckoutPage() {
                   <input value={promoInput} onChange={e => setPromoInput(e.target.value.toUpperCase())}
                     placeholder="Ex: VENIP10"
                     className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono uppercase" />
-                  <button onClick={applyPromo} className="bg-gray-900 hover:bg-gray-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors">OK</button>
+                  <button onClick={applyPromo} className="bg-[#080b3b] hover:bg-[#1a2080] text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors">OK</button>
                 </div>
               )}
               {promoError && <p className="text-red-500 text-xs mt-1">{promoError}</p>}

@@ -3,7 +3,7 @@ import VenipsLogo from '@/components/ui/VenipsLogo';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-400 mt-20">
+    <footer className="bg-[#080b3b] text-gray-400 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
@@ -14,7 +14,7 @@ export default function Footer() {
             <p className="text-sm leading-relaxed mb-4">Votre boutique tech de confiance. Produits authentiques, livraison rapide, service client premium.</p>
             <div className="flex gap-3">
               {['facebook','instagram','twitter','youtube'].map(s => (
-                <a key={s} href="#" className="w-9 h-9 bg-gray-800 hover:bg-cyan-500 rounded-lg flex items-center justify-center transition-colors">
+                <a key={s} href="#" className="w-9 h-9 bg-[#0d1266] hover:bg-cyan-500 rounded-lg flex items-center justify-center transition-colors">
                   <span className="text-sm capitalize">{s[0].toUpperCase()}</span>
                 </a>
               ))}
@@ -54,7 +54,7 @@ export default function Footer() {
         </div>
 
         {/* Trust badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-8 border-y border-gray-800">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-8 border-y border-[#0d1266]">
           {[['🚚','Livraison Rapide','24-48h sur Conakry'],['🔒','Paiement Sécurisé','Wave, OM, CB'],['↩️','Retours Faciles','30 jours gratuits'],['💬','Support 7j/7','Chat & Téléphone']].map(([icon,title,sub]) => (
             <div key={title} className="flex items-center gap-3">
               <span className="text-2xl">{icon}</span>

@@ -12,7 +12,7 @@ const BADGE_STYLE: Record<string, string> = {
   'Populaire':  'bg-blue-600 text-white',
   'Gaming':     'bg-violet-600 text-white',
   'Best Seller':'bg-yellow-500 text-white',
-  'Exclusif':   'bg-gray-900 text-white',
+  'Exclusif':   'bg-[#080b3b] text-white',
 };
 
 export default function ProductCard({ product }: { product: Product }) {

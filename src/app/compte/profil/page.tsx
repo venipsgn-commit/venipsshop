@@ -119,7 +119,7 @@ export default function ProfilPage() {
                 />
               </div>
             ))}
-            <button onClick={handlePwChange} className="bg-gray-900 hover:bg-gray-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors">
+            <button onClick={handlePwChange} className="bg-[#080b3b] hover:bg-[#1a2080] text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-colors">
               Mettre à jour le mot de passe
             </button>
           </div>

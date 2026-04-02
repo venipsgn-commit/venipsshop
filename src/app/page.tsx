@@ -110,7 +110,7 @@ export default function HomePage() {
             const count = products.filter(p => p.category === cat.key).length;
             return (
               <Link key={cat.key} href={`/catalogue?cat=${cat.key}`}
-                className="group relative overflow-hidden rounded-2xl bg-gray-900 text-white p-4 sm:p-6 flex flex-col items-center text-center hover:scale-105 transition-transform shadow-sm">
+                className="group relative overflow-hidden rounded-2xl bg-[#080b3b] text-white p-4 sm:p-6 flex flex-col items-center text-center hover:scale-105 transition-transform shadow-sm">
                 <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-20 group-hover:opacity-30 transition-opacity`} />
                 <span className="text-3xl sm:text-4xl mb-2 relative z-10">{cat.icon}</span>
                 <h3 className="font-bold text-sm sm:text-base relative z-10">{cat.label}</h3>
@@ -179,7 +179,7 @@ export default function HomePage() {
 
       {/* ─── PROMOTIONS ─── */}
       {promoProducts.length > 0 && (
-        <section className="bg-gray-900 py-14">
+        <section className="bg-[#080b3b] py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -192,7 +192,7 @@ export default function HomePage() {
               {promoProducts.map(p => {
                 const disc = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
                 return (
-                  <Link key={p.id} href={`/produit/${p.id}`} className="bg-gray-800 hover:bg-gray-700 rounded-2xl p-3 sm:p-4 transition-colors group">
+                  <Link key={p.id} href={`/produit/${p.id}`} className="bg-[#0d1266] hover:bg-[#1a2080] rounded-2xl p-3 sm:p-4 transition-colors group">
                     <div className="relative h-32 sm:h-40 rounded-xl overflow-hidden mb-3">
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
                       {disc > 0 && <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{disc}%</span>}

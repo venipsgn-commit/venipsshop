@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Admin header */}
-      <header className="bg-gray-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between">
+      <header className="bg-[#080b3b] text-white px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="text-cyan-400 font-extrabold text-lg">VenipShop</Link>
           <span className="text-gray-600">/</span>
