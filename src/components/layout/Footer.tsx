@@ -7,9 +7,8 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="bg-orange-500 text-white rounded-lg w-9 h-9 flex items-center justify-center font-black text-xl">V</div>
-              <span className="font-black text-xl text-white">Venip<span className="text-orange-500">Shop</span></span>
+            <Link href="/" className="flex items-center mb-4">
+              <img src="/venips-logo.svg" alt="Venips" className="h-10 w-auto" />
             </Link>
             <p className="text-sm leading-relaxed mb-4">Votre boutique tech de confiance. Produits authentiques, livraison rapide, service client premium.</p>
             <div className="flex gap-3">

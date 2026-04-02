@@ -51,9 +51,8 @@ export default function Navbar() {
       {/* Main bar */}
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-3 sm:gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="bg-orange-500 text-white rounded-lg w-9 h-9 flex items-center justify-center font-black text-xl">V</div>
-          <span className="font-black text-xl hidden sm:block tracking-tight">Venip<span className="text-orange-500">Shop</span></span>
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <img src="/venips-logo.svg" alt="Venips" className="h-10 w-auto" />
         </Link>
 
         {/* Search */}
