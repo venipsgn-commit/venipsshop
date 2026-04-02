@@ -56,7 +56,7 @@ function CatalogueContent() {
       <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
         {CATEGORIES.map(c => (
           <button key={c.id} onClick={() => setCat(c.id)}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${cat === c.id ? 'bg-orange-500 text-white' : 'bg-white text-gray-700 hover:bg-orange-50 border border-gray-200'}`}>
+            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${cat === c.id ? 'bg-teal-500 text-white' : 'bg-white text-gray-700 hover:bg-teal-50 border border-gray-200'}`}>
             {c.label}
           </button>
         ))}
@@ -68,11 +68,11 @@ function CatalogueContent() {
           <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-6 sticky top-24">
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 text-sm">Recherche</h3>
-              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Nom, marque..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Nom, marque..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 text-sm">Prix max: {maxPrice >= 2000000 ? 'Tous' : `${Math.round(maxPrice/1000)}K GNF`}</h3>
-              <input type="range" min={50000} max={2000000} step={50000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full accent-orange-500" />
+              <input type="range" min={50000} max={2000000} step={50000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full accent-teal-500" />
               <div className="flex justify-between text-xs text-gray-400 mt-1"><span>50K</span><span>2M</span></div>
             </div>
             <div>
@@ -80,14 +80,14 @@ function CatalogueContent() {
               <div className="space-y-2">
                 {allBrands.map(b => (
                   <label key={b} className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={selectedBrands.includes(b)} onChange={() => toggleBrand(b)} className="accent-orange-500" />
+                    <input type="checkbox" checked={selectedBrands.includes(b)} onChange={() => toggleBrand(b)} className="accent-teal-500" />
                     <span className="text-sm text-gray-700">{b}</span>
                   </label>
                 ))}
               </div>
             </div>
             {(selectedBrands.length > 0 || maxPrice < 2000000 || q) && (
-              <button onClick={() => { setSelectedBrands([]); setMaxPrice(2000000); setQ(''); }} className="w-full text-sm text-orange-500 hover:text-orange-600 font-medium py-2 border border-orange-200 rounded-xl">
+              <button onClick={() => { setSelectedBrands([]); setMaxPrice(2000000); setQ(''); }} className="w-full text-sm text-teal-500 hover:text-teal-600 font-medium py-2 border border-teal-200 rounded-xl">
                 Réinitialiser les filtres
               </button>
             )}
@@ -100,7 +100,7 @@ function CatalogueContent() {
             <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white">
               ⚙️ Filtres
             </button>
-            <select value={sort} onChange={e => setSort(e.target.value)} className="ml-auto px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500">
+            <select value={sort} onChange={e => setSort(e.target.value)} className="ml-auto px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500">
               <option value="popular">Populaires</option>
               <option value="new">Nouveautés</option>
               <option value="price-asc">Prix croissant</option>
@@ -112,14 +112,14 @@ function CatalogueContent() {
           {/* Mobile filters */}
           {showFilters && (
             <div className="lg:hidden bg-white rounded-2xl border border-gray-100 p-5 mb-4 space-y-4">
-              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Rechercher..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Rechercher..." className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2">Prix max: {maxPrice >= 2000000 ? 'Tous' : `${Math.round(maxPrice/1000)}K GNF`}</p>
-                <input type="range" min={50000} max={2000000} step={50000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full accent-orange-500" />
+                <input type="range" min={50000} max={2000000} step={50000} value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} className="w-full accent-teal-500" />
               </div>
               <div className="flex flex-wrap gap-2">
                 {allBrands.map(b => (
-                  <button key={b} onClick={() => toggleBrand(b)} className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${selectedBrands.includes(b) ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-700 border-gray-200'}`}>
+                  <button key={b} onClick={() => toggleBrand(b)} className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${selectedBrands.includes(b) ? 'bg-teal-500 text-white border-teal-500' : 'bg-white text-gray-700 border-gray-200'}`}>
                     {b}
                   </button>
                 ))}
@@ -132,7 +132,7 @@ function CatalogueContent() {
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Aucun produit trouvé</h3>
               <p className="text-gray-500 mb-6">Essayez de modifier vos filtres</p>
-              <button onClick={() => { setCat('all'); setQ(''); setSelectedBrands([]); setMaxPrice(2000000); }} className="bg-orange-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-600 transition-colors">
+              <button onClick={() => { setCat('all'); setQ(''); setSelectedBrands([]); setMaxPrice(2000000); }} className="bg-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-600 transition-colors">
                 Voir tous les produits
               </button>
             </div>

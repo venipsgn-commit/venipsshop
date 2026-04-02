@@ -13,7 +13,7 @@ export default function Footer() {
             <p className="text-sm leading-relaxed mb-4">Votre boutique tech de confiance. Produits authentiques, livraison rapide, service client premium.</p>
             <div className="flex gap-3">
               {['facebook','instagram','twitter','youtube'].map(s => (
-                <a key={s} href="#" className="w-9 h-9 bg-gray-800 hover:bg-orange-500 rounded-lg flex items-center justify-center transition-colors">
+                <a key={s} href="#" className="w-9 h-9 bg-gray-800 hover:bg-teal-500 rounded-lg flex items-center justify-center transition-colors">
                   <span className="text-sm capitalize">{s[0].toUpperCase()}</span>
                 </a>
               ))}
@@ -25,7 +25,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Catégories</h4>
             <ul className="space-y-2 text-sm">
               {[['Téléphones','/catalogue?cat=telephones'],['Ordinateurs','/catalogue?cat=ordinateurs'],['Accessoires','/catalogue?cat=accessoires'],['Gaming','/catalogue?cat=gaming'],['TV & Audio','/catalogue?cat=tv-audio']].map(([l,h]) => (
-                <li key={h}><Link href={h} className="hover:text-orange-400 transition-colors">{l}</Link></li>
+                <li key={h}><Link href={h} className="hover:text-teal-400 transition-colors">{l}</Link></li>
               ))}
             </ul>
           </div>
@@ -35,7 +35,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Mon Compte</h4>
             <ul className="space-y-2 text-sm">
               {[['Connexion','/auth/connexion'],['Inscription','/auth/inscription'],['Mes commandes','/compte/commandes'],['Ma wishlist','/compte/wishlist'],['Mon profil','/compte/profil']].map(([l,h]) => (
-                <li key={h}><Link href={h} className="hover:text-orange-400 transition-colors">{l}</Link></li>
+                <li key={h}><Link href={h} className="hover:text-teal-400 transition-colors">{l}</Link></li>
               ))}
             </ul>
           </div>
@@ -44,10 +44,10 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Contact</h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📍</span>Dakar, Sénégal</li>
-              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📞</span>+221 77 000 00 00</li>
-              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📧</span>contact@venipshop.com</li>
-              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">⏰</span>Lun-Sam : 8h - 20h</li>
+              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📍</span>Dakar, Sénégal</li>
+              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📞</span>+221 77 000 00 00</li>
+              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📧</span>contact@venipshop.com</li>
+              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">⏰</span>Lun-Sam : 8h - 20h</li>
             </ul>
           </div>
         </div>
@@ -65,9 +65,9 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 text-xs">
           <p>© 2026 VenipShop. Tous droits réservés.</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-orange-400 transition-colors">Conditions générales</a>
-            <a href="#" className="hover:text-orange-400 transition-colors">Confidentialité</a>
-            <a href="#" className="hover:text-orange-400 transition-colors">Cookies</a>
+            <a href="#" className="hover:text-teal-400 transition-colors">Conditions générales</a>
+            <a href="#" className="hover:text-teal-400 transition-colors">Confidentialité</a>
+            <a href="#" className="hover:text-teal-400 transition-colors">Cookies</a>
           </div>
         </div>
       </div>

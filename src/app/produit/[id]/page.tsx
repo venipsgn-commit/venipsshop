@@ -39,11 +39,11 @@ export default function ProductPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6 flex-wrap">
-        <Link href="/" className="hover:text-orange-500">Accueil</Link>
+        <Link href="/" className="hover:text-teal-500">Accueil</Link>
         <span>/</span>
-        <Link href="/catalogue" className="hover:text-orange-500">Catalogue</Link>
+        <Link href="/catalogue" className="hover:text-teal-500">Catalogue</Link>
         <span>/</span>
-        <Link href={`/catalogue?cat=${product.category}`} className="hover:text-orange-500 capitalize">{product.category}</Link>
+        <Link href={`/catalogue?cat=${product.category}`} className="hover:text-teal-500 capitalize">{product.category}</Link>
         <span>/</span>
         <span className="text-gray-900 truncate max-w-[200px]">{product.name}</span>
       </nav>
@@ -63,7 +63,7 @@ export default function ProductPage() {
               <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-bold text-white ${
                 product.badge === 'Promo' ? 'bg-red-500' :
                 product.badge === 'Nouveau' ? 'bg-green-500' :
-                product.badge === 'Populaire' ? 'bg-orange-500' : 'bg-violet-500'
+                product.badge === 'Populaire' ? 'bg-teal-500' : 'bg-violet-500'
               }`}>
                 {product.badge}
                 {discount > 0 && ` -${discount}%`}
@@ -74,7 +74,7 @@ export default function ProductPage() {
             <div className="flex gap-2">
               {product.images.map((img, i) => (
                 <button key={i} onClick={() => setActiveImg(i)}
-                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${activeImg === i ? 'border-orange-500' : 'border-gray-200 hover:border-gray-400'}`}>
+                  className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${activeImg === i ? 'border-teal-500' : 'border-gray-200 hover:border-gray-400'}`}>
                   <Image src={img} alt="" width={64} height={64} className="object-cover w-full h-full" unoptimized />
                 </button>
               ))}
@@ -84,7 +84,7 @@ export default function ProductPage() {
 
         {/* Info */}
         <div>
-          <p className="text-sm font-semibold text-orange-500 uppercase tracking-wide mb-1">{product.brand}</p>
+          <p className="text-sm font-semibold text-teal-500 uppercase tracking-wide mb-1">{product.brand}</p>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">{product.name}</h1>
 
           {/* Rating */}
@@ -119,7 +119,7 @@ export default function ProductPage() {
           <ul className="grid grid-cols-2 gap-1.5 mb-6">
             {product.features.slice(0, 6).map(f => (
               <li key={f} className="flex items-center gap-1.5 text-xs text-gray-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-orange-500 flex-shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
                 {f}
               </li>
             ))}
@@ -133,8 +133,8 @@ export default function ProductPage() {
                 En stock ({product.stock} disponibles)
               </span>
             ) : product.stock > 0 ? (
-              <span className="flex items-center gap-1.5 text-sm text-orange-600 font-medium">
-                <span className="w-2 h-2 rounded-full bg-orange-500" />
+              <span className="flex items-center gap-1.5 text-sm text-teal-600 font-medium">
+                <span className="w-2 h-2 rounded-full bg-teal-500" />
                 Plus que {product.stock} en stock !
               </span>
             ) : (
@@ -158,7 +158,7 @@ export default function ProductPage() {
               className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${
                 added ? 'bg-green-500 text-white' :
                 product.stock === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' :
-                'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/25 active:scale-95'
+                'bg-teal-500 hover:bg-teal-600 text-white shadow-lg shadow-teal-500/25 active:scale-95'
               }`}
             >
               {added ? '✓ Ajouté au panier' : product.stock === 0 ? 'Rupture de stock' : 'Ajouter au panier'}
@@ -190,7 +190,7 @@ export default function ProductPage() {
         <div className="flex border-b border-gray-200 bg-gray-50">
           {(['desc','specs','reviews'] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-3.5 text-sm font-semibold transition-colors ${activeTab === tab ? 'bg-white text-orange-500 border-b-2 border-orange-500' : 'text-gray-500 hover:text-gray-900'}`}>
+              className={`flex-1 py-3.5 text-sm font-semibold transition-colors ${activeTab === tab ? 'bg-white text-teal-500 border-b-2 border-teal-500' : 'text-gray-500 hover:text-gray-900'}`}>
               {tab === 'desc' ? 'Description' : tab === 'specs' ? 'Caractéristiques' : `Avis (${product.reviews.length})`}
             </button>
           ))}
@@ -205,7 +205,7 @@ export default function ProductPage() {
                   <ul className="space-y-2">
                     {product.features.map(f => (
                       <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="w-5 h-5 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+                        <span className="w-5 h-5 rounded-full bg-teal-100 text-teal-500 flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
                         {f}
                       </li>
                     ))}
@@ -270,7 +270,7 @@ export default function ProductPage() {
                   <Image src={p.images[0]} alt={p.name} fill className="object-contain p-2 group-hover:scale-105 transition-transform" unoptimized />
                 </div>
                 <div className="p-3">
-                  <p className="text-xs text-orange-500 font-semibold">{p.brand}</p>
+                  <p className="text-xs text-teal-500 font-semibold">{p.brand}</p>
                   <p className="text-sm font-semibold text-gray-900 line-clamp-2">{p.name}</p>
                   <p className="text-sm font-bold text-gray-900 mt-1">{formatPriceShort(p.price)}</p>
                 </div>

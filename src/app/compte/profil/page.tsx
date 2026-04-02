@@ -45,12 +45,12 @@ export default function ProfilPage() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-extrabold text-gray-900 text-lg">Informations personnelles</h2>
             {!editing ? (
-              <button onClick={() => setEditing(true)} className="text-sm font-semibold text-orange-500 hover:text-orange-600">Modifier</button>
+              <button onClick={() => setEditing(true)} className="text-sm font-semibold text-teal-500 hover:text-teal-600">Modifier</button>
             ) : (
               <div className="flex gap-2">
                 <button onClick={() => { setEditing(false); setForm({ nom: user.nom, prenom: user.prenom, email: user.email, telephone: user.telephone }); }}
                   className="text-sm text-gray-500 hover:text-gray-700">Annuler</button>
-                <button onClick={handleSave} className="text-sm font-semibold text-orange-500 hover:text-orange-600">Enregistrer</button>
+                <button onClick={handleSave} className="text-sm font-semibold text-teal-500 hover:text-teal-600">Enregistrer</button>
               </div>
             )}
           </div>
@@ -59,13 +59,13 @@ export default function ProfilPage() {
 
           {/* Avatar */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-20 h-20 rounded-full bg-orange-500 flex items-center justify-center text-white font-extrabold text-2xl">
+            <div className="w-20 h-20 rounded-full bg-teal-500 flex items-center justify-center text-white font-extrabold text-2xl">
               {user.prenom[0]}{user.nom[0]}
             </div>
             <div>
               <p className="font-bold text-gray-900">{user.prenom} {user.nom}</p>
               <p className="text-sm text-gray-500">Membre depuis {new Date(user.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</p>
-              {user.role === 'admin' && <span className="inline-block mt-1 bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">Administrateur</span>}
+              {user.role === 'admin' && <span className="inline-block mt-1 bg-teal-100 text-teal-600 text-xs font-bold px-2 py-0.5 rounded-full">Administrateur</span>}
             </div>
           </div>
 
@@ -83,7 +83,7 @@ export default function ProfilPage() {
                     type={f.type}
                     value={(form as Record<string, string>)[f.key]}
                     onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 ) : (
                   <p className="text-gray-900 font-medium px-4 py-2.5 bg-gray-50 rounded-xl text-sm">
@@ -115,7 +115,7 @@ export default function ProfilPage() {
                   value={(pwForm as Record<string, string>)[f.key]}
                   onChange={e => setPwForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                   placeholder={f.placeholder}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
             ))}

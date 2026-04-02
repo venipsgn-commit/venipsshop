@@ -15,11 +15,11 @@ export default function CartSidebar() {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b bg-gray-50">
           <h2 className="font-bold text-lg text-gray-900 flex items-center gap-2">
-            <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             Mon Panier
-            {totalItems > 0 && <span className="bg-orange-500 text-white text-xs rounded-full px-2 py-0.5">{totalItems}</span>}
+            {totalItems > 0 && <span className="bg-teal-500 text-white text-xs rounded-full px-2 py-0.5">{totalItems}</span>}
           </h2>
           <button onClick={close} className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
             <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,8 +32,8 @@ export default function CartSidebar() {
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-              <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center">
-                <svg className="w-10 h-10 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center">
+                <svg className="w-10 h-10 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
@@ -41,7 +41,7 @@ export default function CartSidebar() {
                 <p className="font-semibold text-gray-700">Votre panier est vide</p>
                 <p className="text-sm text-gray-400 mt-1">Ajoutez des produits pour commencer</p>
               </div>
-              <button onClick={close} className="bg-orange-500 text-white px-6 py-2 rounded-xl font-semibold hover:bg-orange-600 transition-colors text-sm">
+              <button onClick={close} className="bg-teal-500 text-white px-6 py-2 rounded-xl font-semibold hover:bg-teal-600 transition-colors text-sm">
                 Continuer les achats
               </button>
             </div>
@@ -52,9 +52,9 @@ export default function CartSidebar() {
               </Link>
               <div className="flex-1 min-w-0">
                 <Link href={`/produit/${item.product.id}`} onClick={close}>
-                  <p className="font-medium text-sm text-gray-900 hover:text-orange-500 transition-colors truncate">{item.product.name}</p>
+                  <p className="font-medium text-sm text-gray-900 hover:text-teal-500 transition-colors truncate">{item.product.name}</p>
                 </Link>
-                <p className="text-orange-500 font-bold text-sm">{formatPrice(item.product.price)}</p>
+                <p className="text-teal-500 font-bold text-sm">{formatPrice(item.product.price)}</p>
                 <div className="flex items-center gap-2 mt-1.5">
                   <div className="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden">
                     <button onClick={() => setQty(item.product.id, item.quantity - 1)} className="w-7 h-7 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors font-bold">−</button>
@@ -87,9 +87,9 @@ export default function CartSidebar() {
             </div>
             <div className="flex justify-between font-bold text-lg border-t pt-2">
               <span>Total</span>
-              <span className="text-orange-500">{formatPrice(totalPrice + delivery)}</span>
+              <span className="text-teal-500">{formatPrice(totalPrice + delivery)}</span>
             </div>
-            <Link href="/paiement" onClick={close} className="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center py-3.5 rounded-xl font-bold transition-colors text-sm">
+            <Link href="/paiement" onClick={close} className="block w-full bg-teal-500 hover:bg-teal-600 text-white text-center py-3.5 rounded-xl font-bold transition-colors text-sm">
               Commander →
             </Link>
             <button onClick={close} className="block w-full text-center text-sm text-gray-500 hover:text-gray-700 py-1 transition-colors">

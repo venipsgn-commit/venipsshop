@@ -47,11 +47,11 @@ export default function AdminCommandes() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher par ID, client, téléphone..."
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
           <div className="flex gap-2 flex-wrap">
             {[['all','Toutes'],...ALL_STATUSES.map(s => [s, getStatusLabel(s)?.label || s])].map(([val, lbl]) => (
               <button key={val} onClick={() => setFilter(val as 'all' | OrderStatus)}
-                className={`px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${filter === val ? 'bg-orange-500 text-white' : 'border border-gray-200 text-gray-600 hover:border-orange-300'}`}>
+                className={`px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${filter === val ? 'bg-teal-500 text-white' : 'border border-gray-200 text-gray-600 hover:border-teal-300'}`}>
                 {lbl}
               </button>
             ))}
@@ -120,7 +120,7 @@ export default function AdminCommandes() {
                         <p className="text-sm text-gray-500">{order.address.rue}, {order.address.ville}</p>
                         <p className="text-sm text-gray-500">{order.address.telephone}</p>
                         {order.estimatedDelivery && (
-                          <p className="text-sm text-orange-600 font-medium mt-1">Date estimée : {new Date(order.estimatedDelivery).toLocaleDateString('fr-FR')}</p>
+                          <p className="text-sm text-teal-600 font-medium mt-1">Date estimée : {new Date(order.estimatedDelivery).toLocaleDateString('fr-FR')}</p>
                         )}
                       </div>
 
@@ -132,7 +132,7 @@ export default function AdminCommandes() {
                           defaultValue={order.transiteur || ''}
                           onBlur={e => updateTransiteur(order.id, e.target.value)}
                           placeholder="Nom du livreur / transporteur"
-                          className="w-full sm:w-64 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full sm:w-64 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
                       </div>
 
@@ -147,7 +147,7 @@ export default function AdminCommandes() {
                                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
                                   order.status === s
                                     ? `bg-${lbl?.color}-100 text-${lbl?.color}-700 border-${lbl?.color}-200`
-                                    : 'border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'
+                                    : 'border-gray-200 text-gray-600 hover:border-teal-300 hover:text-teal-600'
                                 }`}>
                                 {order.status === s ? '✓ ' : ''}{lbl?.label}
                               </button>

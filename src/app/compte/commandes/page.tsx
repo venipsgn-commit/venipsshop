@@ -38,7 +38,7 @@ function OrderCard({ order }: { order: Order }) {
               <p className="text-xs text-gray-500 mt-1">Transiteur : <span className="font-semibold text-gray-700">{order.transiteur}</span></p>
             )}
             {order.status === 'expedie' && daysLeft >= 0 && (
-              <p className="text-xs text-orange-600 font-semibold mt-1">🚚 Livraison estimée : {estimatedDate.toLocaleDateString('fr-FR')} ({daysLeft > 0 ? `dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}` : 'aujourd\'hui'})</p>
+              <p className="text-xs text-teal-600 font-semibold mt-1">🚚 Livraison estimée : {estimatedDate.toLocaleDateString('fr-FR')} ({daysLeft > 0 ? `dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}` : 'aujourd\'hui'})</p>
             )}
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
@@ -62,12 +62,12 @@ function OrderCard({ order }: { order: Order }) {
                   const done = i <= stepIdx;
                   return (
                     <div key={s} className="flex flex-col items-center gap-1 flex-1">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${done ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${done ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
                         {done && i < stepIdx ? '✓' : i + 1}
                       </div>
                       <span className="text-[10px] text-gray-500 text-center hidden sm:block">{lbl?.label}</span>
                       {i < STATUS_STEPS.length - 1 && (
-                        <div className={`absolute mt-3 h-px ${i < stepIdx ? 'bg-orange-500' : 'bg-gray-200'}`} style={{ width: 'calc(100% / 5)' }} />
+                        <div className={`absolute mt-3 h-px ${i < stepIdx ? 'bg-teal-500' : 'bg-gray-200'}`} style={{ width: 'calc(100% / 5)' }} />
                       )}
                     </div>
                   );
@@ -107,7 +107,7 @@ function OrderCard({ order }: { order: Order }) {
                 <div className="flex justify-between"><span className="text-gray-500">Sous-total</span><span>{formatPrice(order.subtotal)}</span></div>
                 {order.discount > 0 && <div className="flex justify-between text-green-600"><span>Réduction</span><span>-{formatPrice(order.discount)}</span></div>}
                 <div className="flex justify-between"><span className="text-gray-500">Livraison</span><span>{order.shippingCost === 0 ? 'Gratuite' : formatPrice(order.shippingCost)}</span></div>
-                <div className="flex justify-between font-bold border-t border-gray-100 pt-1"><span>Total</span><span className="text-orange-500">{formatPrice(order.total)}</span></div>
+                <div className="flex justify-between font-bold border-t border-gray-100 pt-1"><span>Total</span><span className="text-teal-500">{formatPrice(order.total)}</span></div>
               </div>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function CommandesPage() {
         <div className="flex gap-2 flex-wrap">
           {[['all','Toutes'],['en_attente','En attente'],['expedie','Expédiées'],['livre','Livrées'],['annule','Annulées']].map(([val,lbl]) => (
             <button key={val} onClick={() => setFilter(val as 'all' | OrderStatus)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${filter === val ? 'bg-orange-500 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-orange-300'}`}>
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${filter === val ? 'bg-teal-500 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-teal-300'}`}>
               {lbl}
             </button>
           ))}

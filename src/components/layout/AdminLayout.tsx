@@ -22,7 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading || !user || user.role !== 'admin') return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
@@ -31,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Admin header */}
       <header className="bg-gray-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-orange-400 font-extrabold text-lg">VenipShop</Link>
+          <Link href="/" className="text-teal-400 font-extrabold text-lg">VenipShop</Link>
           <span className="text-gray-600">/</span>
           <span className="text-gray-300 text-sm font-semibold">Administration</span>
         </div>
@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link key={l.href} href={l.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                     pathname === l.href || (l.href !== '/admin' && pathname.startsWith(l.href))
-                      ? 'bg-orange-50 text-orange-600'
+                      ? 'bg-teal-50 text-teal-600'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}>
                   <span>{l.icon}</span>{l.label}

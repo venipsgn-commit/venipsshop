@@ -16,9 +16,9 @@ export default function CompteHome() {
     <AccountLayout>
       <div className="space-y-6">
         {/* Welcome */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-2xl p-6 text-white">
           <h1 className="text-2xl font-extrabold mb-1">Bonjour, {user.prenom} ! 👋</h1>
-          <p className="text-orange-100 text-sm">Bienvenue sur votre espace personnel VenipShop.</p>
+          <p className="text-teal-100 text-sm">Bienvenue sur votre espace personnel VenipShop.</p>
         </div>
 
         {/* Stats */}
@@ -45,9 +45,9 @@ export default function CompteHome() {
             { href: '/catalogue', icon: '🛍️', label: 'Continuer achats' },
           ].map(l => (
             <Link key={l.href} href={l.href}
-              className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col items-center text-center gap-2 hover:border-orange-200 hover:bg-orange-50 transition-all group">
+              className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col items-center text-center gap-2 hover:border-teal-200 hover:bg-teal-50 transition-all group">
               <span className="text-2xl">{l.icon}</span>
-              <span className="text-xs font-semibold text-gray-700 group-hover:text-orange-600">{l.label}</span>
+              <span className="text-xs font-semibold text-gray-700 group-hover:text-teal-600">{l.label}</span>
             </Link>
           ))}
         </div>
@@ -57,7 +57,7 @@ export default function CompteHome() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-extrabold text-gray-900">Commandes récentes</h2>
-              <Link href="/compte/commandes" className="text-xs text-orange-500 font-semibold hover:text-orange-600">Voir tout →</Link>
+              <Link href="/compte/commandes" className="text-xs text-teal-500 font-semibold hover:text-teal-600">Voir tout →</Link>
             </div>
             <div className="space-y-3">
               {recent.map(order => {

@@ -10,7 +10,7 @@ const CATEGORIES = [
   { key: 'ordinateurs', label: 'Ordinateurs', icon: '💻', desc: 'Laptops & PC de bureau',          color: 'from-violet-500 to-violet-700' },
   { key: 'accessoires', label: 'Accessoires', icon: '🎧', desc: 'Écouteurs, chargeurs & plus',     color: 'from-emerald-500 to-emerald-700' },
   { key: 'gaming',      label: 'Gaming',      icon: '🎮', desc: 'Consoles & jeux vidéo',          color: 'from-red-500 to-red-700' },
-  { key: 'tv-audio',   label: 'TV & Audio',  icon: '📺', desc: 'Télévisions & enceintes',        color: 'from-orange-500 to-orange-700' },
+  { key: 'tv-audio',   label: 'TV & Audio',  icon: '📺', desc: 'Télévisions & enceintes',        color: 'from-teal-500 to-teal-700' },
 ];
 
 const TESTIMONIALS = [
@@ -30,34 +30,34 @@ export default function HomePage() {
       {/* ─── HERO ─── */}
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
         <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs sm:text-sm px-3 py-1.5 rounded-full mb-5 font-medium">
+              <span className="inline-flex items-center gap-2 bg-teal-500/20 border border-teal-500/30 text-teal-400 text-xs sm:text-sm px-3 py-1.5 rounded-full mb-5 font-medium">
                 🎉 Livraison gratuite dès 100 000 GNF
               </span>
               <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-5">
                 La tech à votre portée,
-                <span className="block text-orange-400 mt-1">au meilleur prix</span>
+                <span className="block text-teal-400 mt-1">au meilleur prix</span>
               </h1>
               <p className="text-gray-400 text-base sm:text-lg mb-8 leading-relaxed max-w-lg">
                 Téléphones, ordinateurs et accessoires high-tech de qualité. Large gamme de produits authentiques avec livraison rapide au Sénégal.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/catalogue" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25 active:scale-95">
+                <Link href="/catalogue" className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25 active:scale-95">
                   Explorer le catalogue
                 </Link>
-                <Link href="/catalogue?cat=telephones" className="border border-gray-600 hover:border-orange-500 hover:text-orange-400 text-gray-300 px-6 py-3 rounded-xl font-semibold transition-all">
+                <Link href="/catalogue?cat=telephones" className="border border-gray-600 hover:border-teal-500 hover:text-teal-400 text-gray-300 px-6 py-3 rounded-xl font-semibold transition-all">
                   Voir les téléphones
                 </Link>
               </div>
               <div className="flex flex-wrap gap-5 mt-8">
                 {[['✓','Produits authentiques'],['✓','Garantie constructeur'],['✓','Retours 30 jours']].map(([icon,txt]) => (
                   <span key={txt} className="flex items-center gap-1.5 text-sm text-gray-400">
-                    <span className="text-orange-400 font-bold">{icon}</span>{txt}
+                    <span className="text-teal-400 font-bold">{icon}</span>{txt}
                   </span>
                 ))}
               </div>
@@ -91,7 +91,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[['500+','Produits disponibles'],['50+','Marques référencées'],['10 000+','Clients satisfaits'],['4.8★','Note moyenne']].map(([val,lbl]) => (
               <div key={lbl} className="py-2">
-                <p className="text-2xl sm:text-3xl font-extrabold text-orange-500">{val}</p>
+                <p className="text-2xl sm:text-3xl font-extrabold text-teal-500">{val}</p>
                 <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{lbl}</p>
               </div>
             ))}
@@ -131,7 +131,7 @@ export default function HomePage() {
                 <h2 className="text-2xl font-extrabold text-gray-900">Nouveautés</h2>
                 <p className="text-gray-500 text-sm mt-1">Les derniers arrivages en stock</p>
               </div>
-              <Link href="/catalogue?badge=Nouveau" className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+              <Link href="/catalogue?badge=Nouveau" className="text-sm font-semibold text-teal-500 hover:text-teal-600 transition-colors">
                 Voir tout →
               </Link>
             </div>
@@ -144,17 +144,17 @@ export default function HomePage() {
 
       {/* ─── PROMO BANNER ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-3xl overflow-hidden relative">
+        <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-3xl overflow-hidden relative">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           </div>
           <div className="relative z-10 px-6 sm:px-12 py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="text-white text-center sm:text-left">
-              <p className="text-sm font-semibold uppercase tracking-widest text-orange-100">Offre spéciale</p>
+              <p className="text-sm font-semibold uppercase tracking-widest text-teal-100">Offre spéciale</p>
               <h2 className="text-2xl sm:text-4xl font-extrabold mt-1">Jusqu&apos;à <span className="text-white">-25%</span></h2>
-              <p className="text-orange-100 mt-1">Utilisez le code <strong className="bg-white/20 px-2 py-0.5 rounded font-mono">NOEL25</strong> à la caisse</p>
+              <p className="text-teal-100 mt-1">Utilisez le code <strong className="bg-white/20 px-2 py-0.5 rounded font-mono">NOEL25</strong> à la caisse</p>
             </div>
-            <Link href="/catalogue" className="bg-white text-orange-600 hover:bg-orange-50 font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg whitespace-nowrap">
+            <Link href="/catalogue" className="bg-white text-teal-600 hover:bg-teal-50 font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg whitespace-nowrap">
               Profiter de l&apos;offre
             </Link>
           </div>
@@ -168,7 +168,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-extrabold text-gray-900">Produits Populaires</h2>
             <p className="text-gray-500 text-sm mt-1">Les meilleures ventes du moment</p>
           </div>
-          <Link href="/catalogue" className="text-sm font-semibold text-orange-500 hover:text-orange-600 transition-colors">
+          <Link href="/catalogue" className="text-sm font-semibold text-teal-500 hover:text-teal-600 transition-colors">
             Voir tout →
           </Link>
         </div>
@@ -186,7 +186,7 @@ export default function HomePage() {
                 <h2 className="text-2xl font-extrabold text-white">Promotions</h2>
                 <p className="text-gray-400 text-sm mt-1">Offres à durée limitée</p>
               </div>
-              <Link href="/catalogue?badge=Promo" className="text-sm font-semibold text-orange-400 hover:text-orange-300">Voir tout →</Link>
+              <Link href="/catalogue?badge=Promo" className="text-sm font-semibold text-teal-400 hover:text-teal-300">Voir tout →</Link>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {promoProducts.map(p => {
@@ -197,10 +197,10 @@ export default function HomePage() {
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
                       {disc > 0 && <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{disc}%</span>}
                     </div>
-                    <p className="text-xs font-semibold text-orange-400 uppercase mb-0.5">{p.brand}</p>
+                    <p className="text-xs font-semibold text-teal-400 uppercase mb-0.5">{p.brand}</p>
                     <p className="text-white text-sm font-semibold line-clamp-2 mb-2">{p.name}</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-orange-400 font-bold text-sm">{formatPrice(p.price)}</span>
+                      <span className="text-teal-400 font-bold text-sm">{formatPrice(p.price)}</span>
                       {p.originalPrice && <span className="text-gray-500 text-xs line-through">{formatPrice(p.originalPrice)}</span>}
                     </div>
                   </Link>
@@ -229,7 +229,7 @@ export default function HomePage() {
               </div>
               <p className="text-gray-600 text-sm leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{t.avatar}</div>
+                <div className="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{t.avatar}</div>
                 <div>
                   <p className="font-semibold text-sm text-gray-900">{t.name}</p>
                   <p className="text-xs text-gray-400">{t.role}</p>
@@ -268,8 +268,8 @@ export default function HomePage() {
           <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 mb-2">Restez informé des offres</h2>
           <p className="text-gray-500 text-sm mb-6">Recevez nos meilleures promotions directement dans votre boîte mail.</p>
           <form onSubmit={e => e.preventDefault()} className="flex gap-2">
-            <input type="email" placeholder="Votre adresse email" className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm" />
-            <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl font-semibold transition-colors text-sm whitespace-nowrap">S&apos;abonner</button>
+            <input type="email" placeholder="Votre adresse email" className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm" />
+            <button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white px-5 py-3 rounded-xl font-semibold transition-colors text-sm whitespace-nowrap">S&apos;abonner</button>
           </form>
         </div>
       </section>
