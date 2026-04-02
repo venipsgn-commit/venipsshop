@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   const stats = [
     { icon: '💰', label: 'Revenus totaux', value: formatPrice(totalRevenue), color: 'text-green-600', bg: 'bg-green-50' },
     { icon: '📦', label: 'Total commandes', value: orders.length, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { icon: '⏳', label: 'En attente', value: pendingOrders, color: 'text-orange-600', bg: 'bg-orange-50' },
+    { icon: '⏳', label: 'En attente', value: pendingOrders, color: 'text-cyan-600', bg: 'bg-cyan-50' },
     { icon: '👥', label: 'Clients', value: userCount, color: 'text-violet-600', bg: 'bg-violet-50' },
     { icon: '🛍️', label: 'Produits', value: productCount, color: 'text-gray-700', bg: 'bg-gray-50' },
     { icon: '📅', label: "Commandes aujourd'hui", value: todayOrders, color: 'text-rose-600', bg: 'bg-rose-50' },
@@ -59,9 +59,9 @@ export default function AdminDashboard() {
             { href: '/catalogue', icon: '🛍️', label: 'Voir la boutique' },
           ].map(a => (
             <Link key={a.href} href={a.href}
-              className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col items-center text-center gap-2 hover:border-orange-200 hover:bg-orange-50 transition-all group">
+              className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col items-center text-center gap-2 hover:border-cyan-200 hover:bg-cyan-50 transition-all group">
               <span className="text-2xl">{a.icon}</span>
-              <span className="text-xs font-semibold text-gray-700 group-hover:text-orange-600">{a.label}</span>
+              <span className="text-xs font-semibold text-gray-700 group-hover:text-cyan-600">{a.label}</span>
             </Link>
           ))}
         </div>
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
             <h2 className="font-extrabold text-gray-900">Dernières commandes</h2>
-            <Link href="/admin/commandes" className="text-xs text-orange-500 font-semibold hover:text-orange-600">Voir tout →</Link>
+            <Link href="/admin/commandes" className="text-xs text-cyan-500 font-semibold hover:text-cyan-600">Voir tout →</Link>
           </div>
           {recentOrders.length === 0 ? (
             <p className="text-center text-gray-400 py-10 text-sm">Aucune commande pour le moment.</p>

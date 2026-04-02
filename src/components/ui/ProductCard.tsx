@@ -8,7 +8,7 @@ import { useWishlist } from '@/context/WishlistContext';
 
 const BADGE_STYLE: Record<string, string> = {
   'Nouveau':    'bg-emerald-500 text-white',
-  'Promo':      'bg-orange-500 text-white',
+  'Promo':      'bg-cyan-500 text-white',
   'Populaire':  'bg-blue-600 text-white',
   'Gaming':     'bg-violet-600 text-white',
   'Best Seller':'bg-yellow-500 text-white',
@@ -51,7 +51,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </button>
         {/* Stock faible */}
         {product.stock > 0 && product.stock <= 5 && (
-          <div className="absolute bottom-0 left-0 right-0 bg-orange-500/90 text-white text-[10px] font-semibold text-center py-1">
+          <div className="absolute bottom-0 left-0 right-0 bg-cyan-500/90 text-white text-[10px] font-semibold text-center py-1">
             ⚡ Plus que {product.stock} en stock !
           </div>
         )}
@@ -59,9 +59,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Infos */}
       <div className="p-3 sm:p-4 flex flex-col flex-1">
-        <p className="text-[10px] sm:text-xs text-orange-500 font-semibold uppercase tracking-wider mb-1">{product.brand}</p>
+        <p className="text-[10px] sm:text-xs text-cyan-500 font-semibold uppercase tracking-wider mb-1">{product.brand}</p>
         <Link href={`/produit/${product.id}`}>
-          <h3 className="text-xs sm:text-sm font-semibold text-gray-900 hover:text-orange-500 transition-colors line-clamp-2 leading-snug mb-2">
+          <h3 className="text-xs sm:text-sm font-semibold text-gray-900 hover:text-cyan-500 transition-colors line-clamp-2 leading-snug mb-2">
             {product.name}
           </h3>
         </Link>
@@ -90,7 +90,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
           <button
             onClick={() => addItem(product)}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm font-semibold py-2 sm:py-2.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5"
+            className="w-full bg-cyan-500 hover:bg-cyan-600 text-white text-xs sm:text-sm font-semibold py-2 sm:py-2.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5"
           >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />

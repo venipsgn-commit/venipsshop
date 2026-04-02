@@ -61,7 +61,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center">
         <p className="text-gray-500 mb-4">Votre panier est vide.</p>
-        <Link href="/catalogue" className="bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orange-600">
+        <Link href="/catalogue" className="bg-cyan-500 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-cyan-600">
           Retour au catalogue
         </Link>
       </div>
@@ -127,10 +127,10 @@ export default function CheckoutPage() {
         <p className="text-gray-500 mb-1">Votre commande <span className="font-semibold text-gray-900">{orderDone}</span> a été passée avec succès.</p>
         <p className="text-gray-400 text-sm mb-8">Vous recevrez une notification quand votre commande sera expédiée.</p>
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/compte/commandes" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold transition-all">
+          <Link href="/compte/commandes" className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-3 rounded-xl font-bold transition-all">
             Suivre ma commande
           </Link>
-          <Link href="/catalogue" className="border border-gray-200 hover:border-orange-500 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all">
+          <Link href="/catalogue" className="border border-gray-200 hover:border-cyan-500 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all">
             Continuer mes achats
           </Link>
         </div>
@@ -146,9 +146,9 @@ export default function CheckoutPage() {
       <div className="flex items-center gap-2 mb-8">
         {(['adresse','paiement'] as const).map((s, i) => (
           <div key={s} className="flex items-center gap-2">
-            {i > 0 && <div className={`h-px w-8 sm:w-16 ${step === 'paiement' ? 'bg-orange-500' : 'bg-gray-200'}`} />}
-            <div className={`flex items-center gap-2 ${step === s ? 'text-orange-500' : step === 'paiement' && s === 'adresse' ? 'text-green-500' : 'text-gray-400'}`}>
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold border-2 ${step === s ? 'border-orange-500 bg-orange-50' : step === 'paiement' && s === 'adresse' ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}>
+            {i > 0 && <div className={`h-px w-8 sm:w-16 ${step === 'paiement' ? 'bg-cyan-500' : 'bg-gray-200'}`} />}
+            <div className={`flex items-center gap-2 ${step === s ? 'text-cyan-500' : step === 'paiement' && s === 'adresse' ? 'text-green-500' : 'text-gray-400'}`}>
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold border-2 ${step === s ? 'border-cyan-500 bg-cyan-50' : step === 'paiement' && s === 'adresse' ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}>
                 {step === 'paiement' && s === 'adresse' ? '✓' : i + 1}
               </span>
               <span className="hidden sm:block text-sm font-semibold capitalize">{s === 'adresse' ? 'Livraison' : 'Paiement'}</span>
@@ -178,7 +178,7 @@ export default function CheckoutPage() {
                       value={(addr as unknown as Record<string, string>)[f.key] || ''}
                       onChange={e => setAddr(a => ({ ...a, [f.key]: e.target.value }))}
                       placeholder={f.placeholder}
-                      className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all ${addrErrors[f.key] ? 'border-red-400' : 'border-gray-200'}`}
+                      className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all ${addrErrors[f.key] ? 'border-red-400' : 'border-gray-200'}`}
                     />
                     {addrErrors[f.key] && <p className="text-red-500 text-xs mt-1">{addrErrors[f.key]}</p>}
                   </div>
@@ -186,13 +186,13 @@ export default function CheckoutPage() {
               </div>
 
               {!user && (
-                <div className="mt-4 p-3 bg-orange-50 border border-orange-100 rounded-xl text-sm text-orange-700">
+                <div className="mt-4 p-3 bg-cyan-50 border border-cyan-100 rounded-xl text-sm text-cyan-700">
                   <Link href="/auth/connexion?redirect=/paiement" className="font-semibold underline">Connectez-vous</Link> pour un checkout plus rapide et suivre vos commandes.
                 </div>
               )}
 
               <button onClick={() => { if (validateAddr()) setStep('paiement'); }}
-                className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25">
+                className="w-full mt-6 bg-cyan-500 hover:bg-cyan-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-cyan-500/25">
                 Continuer vers le paiement →
               </button>
             </div>
@@ -206,18 +206,18 @@ export default function CheckoutPage() {
               <div className="space-y-3 mb-6">
                 {[
                   { key: 'wave' as PayMethod, label: 'Wave', desc: 'Paiement instantané via Wave', icon: '🌊', color: 'bg-blue-500' },
-                  { key: 'orange_money' as PayMethod, label: 'Orange Money', desc: 'Paiement via Orange Money', icon: '🟠', color: 'bg-orange-500' },
+                  { key: 'orange_money' as PayMethod, label: 'Orange Money', desc: 'Paiement via Orange Money', icon: '🟠', color: 'bg-cyan-500' },
                   { key: 'carte' as PayMethod, label: 'Carte bancaire', desc: 'Visa / Mastercard', icon: '💳', color: 'bg-gray-700' },
                 ].map(m => (
                   <button key={m.key} onClick={() => setPayMethod(m.key)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${payMethod === m.key ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${payMethod === m.key ? 'border-cyan-500 bg-cyan-50' : 'border-gray-200 hover:border-gray-300'}`}>
                     <span className={`w-10 h-10 rounded-xl ${m.color} flex items-center justify-center text-xl flex-shrink-0`}>{m.icon}</span>
                     <div>
                       <p className="font-bold text-gray-900 text-sm">{m.label}</p>
                       <p className="text-xs text-gray-500">{m.desc}</p>
                     </div>
-                    <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${payMethod === m.key ? 'border-orange-500' : 'border-gray-300'}`}>
-                      {payMethod === m.key && <div className="w-2.5 h-2.5 rounded-full bg-orange-500" />}
+                    <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${payMethod === m.key ? 'border-cyan-500' : 'border-gray-300'}`}>
+                      {payMethod === m.key && <div className="w-2.5 h-2.5 rounded-full bg-cyan-500" />}
                     </div>
                   </button>
                 ))}
@@ -227,16 +227,16 @@ export default function CheckoutPage() {
                 <div className="border border-gray-200 rounded-xl p-4 mb-6 space-y-3">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Numéro de carte</label>
-                    <input type="text" placeholder="1234 5678 9012 3456" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                    <input type="text" placeholder="1234 5678 9012 3456" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-gray-700 mb-1.5">Expiration</label>
-                      <input type="text" placeholder="MM/AA" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      <input type="text" placeholder="MM/AA" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-gray-700 mb-1.5">CVV</label>
-                      <input type="text" placeholder="123" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      <input type="text" placeholder="123" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                     </div>
                   </div>
                 </div>
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
               {(payMethod === 'wave' || payMethod === 'orange_money') && (
                 <div className="border border-gray-200 rounded-xl p-4 mb-6">
                   <label className="block text-xs font-semibold text-gray-700 mb-1.5">Numéro {payMethod === 'wave' ? 'Wave' : 'Orange Money'}</label>
-                  <input type="tel" placeholder="+224 6xx xxx xxx" defaultValue={user?.telephone} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <input type="tel" placeholder="+224 6xx xxx xxx" defaultValue={user?.telephone} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                   <p className="text-xs text-gray-400 mt-1.5">Un code de confirmation vous sera envoyé sur ce numéro.</p>
                 </div>
               )}
@@ -259,7 +259,7 @@ export default function CheckoutPage() {
               )}
 
               <button onClick={placeOrder} disabled={submitting}
-                className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25 text-base">
+                className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:opacity-60 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-cyan-500/25 text-base">
                 {submitting ? 'Traitement en cours...' : `Confirmer la commande – ${formatPrice(grandTotal)}`}
               </button>
 
@@ -299,7 +299,7 @@ export default function CheckoutPage() {
                 <div className="flex gap-2">
                   <input value={promoInput} onChange={e => setPromoInput(e.target.value.toUpperCase())}
                     placeholder="Ex: VENIP10"
-                    className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-orange-500 font-mono uppercase" />
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono uppercase" />
                   <button onClick={applyPromo} className="bg-gray-900 hover:bg-gray-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors">OK</button>
                 </div>
               )}
@@ -322,7 +322,7 @@ export default function CheckoutPage() {
                 </span>
               </div>
               <div className="flex justify-between font-extrabold text-gray-900 text-base pt-2 border-t border-gray-100">
-                <span>Total</span><span className="text-orange-500">{formatPrice(grandTotal)}</span>
+                <span>Total</span><span className="text-cyan-500">{formatPrice(grandTotal)}</span>
               </div>
             </div>
           </div>

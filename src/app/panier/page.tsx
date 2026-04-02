@@ -19,7 +19,7 @@ export default function CartPage() {
         <div className="text-6xl mb-4">🛒</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Votre panier est vide</h1>
         <p className="text-gray-500 mb-8 max-w-sm">Vous n&apos;avez pas encore ajouté de produit à votre panier.</p>
-        <Link href="/catalogue" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25">
+        <Link href="/catalogue" className="bg-cyan-500 hover:bg-cyan-600 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-cyan-500/25">
           Découvrir nos produits
         </Link>
       </div>
@@ -34,13 +34,13 @@ export default function CartPage() {
 
       {/* Free shipping progress */}
       {totalPrice < FREE_DELIVERY && (
-        <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 mb-6">
+        <div className="bg-cyan-50 border border-cyan-100 rounded-2xl p-4 mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-orange-800 font-medium">🚚 Livraison gratuite</span>
-            <span className="text-sm font-bold text-orange-600">{formatPriceShort(remaining)} restants</span>
+            <span className="text-sm text-cyan-800 font-medium">🚚 Livraison gratuite</span>
+            <span className="text-sm font-bold text-cyan-600">{formatPriceShort(remaining)} restants</span>
           </div>
-          <div className="h-2 bg-orange-100 rounded-full overflow-hidden">
-            <div className="h-full bg-orange-500 rounded-full transition-all" style={{ width: `${Math.min(100, (totalPrice / FREE_DELIVERY) * 100)}%` }} />
+          <div className="h-2 bg-cyan-100 rounded-full overflow-hidden">
+            <div className="h-full bg-cyan-500 rounded-full transition-all" style={{ width: `${Math.min(100, (totalPrice / FREE_DELIVERY) * 100)}%` }} />
           </div>
         </div>
       )}
@@ -56,8 +56,8 @@ export default function CartPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-xs text-orange-500 font-semibold uppercase">{product.brand}</p>
-                    <Link href={`/produit/${product.id}`} className="text-sm sm:text-base font-semibold text-gray-900 hover:text-orange-500 line-clamp-2">{product.name}</Link>
+                    <p className="text-xs text-cyan-500 font-semibold uppercase">{product.brand}</p>
+                    <Link href={`/produit/${product.id}`} className="text-sm sm:text-base font-semibold text-gray-900 hover:text-cyan-500 line-clamp-2">{product.name}</Link>
                   </div>
                   <button onClick={() => removeItem(product.id)} className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,14 +102,14 @@ export default function CartPage() {
               </div>
               <div className="border-t border-gray-100 pt-3 flex justify-between">
                 <span className="font-extrabold text-gray-900">Total</span>
-                <span className="font-extrabold text-xl text-orange-500">{formatPrice(grandTotal)}</span>
+                <span className="font-extrabold text-xl text-cyan-500">{formatPrice(grandTotal)}</span>
               </div>
             </div>
             <Link href="/paiement"
-              className="block w-full bg-orange-500 hover:bg-orange-600 text-white text-center py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25 active:scale-95">
+              className="block w-full bg-cyan-500 hover:bg-cyan-600 text-white text-center py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-cyan-500/25 active:scale-95">
               Passer commande
             </Link>
-            <Link href="/catalogue" className="block text-center text-sm text-gray-500 hover:text-orange-500 mt-3 transition-colors">
+            <Link href="/catalogue" className="block text-center text-sm text-gray-500 hover:text-cyan-500 mt-3 transition-colors">
               ← Continuer mes achats
             </Link>
             <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">

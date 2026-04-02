@@ -31,7 +31,7 @@ export default function AdminClients() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Rechercher par nom, email, téléphone..."
-            className="w-full sm:w-80 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+            className="w-full sm:w-80 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
         </div>
 
         {filtered.length === 0 ? (
@@ -55,7 +55,7 @@ export default function AdminClients() {
                     <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                             {u.prenom[0]}{u.nom[0]}
                           </div>
                           <div>
@@ -69,7 +69,7 @@ export default function AdminClients() {
                       <td className="px-5 py-3 text-center font-semibold text-gray-900">{u.orderCount}</td>
                       <td className="px-5 py-3 text-right font-bold text-gray-900">{formatPrice(u.totalSpent)}</td>
                       <td className="px-5 py-3 text-center">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-600'}`}>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.role === 'admin' ? 'bg-cyan-100 text-cyan-700' : 'bg-gray-100 text-gray-600'}`}>
                           {u.role === 'admin' ? 'Admin' : 'Client'}
                         </span>
                       </td>

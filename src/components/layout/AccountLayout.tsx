@@ -22,7 +22,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   if (loading || !user) return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
@@ -39,13 +39,13 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             {/* Avatar */}
             <div className="flex flex-col items-center text-center mb-5 pb-5 border-b border-gray-100">
-              <div className="w-16 h-16 rounded-full bg-orange-500 flex items-center justify-center text-white font-extrabold text-2xl mb-3">
+              <div className="w-16 h-16 rounded-full bg-cyan-500 flex items-center justify-center text-white font-extrabold text-2xl mb-3">
                 {user.prenom[0]}{user.nom[0]}
               </div>
               <p className="font-bold text-gray-900">{user.prenom} {user.nom}</p>
               <p className="text-xs text-gray-400 truncate max-w-full">{user.email}</p>
               {user.role === 'admin' && (
-                <span className="mt-1.5 bg-orange-100 text-orange-600 text-xs font-bold px-2 py-0.5 rounded-full">Admin</span>
+                <span className="mt-1.5 bg-cyan-100 text-cyan-600 text-xs font-bold px-2 py-0.5 rounded-full">Admin</span>
               )}
             </div>
 
@@ -54,7 +54,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               {links.map(l => (
                 <Link key={l.href} href={l.href}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                    pathname === l.href ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    pathname === l.href ? 'bg-cyan-50 text-cyan-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}>
                   <span>{l.icon}</span>{l.label}
                 </Link>
@@ -62,7 +62,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               {user.role === 'admin' && (
                 <Link href="/admin"
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                    pathname.startsWith('/admin') ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    pathname.startsWith('/admin') ? 'bg-cyan-50 text-cyan-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}>
                   <span>⚙️</span>Administration
                 </Link>

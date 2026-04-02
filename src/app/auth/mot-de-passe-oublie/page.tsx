@@ -16,8 +16,8 @@ export default function MotDePasseOubliePage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="bg-orange-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-black text-2xl">V</div>
-            <span className="font-black text-2xl text-gray-900">Venip<span className="text-orange-500">Shop</span></span>
+            <div className="bg-cyan-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-black text-2xl">V</div>
+            <span className="font-black text-2xl text-gray-900">Venip<span className="text-cyan-500">Shop</span></span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Mot de passe oublié</h1>
           <p className="text-gray-500 text-sm mt-1">Entrez votre email pour réinitialiser votre mot de passe.</p>
@@ -30,19 +30,19 @@ export default function MotDePasseOubliePage() {
               </div>
               <h2 className="font-bold text-gray-900 mb-2">Email envoyé !</h2>
               <p className="text-sm text-gray-500 mb-6">Si un compte existe avec cet email, vous recevrez les instructions de réinitialisation.</p>
-              <Link href="/auth/connexion" className="text-orange-500 hover:text-orange-600 font-medium text-sm">Retour à la connexion</Link>
+              <Link href="/auth/connexion" className="text-cyan-500 hover:text-cyan-600 font-medium text-sm">Retour à la connexion</Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm" />
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm" />
               </div>
-              <button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold transition-colors text-sm">
+              <button type="submit" className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-3 rounded-xl font-semibold transition-colors text-sm">
                 Envoyer le lien
               </button>
               <p className="text-center text-sm">
-                <Link href="/auth/connexion" className="text-gray-500 hover:text-orange-500">← Retour à la connexion</Link>
+                <Link href="/auth/connexion" className="text-gray-500 hover:text-cyan-500">← Retour à la connexion</Link>
               </p>
             </form>
           )}

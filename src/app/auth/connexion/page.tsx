@@ -42,7 +42,7 @@ function ConnexionForm() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             placeholder="vous@exemple.com"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm"
           />
         </div>
         <div>
@@ -53,7 +53,7 @@ function ConnexionForm() {
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm"
           />
         </div>
         <div className="flex items-center justify-between text-sm">
@@ -61,12 +61,12 @@ function ConnexionForm() {
             <input type="checkbox" className="rounded" />
             <span className="text-gray-600">Se souvenir de moi</span>
           </label>
-          <Link href="/auth/mot-de-passe-oublie" className="text-orange-500 hover:text-orange-600">Mot de passe oublié ?</Link>
+          <Link href="/auth/mot-de-passe-oublie" className="text-cyan-500 hover:text-cyan-600">Mot de passe oublié ?</Link>
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white py-3 rounded-xl font-semibold transition-colors text-sm"
+          className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:opacity-60 text-white py-3 rounded-xl font-semibold transition-colors text-sm"
         >
           {loading ? 'Connexion...' : 'Se connecter'}
         </button>
@@ -74,7 +74,7 @@ function ConnexionForm() {
 
       <p className="text-center text-sm text-gray-500 mt-6">
         Pas encore de compte ?{' '}
-        <Link href="/auth/inscription" className="text-orange-500 hover:text-orange-600 font-medium">
+        <Link href="/auth/inscription" className="text-cyan-500 hover:text-cyan-600 font-medium">
           Créer un compte
         </Link>
       </p>
@@ -88,8 +88,8 @@ export default function ConnexionPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="bg-orange-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-black text-2xl">V</div>
-            <span className="font-black text-2xl text-gray-900">Venip<span className="text-orange-500">Shop</span></span>
+            <div className="bg-cyan-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-black text-2xl">V</div>
+            <span className="font-black text-2xl text-gray-900">Venip<span className="text-cyan-500">Shop</span></span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Connexion</h1>
           <p className="text-gray-500 text-sm mt-1">Bienvenue ! Connectez-vous à votre compte.</p>

@@ -29,7 +29,7 @@ export default function WishlistPage() {
             <p className="text-5xl mb-3">❤️</p>
             <p className="font-semibold text-gray-900 mb-2">Votre wishlist est vide</p>
             <p className="text-gray-500 text-sm mb-6">Ajoutez des produits à votre liste d&apos;envies en cliquant sur le cœur.</p>
-            <Link href="/catalogue" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all">
+            <Link href="/catalogue" className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all">
               Découvrir nos produits
             </Link>
           </div>
@@ -45,8 +45,8 @@ export default function WishlistPage() {
                     {discount > 0 && <span className="absolute top-1 left-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">-{discount}%</span>}
                   </Link>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-orange-500 font-semibold">{product.brand}</p>
-                    <Link href={`/produit/${product.id}`} className="text-sm font-semibold text-gray-900 hover:text-orange-500 line-clamp-2">{product.name}</Link>
+                    <p className="text-xs text-cyan-500 font-semibold">{product.brand}</p>
+                    <Link href={`/produit/${product.id}`} className="text-sm font-semibold text-gray-900 hover:text-cyan-500 line-clamp-2">{product.name}</Link>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="font-bold text-gray-900 text-sm">{formatPriceShort(product.price)}</span>
                       {product.originalPrice && <span className="text-xs text-gray-400 line-through">{formatPriceShort(product.originalPrice)}</span>}
@@ -55,7 +55,7 @@ export default function WishlistPage() {
                       <button
                         onClick={() => addItem(product)}
                         disabled={product.stock === 0}
-                        className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-xs font-bold py-2 rounded-xl transition-all"
+                        className="flex-1 bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-xs font-bold py-2 rounded-xl transition-all"
                       >
                         {product.stock === 0 ? 'Rupture' : 'Ajouter'}
                       </button>

@@ -76,18 +76,18 @@ export default function AdminProduits() {
       <div className="space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <h1 className="text-2xl font-extrabold text-gray-900">Produits <span className="text-gray-400 font-normal text-lg">({allProducts.length})</span></h1>
-          <button onClick={openAdd} className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
+          <button onClick={openAdd} className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2">
             <span className="text-lg">+</span> Ajouter un produit
           </button>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..."
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
           <div className="flex gap-2 flex-wrap">
-            <button onClick={() => setCatFilter('all')} className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${catFilter === 'all' ? 'bg-orange-500 text-white' : 'border border-gray-200 text-gray-600'}`}>Toutes</button>
+            <button onClick={() => setCatFilter('all')} className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${catFilter === 'all' ? 'bg-cyan-500 text-white' : 'border border-gray-200 text-gray-600'}`}>Toutes</button>
             {CATEGORIES.map(c => (
-              <button key={c.value} onClick={() => setCatFilter(c.value)} className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${catFilter === c.value ? 'bg-orange-500 text-white' : 'border border-gray-200 text-gray-600 hover:border-orange-300'}`}>{c.label}</button>
+              <button key={c.value} onClick={() => setCatFilter(c.value)} className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${catFilter === c.value ? 'bg-cyan-500 text-white' : 'border border-gray-200 text-gray-600 hover:border-cyan-300'}`}>{c.label}</button>
             ))}
           </div>
         </div>
@@ -97,11 +97,11 @@ export default function AdminProduits() {
             <div key={p.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="relative h-36 bg-gray-50">
                 {p.images[0] && <Image src={p.images[0]} alt={p.name} fill className="object-contain p-3" unoptimized />}
-                {p.badge && <span className="absolute top-2 left-2 bg-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{p.badge}</span>}
+                {p.badge && <span className="absolute top-2 left-2 bg-cyan-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{p.badge}</span>}
                 <div className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ${p.stock > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
               </div>
               <div className="p-4">
-                <p className="text-xs text-orange-500 font-semibold mb-0.5">{p.brand} · {CATEGORIES.find(c => c.value === p.category)?.label}</p>
+                <p className="text-xs text-cyan-500 font-semibold mb-0.5">{p.brand} · {CATEGORIES.find(c => c.value === p.category)?.label}</p>
                 <p className="font-bold text-gray-900 text-sm line-clamp-2 mb-2">{p.name}</p>
                 <div className="flex items-center justify-between">
                   <div>
@@ -148,7 +148,7 @@ export default function AdminProduits() {
                     <input type="text" value={(form as unknown as Record<string, string>)[f.key] || ''}
                       onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                       placeholder={f.placeholder}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
 
                   </div>
                 ))}
@@ -157,29 +157,29 @@ export default function AdminProduits() {
                   <label className="block text-xs font-semibold text-gray-700 mb-1.5">Description</label>
                   <textarea value={form.description} onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
                     rows={3} placeholder="Description complète"
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none" />
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Prix (GNF) *</label>
                     <input type="number" value={form.price || ''} onChange={e => setForm(prev => ({ ...prev, price: Number(e.target.value) }))}
-                      placeholder="150000" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      placeholder="150000" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Prix original</label>
                     <input type="number" value={form.originalPrice || ''} onChange={e => setForm(prev => ({ ...prev, originalPrice: e.target.value ? Number(e.target.value) : undefined }))}
-                      placeholder="200000" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      placeholder="200000" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Stock *</label>
                     <input type="number" value={form.stock || ''} onChange={e => setForm(prev => ({ ...prev, stock: Number(e.target.value) }))}
-                      placeholder="50" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                      placeholder="50" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Catégorie</label>
                     <select value={form.category} onChange={e => setForm(prev => ({ ...prev, category: e.target.value as Category }))}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
                       {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
                   </div>
@@ -188,21 +188,21 @@ export default function AdminProduits() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1.5">URL de l&apos;image</label>
                   <input type="url" value={form.images[0] || ''} onChange={e => setForm(prev => ({ ...prev, images: [e.target.value] }))}
-                    placeholder="https://..." className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                    placeholder="https://..." className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">Badge</label>
                     <select value={form.badge || ''} onChange={e => setForm(prev => ({ ...prev, badge: (e.target.value || undefined) as Product['badge'] }))}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
                       <option value="">Aucun</option>
                       {['Nouveau','Promo','Populaire','Gaming','Best Seller','Exclusif'].map(b => <option key={b} value={b}>{b}</option>)}
                     </select>
                   </div>
                   <div className="flex items-end pb-2.5">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={form.isFeatured || false} onChange={e => setForm(prev => ({ ...prev, isFeatured: e.target.checked }))} className="accent-orange-500" />
+                      <input type="checkbox" checked={form.isFeatured || false} onChange={e => setForm(prev => ({ ...prev, isFeatured: e.target.checked }))} className="accent-cyan-500" />
                       <span className="text-xs font-semibold text-gray-700">Produit vedette</span>
                     </label>
                   </div>
@@ -211,7 +211,7 @@ export default function AdminProduits() {
 
               <div className="flex gap-3 mt-5 pt-4 border-t border-gray-100">
                 <button onClick={handleSave} disabled={saving}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white py-3 rounded-xl font-bold text-sm transition-colors">
+                  className="flex-1 bg-cyan-500 hover:bg-cyan-600 disabled:opacity-50 text-white py-3 rounded-xl font-bold text-sm transition-colors">
                   {saving ? 'Enregistrement...' : editingProduct ? 'Enregistrer' : 'Ajouter le produit'}
                 </button>
                 <button onClick={() => setShowModal(false)} className="flex-1 border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-colors">Annuler</button>
