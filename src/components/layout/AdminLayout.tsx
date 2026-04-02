@@ -31,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Admin header */}
       <header className="bg-gray-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-teal-400 font-extrabold text-lg">VenipShop</Link>
+          <Link href="/"><img src="/venips-logo.png" alt="Venips" className="h-8 w-auto" /></Link>
           <span className="text-gray-600">/</span>
           <span className="text-gray-300 text-sm font-semibold">Administration</span>
         </div>
