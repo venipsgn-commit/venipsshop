@@ -1,22 +1,22 @@
 <svg viewBox="0 0 240 62" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#00D8D8"/>
-      <stop offset="100%" stop-color="#006F6F"/>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#C2410C"/>
     </linearGradient>
-    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1A7A42"/>
-      <stop offset="100%" stop-color="#0A3820"/>
+    <linearGradient id="orangeDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#7C2D12"/>
     </linearGradient>
   </defs>
 
-  <!-- W icon: 4 angled bars forming a W shape -->
-  <polygon points="2,6 13,6 17,56 6,56"  fill="#0A6868"/>
-  <polygon points="13,6 28,6 20,56 9,56"  fill="url(#tealGrad)"/>
-  <polygon points="34,6 46,6 44,56 26,56" fill="#009090"/>
-  <polygon points="46,6 58,6 56,56 42,56" fill="url(#greenGrad)"/>
+  <!-- W icon: 4 angled bars in orange tones -->
+  <polygon points="2,6 13,6 17,56 6,56"   fill="#7C2D12"/>
+  <polygon points="13,6 28,6 20,56 9,56"  fill="url(#orangeDark)"/>
+  <polygon points="34,6 46,6 44,56 26,56" fill="url(#orangeGrad)"/>
+  <polygon points="46,6 58,6 56,56 42,56" fill="#EA580C"/>
 
-  <!-- Text: VENıPS  (ı = dotless i, U+0131) with separate cyan dot -->
+  <!-- Text: VENıPS (dotless i) + dot orange vif -->
   <text
     x="70" y="48"
     font-family="'Arial Black', 'Arial Bold', Arial, sans-serif"
@@ -26,6 +26,6 @@
     letter-spacing="1"
   >VENıPS</text>
 
-  <!-- Cyan dot above the dotless i (approximate center of i at ~x=162) -->
-  <circle cx="162" cy="10" r="5.5" fill="#00D8D8"/>
+  <!-- Orange dot above the i -->
+  <circle cx="162" cy="10" r="5.5" fill="#FB923C"/>
 </svg>
