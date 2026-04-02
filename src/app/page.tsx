@@ -44,7 +44,7 @@ export default function HomePage() {
                 <span className="block text-orange-400 mt-1">au meilleur prix</span>
               </h1>
               <p className="text-gray-400 text-base sm:text-lg mb-8 leading-relaxed max-w-lg">
-                Téléphones, ordinateurs et accessoires high-tech de qualité. Large gamme de produits authentiques avec livraison rapide au Sénégal.
+                Téléphones, ordinateurs et accessoires high-tech de qualité. Large gamme de produits authentiques avec livraison rapide en Guinée Conakry.
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link href="/catalogue" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-orange-500/25 active:scale-95">
@@ -245,7 +245,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: '🚚', title: 'Livraison Rapide', desc: '24-48h sur Dakar, 3-5 jours partout au Sénégal' },
+              { icon: '🚚', title: 'Livraison Rapide', desc: '24-48h sur Conakry, 3-5 jours partout en Guinée' },
               { icon: '🔒', title: 'Paiement Sécurisé', desc: 'Wave, Orange Money, carte bancaire' },
               { icon: '↩️', title: 'Retours Gratuits', desc: '30 jours pour retourner sans frais' },
               { icon: '💬', title: 'Support 7j/7', desc: 'Équipe disponible par chat et téléphone' },

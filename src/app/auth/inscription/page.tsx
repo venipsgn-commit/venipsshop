@@ -56,7 +56,7 @@ export default function InscriptionPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Téléphone</label>
-              <input type="tel" required {...f('telephone')} placeholder="+221 77 000 00 00" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm" />
+              <input type="tel" required {...f('telephone')} placeholder="+224 6xx xxx xxx" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>

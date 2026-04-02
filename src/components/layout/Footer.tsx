@@ -45,8 +45,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Contact</h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📍</span>Dakar, Sénégal</li>
-              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📞</span>+221 77 000 00 00</li>
+              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📍</span>Conakry, Guinée</li>
+              <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📞</span>+224 628 880 354</li>
               <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">📧</span>contact@venipshop.com</li>
               <li className="flex items-start gap-2"><span className="text-orange-500 mt-0.5">⏰</span>Lun-Sam : 8h - 20h</li>
             </ul>
@@ -55,7 +55,7 @@ export default function Footer() {
 
         {/* Trust badges */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-8 border-y border-gray-800">
-          {[['🚚','Livraison Rapide','24-48h sur Dakar'],['🔒','Paiement Sécurisé','Wave, OM, CB'],['↩️','Retours Faciles','30 jours gratuits'],['💬','Support 7j/7','Chat & Téléphone']].map(([icon,title,sub]) => (
+          {[['🚚','Livraison Rapide','24-48h sur Conakry'],['🔒','Paiement Sécurisé','Wave, OM, CB'],['↩️','Retours Faciles','30 jours gratuits'],['💬','Support 7j/7','Chat & Téléphone']].map(([icon,title,sub]) => (
             <div key={title} className="flex items-center gap-3">
               <span className="text-2xl">{icon}</span>
               <div><p className="text-white font-medium text-sm">{title}</p><p className="text-xs">{sub}</p></div>

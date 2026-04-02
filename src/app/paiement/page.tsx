@@ -34,8 +34,8 @@ export default function CheckoutPage() {
     nom: user?.nom || '',
     prenom: user?.prenom || '',
     rue: '',
-    ville: 'Dakar',
-    pays: 'Sénégal',
+    ville: 'Conakry',
+    pays: 'Guinée',
     telephone: user?.telephone || '',
     isDefault: true,
   });
@@ -168,8 +168,8 @@ export default function CheckoutPage() {
                   { key: 'nom', label: 'Nom', placeholder: 'Diallo', type: 'text' },
                   { key: 'prenom', label: 'Prénom', placeholder: 'Mamadou', type: 'text' },
                   { key: 'rue', label: 'Adresse complète', placeholder: 'Rue 10, Villa 5, Almadies', type: 'text', full: true },
-                  { key: 'ville', label: 'Ville', placeholder: 'Dakar', type: 'text' },
-                  { key: 'telephone', label: 'Téléphone', placeholder: '+221 77 xxx xx xx', type: 'tel' },
+                  { key: 'ville', label: 'Ville', placeholder: 'Conakry', type: 'text' },
+                  { key: 'telephone', label: 'Téléphone', placeholder: '+224 6xx xxx xxx', type: 'tel' },
                 ].map(f => (
                   <div key={f.key} className={f.full ? 'sm:col-span-2' : ''}>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label}</label>
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
               {(payMethod === 'wave' || payMethod === 'orange_money') && (
                 <div className="border border-gray-200 rounded-xl p-4 mb-6">
                   <label className="block text-xs font-semibold text-gray-700 mb-1.5">Numéro {payMethod === 'wave' ? 'Wave' : 'Orange Money'}</label>
-                  <input type="tel" placeholder="+221 77 xxx xx xx" defaultValue={user?.telephone} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                  <input type="tel" placeholder="+224 6xx xxx xxx" defaultValue={user?.telephone} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" />
                   <p className="text-xs text-gray-400 mt-1.5">Un code de confirmation vous sera envoyé sur ce numéro.</p>
                 </div>
               )}
