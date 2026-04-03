@@ -54,7 +54,7 @@ export default function Footer() {
 
         {/* Trust badges */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-8 border-y border-gray-800">
-          {[['🚚','Livraison Rapide','24-48h sur Dakar'],['🔒','Paiement Sécurisé','Wave, OM, CB'],['↩️','Retours Faciles','30 jours gratuits'],['💬','Support 7j/7','Chat & Téléphone']].map(([icon,title,sub]) => (
+          {[['🚚','Livraison Rapide','Partout en Guinée'],['🔒','Paiement Sécurisé','Wave, OM, CB'],['↩️','Retours Faciles','30 jours gratuits'],['💬','Support 7j/7','Chat & Téléphone']].map(([icon,title,sub]) => (
             <div key={title} className="flex items-center gap-3">
               <span className="text-2xl">{icon}</span>
               <div><p className="text-white font-medium text-sm">{title}</p><p className="text-xs">{sub}</p></div>
