@@ -44,8 +44,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Contact</h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📍</span>Dakar, Sénégal</li>
-              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📞</span>+221 77 000 00 00</li>
+              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📍</span>Guinée, Conakry</li>
+              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📞</span>+224 628 88 34</li>
               <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📧</span>contact@venipshop.com</li>
               <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">⏰</span>Lun-Sam : 8h - 20h</li>
             </ul>
