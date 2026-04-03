@@ -14,10 +14,10 @@ const CATEGORIES = [
 ];
 
 const TESTIMONIALS = [
-  { name: 'Mamadou Diallo', role: 'Entrepreneur', note: 5, text: 'Livraison ultra rapide, produit conforme à la description. Je recommande VenipShop à 100% !', avatar: 'M' },
-  { name: 'Fatou Sow',      role: 'Étudiante',    note: 5, text: 'Mon iPhone est arrivé en parfait état, emballage soigné. Service client très réactif.', avatar: 'F' },
-  { name: 'Ibrahima Kane',  role: 'Ingénieur',    note: 5, text: 'J\'ai commandé un MacBook Pro, tout s\'est passé parfaitement. Prix compétitif !', avatar: 'I' },
-  { name: 'Aïssatou Ndiaye',role: 'Médecin',      note: 4, text: 'Bonne expérience d\'achat en ligne. Paiement facile via Wave. Produits authentiques.', avatar: 'A' },
+  { name: 'Mamadou Diallo', role: 'Entrepreneur', note: 5, text: 'Livraison ultra rapide, produit conforme à la description. Je recommande Venips à 100% !', avatar: 'M' },
+  { name: 'Fatou Camara',   role: 'Étudiante',    note: 5, text: 'Mon iPhone est arrivé en parfait état, emballage soigné. Service client très réactif.', avatar: 'F' },
+  { name: 'Ibrahima Bah',   role: 'Ingénieur',    note: 5, text: 'J\'ai commandé un MacBook Pro, tout s\'est passé parfaitement. Prix compétitif en Guinée !', avatar: 'I' },
+  { name: 'Aïssatou Barry', role: 'Médecin',       note: 4, text: 'Bonne expérience d\'achat en ligne. Paiement facile via Wave. Produits authentiques.', avatar: 'A' },
 ];
 
 export default function HomePage() {
@@ -252,7 +252,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: '🚚', title: 'Livraison Rapide', desc: '24-48h sur Dakar, 3-5 jours partout au Sénégal' },
+              { icon: '🚚', title: 'Livraison Rapide', desc: '24-48h sur Conakry, partout en Guinée' },
               { icon: '🔒', title: 'Paiement Sécurisé', desc: 'Wave, Orange Money, carte bancaire' },
               { icon: '↩️', title: 'Retours Gratuits', desc: '30 jours pour retourner sans frais' },
               { icon: '💬', title: 'Support 7j/7', desc: 'Équipe disponible par chat et téléphone' },

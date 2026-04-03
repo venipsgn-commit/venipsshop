@@ -33,8 +33,8 @@ export default function CheckoutPage() {
     nom: user?.nom || '',
     prenom: user?.prenom || '',
     rue: '',
-    ville: 'Dakar',
-    pays: 'Sénégal',
+    ville: 'Conakry',
+    pays: 'Guinée',
     telephone: user?.telephone || '',
     isDefault: true,
   });
@@ -162,8 +162,8 @@ export default function CheckoutPage() {
                 {[
                   { key: 'nom', label: 'Nom', placeholder: 'Diallo', type: 'text' },
                   { key: 'prenom', label: 'Prénom', placeholder: 'Mamadou', type: 'text' },
-                  { key: 'rue', label: 'Adresse complète', placeholder: 'Rue 10, Villa 5, Almadies', type: 'text', full: true },
-                  { key: 'ville', label: 'Ville', placeholder: 'Dakar', type: 'text' },
+                  { key: 'rue', label: 'Adresse complète', placeholder: 'Quartier, Rue, Commune', type: 'text', full: true },
+                  { key: 'ville', label: 'Ville', placeholder: 'Conakry', type: 'text' },
                   { key: 'telephone', label: 'Téléphone', placeholder: '+221 77 xxx xx xx', type: 'tel' },
                 ].map(f => (
                   <div key={f.key} className={f.full ? 'sm:col-span-2' : ''}>

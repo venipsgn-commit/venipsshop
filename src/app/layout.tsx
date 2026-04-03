@@ -9,8 +9,8 @@ import CartSidebar from '@/components/layout/CartSidebar';
 
 export const metadata: Metadata = {
   title: 'VenipShop – Ordinateurs, Téléphones & Accessoires',
-  description: 'Boutique en ligne spécialisée en high-tech : ordinateurs, téléphones, accessoires, gaming. Livraison rapide au Sénégal.',
-  keywords: 'téléphone, ordinateur, accessoires, gaming, Dakar, Sénégal, tech',
+  description: 'Boutique en ligne spécialisée en high-tech : ordinateurs, téléphones, accessoires, gaming. Livraison partout en Guinée.',
+  keywords: 'téléphone, ordinateur, accessoires, gaming, Conakry, Guinée, tech, Venips',
   icons: {
     icon: '/venips-logo.png',
     apple: '/venips-logo.png',
