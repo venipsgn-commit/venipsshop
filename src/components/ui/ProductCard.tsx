@@ -84,7 +84,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <span className="block sm:hidden text-sm font-bold text-gray-900">{formatPriceShort(product.price)}</span>
             <span className="hidden sm:block text-base font-bold text-gray-900">{formatPrice(product.price)}</span>
             {product.originalPrice && (
-              <span className="text-xs text-gray-400 line-through">{formatPriceShort(product.originalPrice)}</span>
+              <span className="text-xs text-gray-400 line-through">{formatPrice(product.originalPrice)}</span>
             )}
           </div>
 
