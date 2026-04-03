@@ -10,7 +10,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center mb-4">
               <img src="/venips-logo.png" alt="Venips" className="h-10 w-auto" />
             </Link>
-            <p className="text-sm leading-relaxed mb-4">Votre boutique tech de confiance. Produits authentiques, livraison rapide, service client premium.</p>
+            <p className="text-sm leading-relaxed mb-4">Venips est une entreprise de vente en ligne, d'investissement et de prestation de service.</p>
             <div className="flex gap-3">
               {['facebook','instagram','twitter','youtube'].map(s => (
                 <a key={s} href="#" className="w-9 h-9 bg-gray-800 hover:bg-teal-500 rounded-lg flex items-center justify-center transition-colors">
@@ -46,7 +46,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📍</span>Guinée, Conakry</li>
               <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📞</span>+224 628 88 34</li>
-              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📧</span>contact@venipshop.com</li>
+              <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">📧</span>venips.gn@gmail.com</li>
               <li className="flex items-start gap-2"><span className="text-teal-500 mt-0.5">⏰</span>Lun-Sam : 8h - 20h</li>
             </ul>
           </div>
@@ -63,7 +63,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-6 text-xs">
-          <p>© 2026 VenipShop. Tous droits réservés.</p>
+          <p>© 2026 Venips Groupe. Tous droits réservés.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-teal-400 transition-colors">Conditions générales</a>
             <a href="#" className="hover:text-teal-400 transition-colors">Confidentialité</a>
