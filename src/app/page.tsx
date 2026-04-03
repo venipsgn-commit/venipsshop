@@ -28,61 +28,68 @@ export default function HomePage() {
   return (
     <div>
       {/* ─── HERO ─── */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-teal-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+      <section className="relative text-white overflow-hidden" style={{background: 'linear-gradient(135deg, #020B3A 0%, #041459 50%, #020B3A 100%)'}}>
+        {/* Orbes lumineux */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-0 w-[700px] h-[700px] rounded-full blur-3xl -translate-y-1/3 translate-x-1/3" style={{background: 'radial-gradient(circle, rgba(0,216,216,0.12) 0%, transparent 70%)'}} />
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" style={{background: 'radial-gradient(circle, rgba(0,160,160,0.08) 0%, transparent 70%)'}} />
+          <div className="absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" style={{background: 'radial-gradient(circle, rgba(0,216,216,0.05) 0%, transparent 70%)'}} />
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
             <div>
-              <span className="inline-flex items-center gap-2 bg-teal-500/20 border border-teal-500/30 text-teal-400 text-xs sm:text-sm px-3 py-1.5 rounded-full mb-5 font-medium">
-                🎉 Livraison gratuite dès 100 000 GNF
+              <span className="inline-flex items-center gap-2 border text-xs sm:text-sm px-4 py-2 rounded-full mb-6 font-medium" style={{background: 'rgba(0,216,216,0.1)', borderColor: 'rgba(0,216,216,0.3)', color: '#00D8D8'}}>
+                🚚 Livraison partout en Guinée
               </span>
-              <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-5">
+              <h1 className="text-4xl sm:text-6xl font-extrabold leading-tight mb-6">
                 La tech à votre portée,
-                <span className="block text-teal-400 mt-1">au meilleur prix</span>
+                <span className="block mt-2" style={{color: '#00D8D8'}}>au meilleur prix</span>
               </h1>
-              <p className="text-gray-400 text-base sm:text-lg mb-8 leading-relaxed max-w-lg">
-                Téléphones, ordinateurs et accessoires high-tech de qualité. Large gamme de produits authentiques avec livraison rapide au Sénégal.
+              <p className="text-blue-200 text-base sm:text-lg mb-8 leading-relaxed max-w-lg">
+                Téléphones, ordinateurs et accessoires high-tech de qualité. Large gamme de produits authentiques avec livraison partout en Guinée.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/catalogue" className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25 active:scale-95">
+                <Link href="/catalogue" className="text-white px-7 py-3.5 rounded-xl font-bold transition-all shadow-lg active:scale-95" style={{background: 'linear-gradient(135deg, #00D8D8, #009090)', boxShadow: '0 8px 24px rgba(0,216,216,0.3)'}}>
                   Explorer le catalogue
                 </Link>
-                <Link href="/catalogue?cat=telephones" className="border border-gray-600 hover:border-teal-500 hover:text-teal-400 text-gray-300 px-6 py-3 rounded-xl font-semibold transition-all">
+                <Link href="/catalogue?cat=telephones" className="border border-white/20 hover:border-white/50 text-blue-200 hover:text-white px-7 py-3.5 rounded-xl font-semibold transition-all backdrop-blur-sm" style={{background: 'rgba(255,255,255,0.05)'}}>
                   Voir les téléphones
                 </Link>
               </div>
-              <div className="flex flex-wrap gap-5 mt-8">
+              <div className="flex flex-wrap gap-6 mt-10">
                 {[['✓','Produits authentiques'],['✓','Garantie constructeur'],['✓','Retours 30 jours']].map(([icon,txt]) => (
-                  <span key={txt} className="flex items-center gap-1.5 text-sm text-gray-400">
-                    <span className="text-teal-400 font-bold">{icon}</span>{txt}
+                  <span key={txt} className="flex items-center gap-2 text-sm text-blue-200">
+                    <span className="font-bold text-base" style={{color: '#00D8D8'}}>{icon}</span>{txt}
                   </span>
                 ))}
               </div>
             </div>
+
             {/* Hero images grid */}
             <div className="hidden lg:grid grid-cols-2 gap-4">
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden h-52 relative shadow-2xl ring-1 ring-white/10">
+                <div className="rounded-2xl overflow-hidden h-52 relative shadow-2xl" style={{boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,216,216,0.15)'}}>
                   <Image src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80" alt="MacBook" fill className="object-cover" unoptimized />
                 </div>
-                <div className="rounded-2xl overflow-hidden h-40 relative shadow-2xl ring-1 ring-white/10">
+                <div className="rounded-2xl overflow-hidden h-40 relative shadow-2xl" style={{boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,216,216,0.15)'}}>
                   <Image src="https://images.unsplash.com/photo-1588423771073-b8903fbb85b5?w=400&q=80" alt="Écouteurs" fill className="object-cover" unoptimized />
                 </div>
               </div>
               <div className="space-y-4 mt-10">
-                <div className="rounded-2xl overflow-hidden h-40 relative shadow-2xl ring-1 ring-white/10">
+                <div className="rounded-2xl overflow-hidden h-40 relative shadow-2xl" style={{boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,216,216,0.15)'}}>
                   <Image src="https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80" alt="iPhone" fill className="object-cover" unoptimized />
                 </div>
-                <div className="rounded-2xl overflow-hidden h-52 relative shadow-2xl ring-1 ring-white/10">
+                <div className="rounded-2xl overflow-hidden h-52 relative shadow-2xl" style={{boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,216,216,0.15)'}}>
                   <Image src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&q=80" alt="Samsung" fill className="object-cover" unoptimized />
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Vague de transition vers le blanc */}
+        <div className="absolute bottom-0 left-0 right-0 h-16" style={{background: 'linear-gradient(to bottom, transparent, white)'}} />
       </section>
 
       {/* ─── STATS ─── */}
