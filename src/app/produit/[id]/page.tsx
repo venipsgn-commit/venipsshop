@@ -166,9 +166,12 @@ export default function ProductPage() {
             {/* Prix */}
             <div className="mb-5">
               <div className="flex items-baseline gap-3">
-                <span className="text-3xl sm:text-4xl font-extrabold text-teal-600">{formatPrice(product.price)}</span>
+                <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">{formatPrice(product.price)}</span>
                 {product.originalPrice && (
                   <span className="text-lg text-gray-400 line-through">{formatPrice(product.originalPrice)}</span>
+                )}
+                {discount > 0 && (
+                  <span className="bg-red-500 text-white text-sm font-extrabold px-2.5 py-1 rounded-full">-{discount}%</span>
                 )}
               </div>
               {product.originalPrice && (
@@ -206,8 +209,8 @@ export default function ProductPage() {
                 disabled={product.stock === 0}
                 className="flex-1 h-12 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                 style={product.stock > 0 && !added ? {
-                  background: 'linear-gradient(135deg, #00C8C8, #007070)',
-                  boxShadow: '0 8px 20px rgba(0,200,200,0.3)',
+                  background: 'linear-gradient(135deg, #22c55e, #15803d)',
+                  boxShadow: '0 8px 20px rgba(34,197,94,0.3)',
                   color: 'white'
                 } : {}}
               >

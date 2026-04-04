@@ -50,7 +50,7 @@ export default function HomePage() {
                 Téléphones, ordinateurs et accessoires high-tech de qualité. Large gamme de produits authentiques avec livraison partout en Guinée.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Link href="/catalogue" className="text-white px-7 py-3.5 rounded-xl font-bold transition-all shadow-lg active:scale-95" style={{background: 'linear-gradient(135deg, #00D8D8, #009090)', boxShadow: '0 8px 24px rgba(0,216,216,0.3)'}}>
+                <Link href="/catalogue" className="text-white px-7 py-3.5 rounded-xl font-bold transition-all shadow-lg active:scale-95" style={{background: 'linear-gradient(135deg, #22c55e, #15803d)', boxShadow: '0 8px 24px rgba(34,197,94,0.35)'}}>
                   Explorer le catalogue
                 </Link>
                 <Link href="/catalogue?cat=telephones" className="border border-white/20 hover:border-white/50 text-blue-200 hover:text-white px-7 py-3.5 rounded-xl font-semibold transition-all backdrop-blur-sm" style={{background: 'rgba(255,255,255,0.05)'}}>
@@ -151,17 +151,17 @@ export default function HomePage() {
 
       {/* ─── PROMO BANNER ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-3xl overflow-hidden relative">
+        <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-3xl overflow-hidden relative">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           </div>
           <div className="relative z-10 px-6 sm:px-12 py-8 sm:py-10 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="text-white text-center sm:text-left">
-              <p className="text-sm font-semibold uppercase tracking-widest text-teal-100">Offre spéciale</p>
+              <p className="text-sm font-semibold uppercase tracking-widest text-red-100">Offre spéciale</p>
               <h2 className="text-2xl sm:text-4xl font-extrabold mt-1">Jusqu&apos;à <span className="text-white">-25%</span></h2>
-              <p className="text-teal-100 mt-1">Utilisez le code <strong className="bg-white/20 px-2 py-0.5 rounded font-mono">NOEL25</strong> à la caisse</p>
+              <p className="text-red-100 mt-1">Utilisez le code <strong className="bg-white/20 px-2 py-0.5 rounded font-mono">NOEL25</strong> à la caisse</p>
             </div>
-            <Link href="/catalogue" className="bg-white text-teal-600 hover:bg-teal-50 font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg whitespace-nowrap">
+            <Link href="/catalogue" className="bg-white text-red-600 hover:bg-red-50 font-bold px-7 py-3.5 rounded-xl transition-all shadow-lg whitespace-nowrap">
               Profiter de l&apos;offre
             </Link>
           </div>
@@ -276,7 +276,7 @@ export default function HomePage() {
           <p className="text-gray-500 text-sm mb-6">Recevez nos meilleures promotions directement dans votre boîte mail.</p>
           <form onSubmit={e => e.preventDefault()} className="flex gap-2">
             <input type="email" placeholder="Votre adresse email" className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm" />
-            <button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white px-5 py-3 rounded-xl font-semibold transition-colors text-sm whitespace-nowrap">S&apos;abonner</button>
+            <button type="submit" className="text-white px-5 py-3 rounded-xl font-semibold transition-colors text-sm whitespace-nowrap" style={{background: 'linear-gradient(135deg, #22c55e, #15803d)'}}>S&apos;abonner</button>
           </form>
         </div>
       </section>

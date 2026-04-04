@@ -11,7 +11,7 @@ const BADGE_STYLE: Record<string, string> = {
   'Promo':      'bg-red-500 text-white',
   'Populaire':  'bg-blue-600 text-white',
   'Gaming':     'bg-violet-600 text-white',
-  'Best Seller':'bg-yellow-500 text-white',
+  'Best Seller':'bg-amber-500 text-white',
   'Exclusif':   'bg-gray-900 text-white',
 };
 
@@ -101,7 +101,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Prix */}
         <div className="mt-auto">
           <div className="flex items-end gap-2 mb-3">
-            <span className="text-base sm:text-lg font-extrabold text-teal-600">
+            <span className="text-base sm:text-lg font-extrabold text-gray-900">
               {formatPrice(product.price)}
             </span>
             {product.originalPrice && (
@@ -121,7 +121,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <button
             onClick={() => addItem(product)}
             className="w-full text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5"
-            style={{background: 'linear-gradient(135deg, #00C8C8, #007070)', boxShadow: '0 4px 12px rgba(0,200,200,0.25)'}}
+            style={{background: 'linear-gradient(135deg, #22c55e, #15803d)', boxShadow: '0 4px 12px rgba(34,197,94,0.25)'}}
           >
             <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
