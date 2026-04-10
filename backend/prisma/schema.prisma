@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────
+// UTILISATEURS
+// ─────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  prenom    String
+  nom       String
+  telephone String?
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  addresses Address[]
+  orders    Order[]
+  wishlist  WishlistItem[]
+  reviews   Review[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Address {
+  id         String  @id @default(uuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String  @default("Domicile")
+  prenom     String
+  nom        String
+  telephone  String
+  rue        String
+  commune    String?
+  ville      String
+  pays       String  @default("Guinée")
+  isDefault  Boolean @default(false)
+  createdAt  DateTime @default(now())
+
+  orders Order[]
+
+  @@map("addresses")
+}
+
+// ─────────────────────────────────────────
+// PRODUITS
+// ─────────────────────────────────────────
+
+enum ProductBadge {
+  NOUVEAU
+  PROMO
+  POPULAIRE
+  GAMING
+  BEST_SELLER
+  EXCLUSIF
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id            String        @id @default(uuid())
+  name          String
+  slug          String        @unique
+  description   String
+  shortDesc     String?
+  price         Int
+  originalPrice Int?
+  stock         Int           @default(0)
+  categoryId    String
+  category      Category      @relation(fields: [categoryId], references: [id])
+  brand         String
+  badge         ProductBadge?
+  images        String[]
+  features      String[]
+  specs         Json          @default("{}")
+  rating        Float         @default(0)
+  reviewCount   Int           @default(0)
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  orderItems   OrderItem[]
+  reviews      Review[]
+  wishlistItems WishlistItem[]
+
+  @@map("products")
+}
+
+// ─────────────────────────────────────────
+// COMMANDES
+// ─────────────────────────────────────────
+
+enum OrderStatus {
+  EN_ATTENTE
+  CONFIRME
+  EN_PREPARATION
+  EXPEDIE
+  LIVRE
+  ANNULE
+}
+
+enum PaymentMethod {
+  WAVE
+  ORANGE_MONEY
+  CARTE
+  CASH
+}
+
+enum PaymentStatus {
+  EN_ATTENTE
+  PAYE
+  REMBOURSE
+  ECHOUE
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  orderNumber     String        @unique
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  addressId       String?
+  address         Address?      @relation(fields: [addressId], references: [id])
+  items           OrderItem[]
+  subtotal        Int
+  shippingCost    Int           @default(0)
+  discount        Int           @default(0)
+  total           Int
+  status          OrderStatus   @default(EN_ATTENTE)
+  paymentMethod   PaymentMethod
+  paymentStatus   PaymentStatus @default(EN_ATTENTE)
+  promoCode       String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  price     Int
+  quantity  Int
+  image     String?
+
+  @@map("order_items")
+}
+
+// ─────────────────────────────────────────
+// AVIS & WISHLIST
+// ─────────────────────────────────────────
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("reviews")
+}
+
+model WishlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("wishlist_items")
+}
+
+// ─────────────────────────────────────────
+// CODES PROMO
+// ─────────────────────────────────────────
+
+model PromoCode {
+  id           String   @id @default(uuid())
+  code         String   @unique
+  discount     Int
+  minOrder     Int      @default(0)
+  maxUses      Int?
+  currentUses  Int      @default(0)
+  isActive     Boolean  @default(true)
+  expiresAt    DateTime?
+  createdAt    DateTime @default(now())
+
+  @@map("promo_codes")
+}
