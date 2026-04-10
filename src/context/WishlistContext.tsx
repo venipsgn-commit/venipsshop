@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { productApi } from '@/lib/api';
 import { useAuth } from './AuthContext';
 
 interface WishCtx {
@@ -11,22 +12,36 @@ interface WishCtx {
 const Ctx = createContext<WishCtx | null>(null);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  const { user, updateProfile } = useAuth();
+  const { user } = useAuth();
   const [ids, setIds] = useState<string[]>([]);
 
+  // Load wishlist from API when logged in, localStorage otherwise
   useEffect(() => {
-    if (user) setIds(user.wishlist ?? []);
-    else {
+    if (user) {
+      productApi.getWishlist()
+        .then(products => setIds(products.map(p => p.id)))
+        .catch(() => setIds([]));
+    } else {
       try { setIds(JSON.parse(localStorage.getItem('vshop_wishlist') ?? '[]')); }
       catch { setIds([]); }
     }
   }, [user]);
 
-  const toggle = (id: string) => {
+  const toggle = async (id: string) => {
+    // Optimistic UI update
     const next = ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id];
     setIds(next);
-    if (user) updateProfile({ wishlist: next });
-    else localStorage.setItem('vshop_wishlist', JSON.stringify(next));
+
+    if (user) {
+      try {
+        await productApi.toggleWishlist(id);
+      } catch {
+        // Rollback on error
+        setIds(ids);
+      }
+    } else {
+      localStorage.setItem('vshop_wishlist', JSON.stringify(next));
+    }
   };
 
   return (

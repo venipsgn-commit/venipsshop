@@ -1,16 +1,30 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import AccountLayout from '@/components/layout/AccountLayout';
 import { useAuth } from '@/context/AuthContext';
-import { getUserOrders, formatPrice, getStatusLabel } from '@/lib/storage';
+import { useWishlist } from '@/context/WishlistContext';
+import { orderApi, type Order } from '@/lib/api';
+import { formatPrice, getStatusLabel } from '@/lib/utils';
 
 export default function CompteHome() {
   const { user } = useAuth();
+  const { ids: wishlist } = useWishlist();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    orderApi.myOrders(1)
+      .then(res => setOrders(res.orders))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user]);
+
   if (!user) return null;
 
-  const orders = getUserOrders(user.id);
-  const recent = orders.slice(-3).reverse();
-  const totalSpent = orders.filter(o => o.status === 'livre').reduce((s, o) => s + o.total, 0);
+  const recent = orders.slice(0, 3);
+  const totalSpent = orders.filter(o => o.status === 'LIVRE').reduce((s, o) => s + o.total, 0);
 
   return (
     <AccountLayout>
@@ -18,14 +32,14 @@ export default function CompteHome() {
         {/* Welcome */}
         <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-2xl p-6 text-white">
           <h1 className="text-2xl font-extrabold mb-1">Bonjour, {user.prenom} ! 👋</h1>
-          <p className="text-teal-100 text-sm">Bienvenue sur votre espace personnel VenipShop.</p>
+          <p className="text-teal-100 text-sm">Bienvenue sur votre espace personnel Venips.</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {[
             { icon: '📦', label: 'Commandes', value: orders.length },
-            { icon: '❤️', label: 'Wishlist', value: user.wishlist.length },
+            { icon: '❤️', label: 'Wishlist', value: wishlist.length },
             { icon: '💰', label: 'Total dépensé', value: formatPrice(totalSpent) },
           ].map(s => (
             <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 text-center">
@@ -53,7 +67,11 @@ export default function CompteHome() {
         </div>
 
         {/* Recent orders */}
-        {recent.length > 0 && (
+        {loading ? (
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 animate-pulse space-y-3">
+            {[1,2,3].map(i => <div key={i} className="h-12 bg-gray-100 rounded-xl" />)}
+          </div>
+        ) : recent.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-extrabold text-gray-900">Commandes récentes</h2>
@@ -65,12 +83,14 @@ export default function CompteHome() {
                 return (
                   <div key={order.id} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
                     <div>
-                      <p className="font-semibold text-sm text-gray-900">{order.id}</p>
-                      <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('fr-FR')} · {order.items.length} article{order.items.length > 1 ? 's' : ''}</p>
+                      <p className="font-semibold text-sm text-gray-900">{order.orderNumber}</p>
+                      <p className="text-xs text-gray-400">
+                        {new Date(order.createdAt).toLocaleDateString('fr-FR')} · {order.items.length} article{order.items.length > 1 ? 's' : ''}
+                      </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>
-                        {st?.label}
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st.color}-100 text-${st.color}-700`}>
+                        {st.label}
                       </span>
                       <span className="font-bold text-gray-900 text-sm">{formatPrice(order.total)}</span>
                     </div>

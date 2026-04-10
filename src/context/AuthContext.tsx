@@ -1,7 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@/lib/types';
-import { getCurrentUser, setCurrentUser, findUserByEmail, createUser, updateUser } from '@/lib/storage';
+import { authApi, setTokens, clearTokens, getAccessToken, type User } from '@/lib/api';
 
 interface AuthCtx {
   user: User | null;
@@ -19,38 +18,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = getCurrentUser();
-    if (stored) setUser(stored);
-    setLoading(false);
+    const token = getAccessToken();
+    if (!token) { setLoading(false); return; }
+    authApi.me()
+      .then(u => setUser(u))
+      .catch(() => clearTokens())
+      .finally(() => setLoading(false));
   }, []);
 
   const login = async (email: string, password: string) => {
-    const found = findUserByEmail(email);
-    if (!found) return { ok: false, error: 'Aucun compte avec cet email.' };
-    if (found.password !== password) return { ok: false, error: 'Mot de passe incorrect.' };
-    setUser(found);
-    setCurrentUser(found);
-    return { ok: true };
+    try {
+      const data = await authApi.login(email, password);
+      setTokens(data.accessToken, data.refreshToken);
+      setUser(data.user);
+      return { ok: true };
+    } catch (e: unknown) {
+      return { ok: false, error: e instanceof Error ? e.message : 'Erreur de connexion' };
+    }
   };
 
   const register = async (data: { nom: string; prenom: string; email: string; telephone: string; password: string }) => {
-    if (findUserByEmail(data.email)) return { ok: false, error: 'Cet email est déjà utilisé.' };
-    const newUser = createUser(data);
-    setUser(newUser);
-    setCurrentUser(newUser);
-    return { ok: true };
+    try {
+      const res = await authApi.register(data);
+      setTokens(res.accessToken, res.refreshToken);
+      setUser(res.user);
+      return { ok: true };
+    } catch (e: unknown) {
+      return { ok: false, error: e instanceof Error ? e.message : 'Erreur lors de l\'inscription' };
+    }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      const refresh = localStorage.getItem('venips_refresh_token');
+      if (refresh) await authApi.logout(refresh);
+    } catch {}
+    clearTokens();
     setUser(null);
-    setCurrentUser(null);
   };
 
-  const updateProfile = (updates: Partial<User>) => {
+  const updateProfile = async (updates: Partial<User>) => {
     if (!user) return;
-    const updated = updateUser(user.id, updates);
-    setUser(updated);
-    setCurrentUser(updated);
+    try {
+      const updated = await authApi.me();
+      setUser({ ...updated, ...updates });
+    } catch {}
   };
 
   return <Ctx.Provider value={{ user, loading, login, register, logout, updateProfile }}>{children}</Ctx.Provider>;

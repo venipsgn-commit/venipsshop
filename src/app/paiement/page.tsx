@@ -5,14 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { formatPrice, formatPriceShort, createOrder } from '@/lib/storage';
-import { PROMO_CODES } from '@/lib/data/products';
-import type { Address } from '@/lib/types';
+import { orderApi, promoApi } from '@/lib/api';
+import { formatPrice, formatPriceShort } from '@/lib/utils';
 
 type Step = 'adresse' | 'paiement' | 'confirmation';
-type PayMethod = 'wave' | 'orange_money' | 'carte';
+type PayMethod = 'WAVE' | 'ORANGE_MONEY' | 'CARTE' | 'CASH';
 
-const FREE_DELIVERY = 100_000;
+const FREE_DELIVERY = 1_000_000;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -20,23 +19,18 @@ export default function CheckoutPage() {
   const { user } = useAuth();
 
   const [step, setStep] = useState<Step>('adresse');
-  const [payMethod, setPayMethod] = useState<PayMethod>('wave');
+  const [payMethod, setPayMethod] = useState<PayMethod>('WAVE');
   const [promoInput, setPromoInput] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [promoApplied, setPromoApplied] = useState('');
   const [promoError, setPromoError] = useState('');
-  const [orderDone, setOrderDone] = useState<string | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [placing, setPlacing] = useState(false);
+  const [placeError, setPlaceError] = useState('');
 
-  const [addr, setAddr] = useState<Address>({
-    id: '',
-    label: 'Domicile',
-    nom: user?.nom || '',
-    prenom: user?.prenom || '',
-    rue: '',
-    ville: 'Conakry',
-    pays: 'Guinée',
-    telephone: user?.telephone || '',
-    isDefault: true,
+  const [addr, setAddr] = useState({
+    nom: '', prenom: '', rue: '', ville: 'Conakry', telephone: '', commune: '',
   });
   const [addrErrors, setAddrErrors] = useState<Record<string, string>>({});
 
@@ -46,17 +40,16 @@ export default function CheckoutPage() {
         ...a,
         nom: a.nom || user.nom,
         prenom: a.prenom || user.prenom,
-        telephone: a.telephone || user.telephone,
+        telephone: a.telephone || user.telephone || '',
       }));
     }
   }, [user]);
 
-  const shippingCost = total >= FREE_DELIVERY ? 0 : 3500;
+  const shippingCost = total >= FREE_DELIVERY ? 0 : 0; // Free delivery in Guinea
   const discountAmt = Math.round(total * promoDiscount / 100);
   const grandTotal = total + shippingCost - discountAmt;
 
-  // Redirect if cart empty
-  if (items.length === 0 && !orderDone) {
+  if (items.length === 0 && !orderNumber) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center">
         <p className="text-gray-500 mb-4">Votre panier est vide.</p>
@@ -67,14 +60,21 @@ export default function CheckoutPage() {
     );
   }
 
-  const applyPromo = () => {
+  const applyPromo = async () => {
     const code = promoInput.trim().toUpperCase();
-    const pct = PROMO_CODES[code];
-    if (!pct) { setPromoError('Code invalide.'); return; }
-    setPromoDiscount(pct);
-    setPromoApplied(code);
+    if (!code) return;
+    setPromoLoading(true);
     setPromoError('');
-    setPromoInput('');
+    try {
+      const res = await promoApi.validate(code, total);
+      setPromoDiscount(res.discount);
+      setPromoApplied(code);
+      setPromoInput('');
+    } catch (e: unknown) {
+      setPromoError(e instanceof Error ? e.message : 'Code invalide');
+    } finally {
+      setPromoLoading(false);
+    }
   };
 
   const validateAddr = () => {
@@ -87,39 +87,34 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     if (!user) { router.push('/auth/connexion?redirect=/paiement'); return; }
-    const order = createOrder({
-      userId: user.id,
-      items: items.map(i => ({
-        productId: i.product.id,
-        productName: i.product.name,
-        productImage: i.product.images[0],
-        quantity: i.quantity,
-        price: i.product.price,
-      })),
-      subtotal: total,
-      shippingCost,
-      discount: discountAmt,
-      total: grandTotal,
-      status: 'en_attente',
-      promoCode: promoApplied || undefined,
-      address: { ...addr, id: `adr_${Date.now()}` },
-      paymentMethod: payMethod,
-      estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    });
-    clearCart();
-    setOrderDone(order.id);
-    setStep('confirmation');
+    setPlacing(true);
+    setPlaceError('');
+    try {
+      const order = await orderApi.create({
+        items: items.map(i => ({ productId: i.product.id, quantity: i.quantity })),
+        paymentMethod: payMethod,
+        promoCode: promoApplied || undefined,
+        notes: `Livraison: ${addr.prenom} ${addr.nom}, ${addr.rue}, ${addr.commune ? addr.commune + ', ' : ''}${addr.ville} — Tél: ${addr.telephone}`,
+      });
+      clearCart();
+      setOrderNumber(order.orderNumber);
+      setStep('confirmation');
+    } catch (e: unknown) {
+      setPlaceError(e instanceof Error ? e.message : 'Erreur lors de la commande');
+    } finally {
+      setPlacing(false);
+    }
   };
 
   // Confirmation screen
-  if (step === 'confirmation' && orderDone) {
+  if (step === 'confirmation' && orderNumber) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center max-w-lg mx-auto py-16">
         <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center text-4xl mb-6">✓</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Commande confirmée !</h1>
-        <p className="text-gray-500 mb-1">Votre commande <span className="font-semibold text-gray-900">{orderDone}</span> a été passée avec succès.</p>
+        <p className="text-gray-500 mb-1">Commande <span className="font-semibold text-gray-900">{orderNumber}</span> passée avec succès.</p>
         <p className="text-gray-400 text-sm mb-8">Vous recevrez une notification quand votre commande sera expédiée.</p>
         <div className="flex flex-col sm:flex-row gap-3">
           <Link href="/compte/commandes" className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl font-bold transition-all">
@@ -139,7 +134,7 @@ export default function CheckoutPage() {
 
       {/* Steps */}
       <div className="flex items-center gap-2 mb-8">
-        {(['adresse','paiement'] as const).map((s, i) => (
+        {(['adresse', 'paiement'] as const).map((s, i) => (
           <div key={s} className="flex items-center gap-2">
             {i > 0 && <div className={`h-px w-8 sm:w-16 ${step === 'paiement' ? 'bg-teal-500' : 'bg-gray-200'}`} />}
             <div className={`flex items-center gap-2 ${step === s ? 'text-teal-500' : step === 'paiement' && s === 'adresse' ? 'text-green-500' : 'text-gray-400'}`}>
@@ -160,17 +155,18 @@ export default function CheckoutPage() {
               <h2 className="font-extrabold text-gray-900 text-lg mb-5">Adresse de livraison</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { key: 'nom', label: 'Nom', placeholder: 'Diallo', type: 'text' },
-                  { key: 'prenom', label: 'Prénom', placeholder: 'Mamadou', type: 'text' },
-                  { key: 'rue', label: 'Adresse complète', placeholder: 'Quartier, Rue, Commune', type: 'text', full: true },
-                  { key: 'ville', label: 'Ville', placeholder: 'Conakry', type: 'text' },
-                  { key: 'telephone', label: 'Téléphone', placeholder: '+221 77 xxx xx xx', type: 'tel' },
+                  { key: 'nom', label: 'Nom', placeholder: 'Diallo' },
+                  { key: 'prenom', label: 'Prénom', placeholder: 'Mamadou' },
+                  { key: 'rue', label: 'Adresse complète', placeholder: 'Quartier, Rue, Commune', full: true },
+                  { key: 'commune', label: 'Commune', placeholder: 'Kaloum, Ratoma...' },
+                  { key: 'ville', label: 'Ville', placeholder: 'Conakry' },
+                  { key: 'telephone', label: 'Téléphone', placeholder: '+224 628 xxx xxx' },
                 ].map(f => (
-                  <div key={f.key} className={f.full ? 'sm:col-span-2' : ''}>
+                  <div key={f.key} className={(f as any).full ? 'sm:col-span-2' : ''}>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label}</label>
                     <input
-                      type={f.type}
-                      value={(addr as unknown as Record<string, string>)[f.key] || ''}
+                      type="text"
+                      value={(addr as Record<string, string>)[f.key] || ''}
                       onChange={e => setAddr(a => ({ ...a, [f.key]: e.target.value }))}
                       placeholder={f.placeholder}
                       className={`w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all ${addrErrors[f.key] ? 'border-red-400' : 'border-gray-200'}`}
@@ -179,13 +175,11 @@ export default function CheckoutPage() {
                   </div>
                 ))}
               </div>
-
               {!user && (
                 <div className="mt-4 p-3 bg-teal-50 border border-teal-100 rounded-xl text-sm text-teal-700">
-                  <Link href="/auth/connexion?redirect=/paiement" className="font-semibold underline">Connectez-vous</Link> pour un checkout plus rapide et suivre vos commandes.
+                  <Link href="/auth/connexion?redirect=/paiement" className="font-semibold underline">Connectez-vous</Link> pour un checkout plus rapide.
                 </div>
               )}
-
               <button onClick={() => { if (validateAddr()) setStep('paiement'); }}
                 className="w-full mt-6 bg-teal-500 hover:bg-teal-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25">
                 Continuer vers le paiement →
@@ -197,12 +191,12 @@ export default function CheckoutPage() {
           {step === 'paiement' && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="font-extrabold text-gray-900 text-lg mb-5">Méthode de paiement</h2>
-
               <div className="space-y-3 mb-6">
                 {[
-                  { key: 'wave' as PayMethod, label: 'Wave', desc: 'Paiement instantané via Wave', icon: '🌊', color: 'bg-blue-500' },
-                  { key: 'orange_money' as PayMethod, label: 'Orange Money', desc: 'Paiement via Orange Money', icon: '🟠', color: 'bg-teal-500' },
-                  { key: 'carte' as PayMethod, label: 'Carte bancaire', desc: 'Visa / Mastercard', icon: '💳', color: 'bg-gray-700' },
+                  { key: 'WAVE' as PayMethod, label: 'Wave', desc: 'Paiement instantané via Wave', icon: '🌊', color: 'bg-blue-500' },
+                  { key: 'ORANGE_MONEY' as PayMethod, label: 'Orange Money', desc: 'Paiement via Orange Money', icon: '🟠', color: 'bg-orange-500' },
+                  { key: 'CASH' as PayMethod, label: 'Paiement à la livraison', desc: 'Payez en espèces à la réception', icon: '💵', color: 'bg-green-600' },
+                  { key: 'CARTE' as PayMethod, label: 'Carte bancaire', desc: 'Visa / Mastercard', icon: '💳', color: 'bg-gray-700' },
                 ].map(m => (
                   <button key={m.key} onClick={() => setPayMethod(m.key)}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${payMethod === m.key ? 'border-teal-500 bg-teal-50' : 'border-gray-200 hover:border-gray-300'}`}>
@@ -218,43 +212,17 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {payMethod === 'carte' && (
-                <div className="border border-gray-200 rounded-xl p-4 mb-6 space-y-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">Numéro de carte</label>
-                    <input type="text" placeholder="1234 5678 9012 3456" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1.5">Expiration</label>
-                      <input type="text" placeholder="MM/AA" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1.5">CVV</label>
-                      <input type="text" placeholder="123" className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
-                    </div>
-                  </div>
-                </div>
+              {placeError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{placeError}</div>
               )}
 
-              {(payMethod === 'wave' || payMethod === 'orange_money') && (
-                <div className="border border-gray-200 rounded-xl p-4 mb-6">
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Numéro {payMethod === 'wave' ? 'Wave' : 'Orange Money'}</label>
-                  <input type="tel" placeholder="+221 77 xxx xx xx" defaultValue={user?.telephone} className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
-                  <p className="text-xs text-gray-400 mt-1.5">Un code de confirmation vous sera envoyé sur ce numéro.</p>
-                </div>
-              )}
+              <button onClick={() => setStep('adresse')} className="text-sm text-gray-500 hover:text-gray-700 mb-4 block">← Retour</button>
 
-              <div className="flex items-center gap-2 mb-6">
-                <button onClick={() => setStep('adresse')} className="text-sm text-gray-500 hover:text-gray-700 transition-colors">← Retour</button>
-              </div>
-
-              <button onClick={placeOrder}
-                className="w-full bg-teal-500 hover:bg-teal-600 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25 text-base">
-                Confirmer la commande – {formatPrice(grandTotal)}
+              <button onClick={placeOrder} disabled={placing}
+                className="w-full bg-teal-500 hover:bg-teal-600 disabled:opacity-60 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25 text-base">
+                {placing ? 'Traitement en cours...' : `Confirmer la commande – ${formatPrice(grandTotal)}`}
               </button>
-
-              <p className="text-xs text-gray-400 text-center mt-3">🔒 Paiement sécurisé SSL. Vos données sont protégées.</p>
+              <p className="text-xs text-gray-400 text-center mt-3">🔒 Paiement sécurisé. Vos données sont protégées.</p>
             </div>
           )}
         </div>
@@ -289,9 +257,12 @@ export default function CheckoutPage() {
               ) : (
                 <div className="flex gap-2">
                   <input value={promoInput} onChange={e => setPromoInput(e.target.value.toUpperCase())}
-                    placeholder="Ex: VENIP10"
+                    placeholder="Ex: VENIPS10"
                     className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono uppercase" />
-                  <button onClick={applyPromo} className="bg-gray-900 hover:bg-gray-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors">OK</button>
+                  <button onClick={applyPromo} disabled={promoLoading}
+                    className="bg-gray-900 hover:bg-gray-700 disabled:opacity-60 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors">
+                    {promoLoading ? '...' : 'OK'}
+                  </button>
                 </div>
               )}
               {promoError && <p className="text-red-500 text-xs mt-1">{promoError}</p>}
@@ -308,9 +279,7 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between text-gray-600">
                 <span>Livraison</span>
-                <span className={shippingCost === 0 ? 'text-green-600 font-semibold' : 'font-semibold'}>
-                  {shippingCost === 0 ? 'Gratuite' : formatPrice(shippingCost)}
-                </span>
+                <span className="text-green-600 font-semibold">Gratuite</span>
               </div>
               <div className="flex justify-between font-extrabold text-gray-900 text-base pt-2 border-t border-gray-100">
                 <span>Total</span><span className="text-teal-500">{formatPrice(grandTotal)}</span>

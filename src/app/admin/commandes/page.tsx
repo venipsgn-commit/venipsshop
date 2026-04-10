@@ -1,65 +1,76 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import AdminLayout from '@/components/layout/AdminLayout';
-import { getAllOrders, saveAllOrders, formatPrice, getStatusLabel } from '@/lib/storage';
-import type { Order, OrderStatus } from '@/lib/types';
+import { orderApi, type Order, type OrderStatus } from '@/lib/api';
+import { formatPrice, getStatusLabel } from '@/lib/utils';
 
-const ALL_STATUSES: OrderStatus[] = ['en_attente', 'confirme', 'en_preparation', 'expedie', 'livre', 'annule'];
+const ALL_STATUSES: OrderStatus[] = ['EN_ATTENTE', 'CONFIRME', 'EN_PREPARATION', 'EXPEDIE', 'LIVRE', 'ANNULE'];
 
 export default function AdminCommandes() {
-  const [orders, setOrders] = useState<Order[]>(() => getAllOrders().reverse());
-  const [filter, setFilter] = useState<'all' | OrderStatus>('all');
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<'all' | string>('all');
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const updateStatus = useCallback((orderId: string, status: OrderStatus) => {
-    const updated = getAllOrders().map(o =>
-      o.id === orderId ? { ...o, status, updatedAt: new Date().toISOString() } : o
-    );
-    saveAllOrders(updated);
-    setOrders(updated.slice().reverse());
+  useEffect(() => {
+    orderApi.all({ limit: '200' })
+      .then(r => setOrders(r.orders))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const updateTransiteur = useCallback((orderId: string, transiteur: string) => {
-    const updated = getAllOrders().map(o =>
-      o.id === orderId ? { ...o, transiteur, updatedAt: new Date().toISOString() } : o
-    );
-    saveAllOrders(updated);
-    setOrders(updated.slice().reverse());
-  }, []);
+  const updateStatus = async (orderId: string, status: string) => {
+    try {
+      const updated = await orderApi.updateStatus(orderId, status);
+      setOrders(prev => prev.map(o => o.id === orderId ? updated : o));
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erreur');
+    }
+  };
 
   const filtered = orders.filter(o => {
     const matchFilter = filter === 'all' || o.status === filter;
     const q = search.toLowerCase();
-    const matchSearch = !q || o.id.toLowerCase().includes(q) ||
-      `${o.address.prenom} ${o.address.nom}`.toLowerCase().includes(q) ||
-      o.address.telephone.includes(q);
+    const clientName = o.user ? `${o.user.prenom} ${o.user.nom}` : '';
+    const matchSearch = !q || o.orderNumber.toLowerCase().includes(q) || clientName.toLowerCase().includes(q);
     return matchFilter && matchSearch;
   });
 
   return (
     <AdminLayout>
       <div className="space-y-5">
-        <h1 className="text-2xl font-extrabold text-gray-900">Gestion des commandes <span className="text-gray-400 font-normal text-lg">({filtered.length})</span></h1>
+        <h1 className="text-2xl font-extrabold text-gray-900">
+          Gestion des commandes <span className="text-gray-400 font-normal text-lg">({filtered.length})</span>
+        </h1>
 
-        {/* Filters */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Rechercher par ID, client, téléphone..."
+            placeholder="Rechercher par numéro, client..."
             className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
           <div className="flex gap-2 flex-wrap">
-            {[['all','Toutes'],...ALL_STATUSES.map(s => [s, getStatusLabel(s)?.label || s])].map(([val, lbl]) => (
-              <button key={val} onClick={() => setFilter(val as 'all' | OrderStatus)}
-                className={`px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${filter === val ? 'bg-teal-500 text-white' : 'border border-gray-200 text-gray-600 hover:border-teal-300'}`}>
-                {lbl}
-              </button>
-            ))}
+            <button onClick={() => setFilter('all')}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${filter === 'all' ? 'bg-teal-500 text-white' : 'border border-gray-200 text-gray-600 hover:border-teal-300'}`}>
+              Toutes
+            </button>
+            {ALL_STATUSES.map(s => {
+              const lbl = getStatusLabel(s);
+              return (
+                <button key={s} onClick={() => setFilter(s)}
+                  className={`px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors ${filter === s ? 'bg-teal-500 text-white' : 'border border-gray-200 text-gray-600 hover:border-teal-300'}`}>
+                  {lbl.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Orders list */}
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="space-y-3">
+            {[1,2,3].map(i => <div key={i} className="h-20 bg-white rounded-2xl border border-gray-100 animate-pulse" />)}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-400">
             Aucune commande trouvée.
           </div>
@@ -72,16 +83,16 @@ export default function AdminCommandes() {
                 <div key={order.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                   <button onClick={() => setExpanded(isOpen ? null : order.id)} className="w-full p-4 text-left">
                     <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-bold text-gray-900 text-sm">{order.id}</p>
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold bg-${st?.color}-100 text-${st?.color}-700`}>{st?.label}</span>
-                          </div>
-                          <p className="text-xs text-gray-400 mt-0.5">
-                            {order.address.prenom} {order.address.nom} · {order.address.telephone} · {new Date(order.createdAt).toLocaleDateString('fr-FR')}
-                          </p>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-bold text-gray-900 text-sm">{order.orderNumber}</p>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold bg-${st.color}-100 text-${st.color}-700`}>{st.label}</span>
                         </div>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {order.user ? `${order.user.prenom} ${order.user.nom}` : '—'}
+                          {' · '}{new Date(order.createdAt).toLocaleDateString('fr-FR')}
+                          {' · '}{order.items.length} article{order.items.length > 1 ? 's' : ''}
+                        </p>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-extrabold text-gray-900">{formatPrice(order.total)}</span>
@@ -99,12 +110,12 @@ export default function AdminCommandes() {
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Articles</p>
                         <div className="space-y-2">
                           {order.items.map(item => (
-                            <div key={item.productId} className="flex items-center gap-3">
+                            <div key={item.id} className="flex items-center gap-3">
                               <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0">
-                                <Image src={item.productImage} alt={item.productName} fill className="object-contain p-1" unoptimized />
+                                {item.image && <Image src={item.image} alt={item.name} fill className="object-contain p-1" unoptimized />}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold text-gray-900 truncate">{item.productName}</p>
+                                <p className="text-xs font-semibold text-gray-900 truncate">{item.name}</p>
                                 <p className="text-xs text-gray-400">× {item.quantity}</p>
                               </div>
                               <p className="text-xs font-bold">{formatPrice(item.price * item.quantity)}</p>
@@ -113,27 +124,28 @@ export default function AdminCommandes() {
                         </div>
                       </div>
 
-                      {/* Address */}
-                      <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Livraison</p>
-                        <p className="text-sm text-gray-700">{order.address.prenom} {order.address.nom}</p>
-                        <p className="text-sm text-gray-500">{order.address.rue}, {order.address.ville}</p>
-                        <p className="text-sm text-gray-500">{order.address.telephone}</p>
-                        {order.estimatedDelivery && (
-                          <p className="text-sm text-teal-600 font-medium mt-1">Date estimée : {new Date(order.estimatedDelivery).toLocaleDateString('fr-FR')}</p>
-                        )}
-                      </div>
+                      {/* Notes (address info) */}
+                      {order.notes && (
+                        <div>
+                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Livraison</p>
+                          <p className="text-sm text-gray-700">{order.notes}</p>
+                        </div>
+                      )}
 
-                      {/* Transiteur */}
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Transiteur (optionnel)</label>
-                        <input
-                          type="text"
-                          defaultValue={order.transiteur || ''}
-                          onBlur={e => updateTransiteur(order.id, e.target.value)}
-                          placeholder="Nom du livreur / transporteur"
-                          className="w-full sm:w-64 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
-                        />
+                      {/* Payment info */}
+                      <div className="flex gap-4 text-sm">
+                        <div>
+                          <p className="text-xs text-gray-400">Paiement</p>
+                          <p className="font-semibold">{order.paymentMethod}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400">Statut paiement</p>
+                          <p className="font-semibold">{order.paymentStatus}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-400">Total</p>
+                          <p className="font-bold text-teal-500">{formatPrice(order.total)}</p>
+                        </div>
                       </div>
 
                       {/* Status update */}
@@ -146,15 +158,23 @@ export default function AdminCommandes() {
                               <button key={s} onClick={() => updateStatus(order.id, s)}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
                                   order.status === s
-                                    ? `bg-${lbl?.color}-100 text-${lbl?.color}-700 border-${lbl?.color}-200`
+                                    ? `bg-${lbl.color}-100 text-${lbl.color}-700 border-${lbl.color}-200`
                                     : 'border-gray-200 text-gray-600 hover:border-teal-300 hover:text-teal-600'
                                 }`}>
-                                {order.status === s ? '✓ ' : ''}{lbl?.label}
+                                {order.status === s ? '✓ ' : ''}{lbl.label}
                               </button>
                             );
                           })}
                         </div>
                       </div>
+
+                      {/* Mark as paid */}
+                      {order.paymentStatus !== 'PAYE' && (
+                        <button onClick={() => orderApi.updateStatus(order.id, undefined, 'PAYE').then(u => setOrders(prev => prev.map(o => o.id === order.id ? u : o)))}
+                          className="text-sm text-green-600 font-semibold hover:text-green-700">
+                          ✓ Marquer comme payée
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
