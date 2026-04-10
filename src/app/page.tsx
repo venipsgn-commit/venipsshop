@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { products, getFeaturedProducts, getNewProducts } from '@/lib/data/products';
 import ProductCard from '@/components/ui/ProductCard';
-import { formatPrice } from '@/lib/storage';
+import { formatPrice } from '@/lib/utils';
 
 const CATEGORIES = [
   { key: 'telephones',  label: 'Téléphones',  icon: '📱', desc: 'Smartphones dernière génération', color: 'from-blue-500 to-blue-700' },

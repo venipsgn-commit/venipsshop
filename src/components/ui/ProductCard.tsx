@@ -1,63 +1,80 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Product } from '@/lib/types';
-import { formatPrice } from '@/lib/storage';
+import { formatPrice } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 
+// Compatible avec les deux types de produits (hardcodé + API)
+interface AnyProduct {
+  id: string;
+  name: string;
+  brand: string;
+  price: number;
+  originalPrice?: number | null;
+  images: string[];
+  stock: number;
+  rating: number;
+  reviewCount: number;
+  badge?: string | null;
+  slug?: string;
+}
+
 const BADGE_STYLE: Record<string, string> = {
   'Nouveau':    'bg-emerald-500 text-white',
+  'NOUVEAU':    'bg-emerald-500 text-white',
   'Promo':      'bg-red-500 text-white',
+  'PROMO':      'bg-red-500 text-white',
   'Populaire':  'bg-blue-600 text-white',
+  'POPULAIRE':  'bg-blue-600 text-white',
   'Gaming':     'bg-violet-600 text-white',
+  'GAMING':     'bg-violet-600 text-white',
   'Best Seller':'bg-amber-500 text-white',
+  'BEST_SELLER':'bg-amber-500 text-white',
   'Exclusif':   'bg-gray-900 text-white',
+  'EXCLUSIF':   'bg-gray-900 text-white',
 };
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product }: { product: AnyProduct }) {
   const { addItem } = useCart();
   const { toggle, has } = useWishlist();
   const wished = has(product.id);
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100) : null;
 
+  // Lien vers la page produit — utilise slug si dispo, sinon id
+  const href = `/produit/${product.slug || product.id}`;
+
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col overflow-hidden">
 
       {/* Image */}
-      <Link href={`/produit/${product.id}`} className="relative block overflow-hidden bg-gray-50">
+      <Link href={href} className="relative block overflow-hidden bg-gray-50">
         <div className="relative h-44 sm:h-52">
           <Image
             src={product.images[0]} alt={product.name} fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             unoptimized
           />
-          {/* Overlay gradient bas */}
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent" />
         </div>
 
-        {/* Badge */}
         {product.badge && (
           <span className={`absolute top-3 left-3 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-sm ${BADGE_STYLE[product.badge] ?? 'bg-gray-700 text-white'}`}>
-            {product.badge}
+            {product.badge.replace('_', ' ')}
           </span>
         )}
 
-        {/* Réduction — mise en valeur */}
-        {discount && (
+        {discount && discount > 0 && (
           <span className="absolute top-3 right-10 flex items-center gap-0.5 bg-red-500 text-white text-[10px] sm:text-xs font-extrabold px-2 py-1 rounded-full shadow-md">
             -{discount}%
           </span>
         )}
 
-        {/* Wishlist */}
         <button
           onClick={e => { e.preventDefault(); toggle(product.id); }}
           className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-md border ${
-            wished
-              ? 'bg-red-500 text-white border-red-500'
-              : 'bg-white/90 text-gray-400 hover:text-red-500 border-white/50'
+            wished ? 'bg-red-500 text-white border-red-500' : 'bg-white/90 text-gray-400 hover:text-red-500 border-white/50'
           }`}
         >
           <svg className="w-4 h-4" fill={wished ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +82,6 @@ export default function ProductCard({ product }: { product: Product }) {
           </svg>
         </button>
 
-        {/* Stock faible */}
         {product.stock > 0 && product.stock <= 5 && (
           <div className="absolute bottom-0 left-0 right-0 bg-teal-500/90 text-white text-[10px] font-semibold text-center py-1">
             ⚡ Plus que {product.stock} en stock !
@@ -75,18 +91,14 @@ export default function ProductCard({ product }: { product: Product }) {
 
       {/* Infos */}
       <div className="p-3 sm:p-4 flex flex-col flex-1">
-
-        {/* Marque */}
         <p className="text-[10px] sm:text-xs text-teal-500 font-bold uppercase tracking-wider mb-1">{product.brand}</p>
 
-        {/* Nom */}
-        <Link href={`/produit/${product.id}`}>
+        <Link href={href}>
           <h3 className="text-xs sm:text-sm font-semibold text-gray-900 hover:text-teal-600 transition-colors line-clamp-2 leading-snug mb-2">
             {product.name}
           </h3>
         </Link>
 
-        {/* Étoiles */}
         <div className="flex items-center gap-1.5 mb-3">
           <div className="flex">
             {[1,2,3,4,5].map(s => (
@@ -98,20 +110,14 @@ export default function ProductCard({ product }: { product: Product }) {
           <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
         </div>
 
-        {/* Prix */}
         <div className="mt-auto">
           <div className="flex items-end gap-2 mb-3">
-            <span className="text-base sm:text-lg font-extrabold text-gray-900">
-              {formatPrice(product.price)}
-            </span>
+            <span className="text-base sm:text-lg font-extrabold text-gray-900">{formatPrice(product.price)}</span>
             {product.originalPrice && (
-              <span className="text-xs text-gray-400 line-through leading-6">
-                {formatPrice(product.originalPrice)}
-              </span>
+              <span className="text-xs text-gray-400 line-through leading-6">{formatPrice(product.originalPrice)}</span>
             )}
           </div>
 
-          {/* Économie réalisée */}
           {product.originalPrice && (
             <p className="text-[10px] text-emerald-600 font-semibold mb-2">
               Vous économisez {formatPrice(product.originalPrice - product.price)}
@@ -119,7 +125,7 @@ export default function ProductCard({ product }: { product: Product }) {
           )}
 
           <button
-            onClick={() => addItem(product)}
+            onClick={() => addItem(product as any)}
             className="w-full text-white text-xs sm:text-sm font-bold py-2 sm:py-2.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5"
             style={{background: 'linear-gradient(135deg, #22c55e, #15803d)', boxShadow: '0 4px 12px rgba(34,197,94,0.25)'}}
           >

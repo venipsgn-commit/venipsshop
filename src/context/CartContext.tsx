@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useReducer } from 'react';
-import { CartItem, Product } from '@/lib/types';
+import type { CartItem, Product } from '@/lib/types';
 
 interface State { items: CartItem[]; isOpen: boolean; }
 type Action =

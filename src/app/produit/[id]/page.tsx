@@ -4,7 +4,7 @@ import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getProductById, products } from '@/lib/data/products';
-import { formatPrice } from '@/lib/storage';
+import { formatPrice } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import ProductCard from '@/components/ui/ProductCard';

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
-import { formatPrice, formatPriceShort } from '@/lib/storage';
+import { formatPrice, formatPriceShort } from '@/lib/utils';
 
 const FREE_DELIVERY = 100_000;
 

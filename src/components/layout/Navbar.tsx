@@ -43,7 +43,7 @@ export default function Navbar() {
           <span>🚚 Livraison partout en Guinée</span>
           <div className="flex gap-4">
             <Link href="/catalogue" className="hover:text-teal-400 transition-colors">Catalogue</Link>
-            {user?.role === 'admin' && <Link href="/admin" className="hover:text-teal-400 transition-colors text-teal-400">⚙️ Admin</Link>}
+            {user?.role === 'ADMIN' && <Link href="/admin" className="hover:text-teal-400 transition-colors text-teal-400">⚙️ Admin</Link>}
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@ export default function Navbar() {
                     { href: '/compte/profil', label: 'Mon profil', icon: '👤' },
                     { href: '/compte/commandes', label: 'Mes commandes', icon: '📦' },
                     { href: '/compte/wishlist', label: 'Ma wishlist', icon: '❤️' },
-                    ...(user.role === 'admin' ? [{ href: '/admin', label: 'Administration', icon: '⚙️' }] : []),
+                    ...(user.role === 'ADMIN' ? [{ href: '/admin', label: 'Administration', icon: '⚙️' }] : []),
                   ].map(item => (
                     <Link key={item.href} href={item.href} onClick={() => setDropOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-teal-50 transition-colors text-sm">
                       <span>{item.icon}</span>{item.label}

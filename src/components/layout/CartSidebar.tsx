@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { formatPrice } from '@/lib/storage';
+import { formatPrice } from '@/lib/utils';
 
 export default function CartSidebar() {
   const { items, isOpen, close, removeItem, setQty, totalPrice, totalItems } = useCart();

@@ -44,7 +44,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               </div>
               <p className="font-bold text-gray-900">{user.prenom} {user.nom}</p>
               <p className="text-xs text-gray-400 truncate max-w-full">{user.email}</p>
-              {user.role === 'admin' && (
+              {user.role === 'ADMIN' && (
                 <span className="mt-1.5 bg-teal-100 text-teal-600 text-xs font-bold px-2 py-0.5 rounded-full">Admin</span>
               )}
             </div>
@@ -59,7 +59,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                   <span>{l.icon}</span>{l.label}
                 </Link>
               ))}
-              {user.role === 'admin' && (
+              {user.role === 'ADMIN' && (
                 <Link href="/admin"
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                     pathname.startsWith('/admin') ? 'bg-teal-50 text-teal-600' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
