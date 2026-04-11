@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "railway:build": "cd backend && npm install && npx prisma generate && npm run build",
+    "railway:start": "cd backend && npx prisma db push --accept-data-loss && node dist/index.js"
   },
   "dependencies": {
     "next": "16.2.1",
