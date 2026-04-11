@@ -7,6 +7,8 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 
+import bcrypt from 'bcryptjs';
+import prisma from './utils/prisma';
 import authRoutes    from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import orderRoutes   from './routes/order.routes';
@@ -14,6 +16,34 @@ import userRoutes    from './routes/user.routes';
 import categoryRoutes from './routes/category.routes';
 import promoRoutes   from './routes/promo.routes';
 import { errorHandler } from './middleware/error.middleware';
+
+// ── Création automatique du compte admin ──
+async function setupAdmin() {
+  try {
+    const existing = await prisma.user.findUnique({ where: { email: 'admin@venips.gn' } });
+    if (!existing) {
+      const hashed = await bcrypt.hash('Admin@venips2024', 12);
+      await prisma.user.create({
+        data: {
+          email: 'admin@venips.gn',
+          password: hashed,
+          prenom: 'Admin',
+          nom: 'Venips',
+          telephone: '+224628880354',
+          role: 'ADMIN',
+        },
+      });
+      console.log('✅ Compte admin créé: admin@venips.gn');
+    } else if (existing.role !== 'ADMIN') {
+      await prisma.user.update({ where: { email: 'admin@venips.gn' }, data: { role: 'ADMIN' } });
+      console.log('✅ Compte admin promu: admin@venips.gn');
+    } else {
+      console.log('✅ Compte admin déjà existant');
+    }
+  } catch (e) {
+    console.error('⚠️ Setup admin ignoré (DB pas encore prête):', e);
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -73,9 +103,10 @@ app.use((_, res) => {
 // ── Gestion erreurs globale ───────────────
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Venips API démarrée sur http://localhost:${PORT}`);
   console.log(`📦 Environment: ${process.env.NODE_ENV}`);
+  await setupAdmin();
 });
 
 export default app;
