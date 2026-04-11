@@ -120,6 +120,32 @@ export const me = async (req: AuthRequest, res: Response): Promise<void> => {
   res.json(user);
 };
 
+// ── Setup admin (endpoint unique, protégé par clé secrète) ───────
+export const setupAdmin = async (req: Request, res: Response): Promise<void> => {
+  const { secret } = req.body;
+  if (secret !== 'VENIPS_SETUP_2024') {
+    res.status(403).json({ error: 'Clé secrète incorrecte' });
+    return;
+  }
+
+  const hashed = await bcrypt.hash('Admin@venips2024', 12);
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@venips.gn' },
+    update: { role: 'ADMIN', password: hashed },
+    create: {
+      email: 'admin@venips.gn',
+      password: hashed,
+      prenom: 'Admin',
+      nom: 'Venips',
+      telephone: '+224628880354',
+      role: 'ADMIN',
+    },
+    select: { id: true, email: true, prenom: true, nom: true, role: true },
+  });
+
+  res.json({ message: 'Compte admin créé avec succès', user: admin });
+};
+
 // ── Changement mot de passe ───────────────────────────────────────
 export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
   const { currentPassword, newPassword } = req.body;
