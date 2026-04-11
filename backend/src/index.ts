@@ -21,7 +21,20 @@ const PORT = process.env.PORT || 4000;
 // ── Sécurité ──────────────────────────────
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile, curl, etc.)
+    if (!origin) return callback(null, true);
+    const allowed = [
+      process.env.FRONTEND_URL,
+      'http://localhost:3000',
+      'https://venipsshop.vercel.app',
+    ].filter(Boolean);
+    // Allow any vercel.app or railway.app subdomain
+    if (allowed.includes(origin) || origin.endsWith('.vercel.app') || origin.endsWith('.railway.app')) {
+      return callback(null, true);
+    }
+    callback(null, true); // permissive for now — restrict after go-live
+  },
   credentials: true,
 }));
 
