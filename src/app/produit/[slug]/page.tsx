@@ -1,39 +1,82 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getProductById, products } from '@/lib/data/products';
+import { productApi, type Product, type Review } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ui/ProductCard';
 
 export default function ProductPage() {
   const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : (params.id ?? '');
-  const product = getProductById(id);
+  const slug = Array.isArray(params.slug) ? params.slug[0] : (params.slug ?? '');
 
   const { addItem } = useCart();
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
+
+  const [product, setProduct] = useState<Product | null>(null);
+  const [related, setRelated] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFoundError, setNotFoundError] = useState(false);
+
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
   const [added, setAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<'desc' | 'specs' | 'reviews'>('desc');
 
+  useEffect(() => {
+    if (!slug) return;
+    setLoading(true);
+    productApi.get(slug)
+      .then(p => {
+        setProduct(p);
+        // Fetch related products by category
+        if (p.category?.slug) {
+          productApi.list({ category: p.category.slug, limit: 5 })
+            .then(r => setRelated(r.products.filter(rp => rp.id !== p.id).slice(0, 4)))
+            .catch(() => {});
+        }
+      })
+      .catch(() => setNotFoundError(true))
+      .finally(() => setLoading(false));
+  }, [slug]);
+
   const handleAddToCart = useCallback(() => {
     if (!product) return;
-    for (let i = 0; i < qty; i++) addItem(product);
+    for (let i = 0; i < qty; i++) addItem(product as any);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }, [product, qty, addItem]);
 
-  if (!product) notFound();
+  if (notFoundError) notFound();
 
-  const related = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
-  const inWishlist = isInWishlist(product.id);
-  const discount = product.originalPrice
+  const discount = product?.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+
+  const inWishlist = product ? isInWishlist(product.id) : false;
+
+  // Loading skeleton
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-pulse">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="rounded-3xl bg-gray-100 h-96" />
+          <div className="space-y-4">
+            <div className="h-4 bg-gray-100 rounded w-1/4" />
+            <div className="h-8 bg-gray-100 rounded w-3/4" />
+            <div className="h-4 bg-gray-100 rounded w-1/2" />
+            <div className="h-12 bg-gray-100 rounded w-1/3" />
+            <div className="h-32 bg-gray-100 rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) return null;
 
   return (
     <div className="bg-white min-h-screen">
@@ -45,8 +88,14 @@ export default function ProductPage() {
             <span>/</span>
             <Link href="/catalogue" className="hover:text-teal-500 transition-colors">Catalogue</Link>
             <span>/</span>
-            <Link href={`/catalogue?cat=${product.category}`} className="hover:text-teal-500 transition-colors capitalize">{product.category}</Link>
-            <span>/</span>
+            {product.category && (
+              <>
+                <Link href={`/catalogue?cat=${product.category.slug}`} className="hover:text-teal-500 transition-colors capitalize">
+                  {product.category.name}
+                </Link>
+                <span>/</span>
+              </>
+            )}
             <span className="text-gray-700 truncate max-w-[200px] font-medium">{product.name}</span>
           </nav>
         </div>
@@ -57,7 +106,6 @@ export default function ProductPage() {
 
           {/* ── GALERIE ── */}
           <div className="space-y-3">
-            {/* Image principale */}
             <div className="relative rounded-3xl overflow-hidden bg-gray-50 border border-gray-100" style={{height: '460px'}}>
               <Image
                 src={product.images[activeImg] || product.images[0]}
@@ -67,14 +115,13 @@ export default function ProductPage() {
                 unoptimized
               />
 
-              {/* Badge + Réduction */}
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 {product.badge && (
                   <span className={`text-xs font-bold px-3 py-1.5 rounded-full shadow-md ${
-                    product.badge === 'Promo' ? 'bg-red-500 text-white' :
-                    product.badge === 'Nouveau' ? 'bg-emerald-500 text-white' :
-                    product.badge === 'Populaire' ? 'bg-blue-600 text-white' : 'bg-violet-600 text-white'
-                  }`}>{product.badge}</span>
+                    product.badge === 'Promo' || product.badge === 'PROMO' ? 'bg-red-500 text-white' :
+                    product.badge === 'Nouveau' || product.badge === 'NOUVEAU' ? 'bg-emerald-500 text-white' :
+                    product.badge === 'Populaire' || product.badge === 'POPULAIRE' ? 'bg-blue-600 text-white' : 'bg-violet-600 text-white'
+                  }`}>{product.badge.replace('_', ' ')}</span>
                 )}
                 {discount > 0 && (
                   <span className="bg-red-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-full shadow-md">
@@ -83,7 +130,6 @@ export default function ProductPage() {
                 )}
               </div>
 
-              {/* Navigation flèches */}
               {product.images.length > 1 && (
                 <>
                   <button
@@ -105,7 +151,6 @@ export default function ProductPage() {
                 </>
               )}
 
-              {/* Indicateur points */}
               {product.images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
                   {product.images.map((_, i) => (
@@ -117,7 +162,6 @@ export default function ProductPage() {
               )}
             </div>
 
-            {/* Miniatures */}
             {product.images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {product.images.map((img, i) => (
@@ -137,13 +181,9 @@ export default function ProductPage() {
 
           {/* ── INFO PRODUIT ── */}
           <div className="flex flex-col">
-            {/* Marque */}
             <p className="text-sm font-bold text-teal-500 uppercase tracking-widest mb-2">{product.brand}</p>
-
-            {/* Nom */}
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight mb-3">{product.name}</h1>
 
-            {/* Rating */}
             <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
               <div className="flex gap-0.5">
                 {[1,2,3,4,5].map(s => (
@@ -163,7 +203,6 @@ export default function ProductPage() {
               </span>
             </div>
 
-            {/* Prix */}
             <div className="mb-5">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">{formatPrice(product.price)}</span>
@@ -181,10 +220,10 @@ export default function ProductPage() {
               )}
             </div>
 
-            {/* Description courte */}
-            <p className="text-gray-600 text-sm leading-relaxed mb-5">{product.shortDesc}</p>
+            {product.shortDesc && (
+              <p className="text-gray-600 text-sm leading-relaxed mb-5">{product.shortDesc}</p>
+            )}
 
-            {/* Features */}
             <ul className="grid grid-cols-1 gap-2 mb-6">
               {product.features.slice(0, 4).map(f => (
                 <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
@@ -194,16 +233,13 @@ export default function ProductPage() {
               ))}
             </ul>
 
-            {/* Qty + Panier + Wishlist */}
             <div className="flex items-center gap-3 mb-4">
-              {/* Quantité */}
               <div className="flex items-center rounded-xl overflow-hidden border border-gray-200">
                 <button onClick={() => setQty(q => Math.max(1, q - 1))} className="w-11 h-12 flex items-center justify-center hover:bg-gray-50 text-gray-700 text-xl font-light transition-colors">−</button>
                 <span className="w-10 text-center font-bold text-gray-900 text-sm">{qty}</span>
                 <button onClick={() => setQty(q => Math.min(product.stock, q + 1))} className="w-11 h-12 flex items-center justify-center hover:bg-gray-50 text-gray-700 text-xl font-light transition-colors">+</button>
               </div>
 
-              {/* Ajouter au panier */}
               <button
                 onClick={handleAddToCart}
                 disabled={product.stock === 0}
@@ -228,7 +264,6 @@ export default function ProductPage() {
                 )}
               </button>
 
-              {/* Wishlist */}
               <button
                 onClick={() => toggleWishlist(product.id)}
                 className={`w-12 h-12 rounded-xl border-2 flex items-center justify-center transition-all ${
@@ -241,7 +276,6 @@ export default function ProductPage() {
               </button>
             </div>
 
-            {/* Trust badges */}
             <div className="grid grid-cols-3 gap-2 mt-4 pt-5 border-t border-gray-100">
               {[['🔒','Paiement','sécurisé'],['🚚','Livraison','partout en Guinée'],['↩️','Retours','30 jours']].map(([icon,t1,t2]) => (
                 <div key={t1} className="flex flex-col items-center text-center gap-1 p-3 rounded-xl bg-gray-50">
@@ -264,7 +298,7 @@ export default function ProductPage() {
                     ? 'text-teal-600 border-b-2 border-teal-500 bg-teal-50/50'
                     : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
                 }`}>
-                {tab === 'desc' ? 'Description' : tab === 'specs' ? 'Caractéristiques' : `Avis clients (${product.reviews.length})`}
+                {tab === 'desc' ? 'Description' : tab === 'specs' ? 'Caractéristiques' : `Avis clients (${product.reviews?.length ?? 0})`}
               </button>
             ))}
           </div>
@@ -291,55 +325,25 @@ export default function ProductPage() {
 
             {activeTab === 'specs' && (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <tbody>
-                    {Object.entries(product.specs).map(([key, val], i) => (
-                      <tr key={key} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                        <td className="py-3 px-4 font-semibold text-gray-700 w-2/5 rounded-l-lg">{key}</td>
-                        <td className="py-3 px-4 text-gray-600 rounded-r-lg">{val}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                {Object.keys(product.specs).length === 0 ? (
+                  <p className="text-gray-400 text-sm text-center py-8">Aucune caractéristique disponible.</p>
+                ) : (
+                  <table className="w-full text-sm">
+                    <tbody>
+                      {Object.entries(product.specs).map(([key, val], i) => (
+                        <tr key={key} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                          <td className="py-3 px-4 font-semibold text-gray-700 w-2/5 rounded-l-lg">{key}</td>
+                          <td className="py-3 px-4 text-gray-600 rounded-r-lg">{String(val)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             )}
 
             {activeTab === 'reviews' && (
-              <div>
-                {product.reviews.length === 0 ? (
-                  <div className="text-center py-12">
-                    <p className="text-4xl mb-3">💬</p>
-                    <p className="text-gray-500 font-medium">Aucun avis pour le moment</p>
-                    <p className="text-gray-400 text-sm mt-1">Soyez le premier à donner votre avis</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {product.reviews.map(r => (
-                      <div key={r.id} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold text-sm">
-                              {r.userName[0].toUpperCase()}
-                            </div>
-                            <div>
-                              <p className="font-semibold text-sm text-gray-900">{r.userName}</p>
-                              <p className="text-xs text-gray-400">{new Date(r.date).toLocaleDateString('fr-FR')}</p>
-                            </div>
-                          </div>
-                          <div className="flex gap-0.5">
-                            {[1,2,3,4,5].map(s => (
-                              <svg key={s} className={`w-3.5 h-3.5 ${s <= r.rating ? 'text-yellow-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                              </svg>
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ReviewsTab product={product} />
             )}
           </div>
         </div>
@@ -349,9 +353,11 @@ export default function ProductPage() {
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-extrabold text-gray-900">Produits similaires</h2>
-              <Link href={`/catalogue?cat=${product.category}`} className="text-sm font-semibold text-teal-500 hover:text-teal-600">
-                Voir tout →
-              </Link>
+              {product.category && (
+                <Link href={`/catalogue?cat=${product.category.slug}`} className="text-sm font-semibold text-teal-500 hover:text-teal-600">
+                  Voir tout →
+                </Link>
+              )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {related.map(p => <ProductCard key={p.id} product={p} />)}
@@ -359,6 +365,100 @@ export default function ProductPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ── Onglet avis ──────────────────────────────────────────────────
+function ReviewsTab({ product }: { product: Product }) {
+  const { user } = useAuth();
+  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState(5);
+  const [submitting, setSubmitting] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>(product.reviews ?? []);
+  const [error, setError] = useState('');
+
+  const submitReview = async () => {
+    if (!user) { setError('Connectez-vous pour laisser un avis.'); return; }
+    setSubmitting(true);
+    setError('');
+    try {
+      const r = await productApi.addReview(product.id, rating, comment.trim() || undefined);
+      setReviews(prev => [r, ...prev]);
+      setComment('');
+      setRating(5);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Erreur');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Formulaire avis */}
+      <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <h4 className="font-bold text-gray-900 mb-4">Laisser un avis</h4>
+        <div className="flex gap-1 mb-3">
+          {[1,2,3,4,5].map(s => (
+            <button key={s} onClick={() => setRating(s)}>
+              <svg className={`w-7 h-7 transition-colors ${s <= rating ? 'text-yellow-400' : 'text-gray-200 hover:text-yellow-300'}`} fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            </button>
+          ))}
+        </div>
+        <textarea
+          value={comment}
+          onChange={e => setComment(e.target.value)}
+          placeholder="Partagez votre expérience avec ce produit..."
+          rows={3}
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+        />
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+        <button onClick={submitReview} disabled={submitting}
+          className="mt-3 bg-teal-500 hover:bg-teal-600 disabled:opacity-60 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-colors">
+          {submitting ? 'Envoi...' : 'Publier mon avis'}
+        </button>
+      </div>
+
+      {/* Liste avis */}
+      {reviews.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-4xl mb-3">💬</p>
+          <p className="text-gray-500 font-medium">Aucun avis pour le moment</p>
+          <p className="text-gray-400 text-sm mt-1">Soyez le premier à donner votre avis</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {reviews.map(r => {
+            const name = r.user ? `${r.user.prenom} ${r.user.nom}` : 'Client';
+            return (
+              <div key={r.id} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold text-sm">
+                      {name[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-gray-900">{name}</p>
+                      <p className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5].map(s => (
+                      <svg key={s} className={`w-3.5 h-3.5 ${s <= r.rating ? 'text-yellow-400' : 'text-gray-200'}`} fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+                {r.comment && <p className="text-sm text-gray-600 leading-relaxed">{r.comment}</p>}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

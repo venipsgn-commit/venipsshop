@@ -5,10 +5,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useEffect } from 'react';
 
 const links = [
-  { href: '/admin',           icon: '📊', label: 'Tableau de bord' },
-  { href: '/admin/produits',  icon: '🛍️', label: 'Produits' },
-  { href: '/admin/commandes', icon: '📦', label: 'Commandes' },
-  { href: '/admin/clients',   icon: '👥', label: 'Clients' },
+  { href: '/admin',            icon: '📊', label: 'Tableau de bord' },
+  { href: '/admin/produits',   icon: '🛍️', label: 'Produits' },
+  { href: '/admin/commandes',  icon: '📦', label: 'Commandes' },
+  { href: '/admin/clients',    icon: '👥', label: 'Clients' },
+  { href: '/admin/categories', icon: '🗂️', label: 'Catégories' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
