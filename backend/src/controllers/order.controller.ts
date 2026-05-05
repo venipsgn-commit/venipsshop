@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { sendOrderConfirmationEmail } from '../utils/email';
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -75,6 +76,21 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
 
     return newOrder;
   });
+
+  // Send confirmation email (fire-and-forget)
+  prisma.user.findUnique({ where: { id: userId }, select: { email: true, prenom: true } })
+    .then(u => {
+      if (u) sendOrderConfirmationEmail(u, {
+        orderNumber: order.orderNumber,
+        total: order.total,
+        subtotal: order.subtotal,
+        discount: order.discount,
+        shippingCost: order.shippingCost,
+        paymentMethod: order.paymentMethod,
+        items: order.items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+      }).catch(() => {});
+    })
+    .catch(() => {});
 
   res.status(201).json(order);
 };

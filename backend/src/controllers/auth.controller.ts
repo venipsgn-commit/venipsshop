@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '../utils/prisma';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { sendWelcomeEmail, sendPasswordResetEmail } from '../utils/email';
 
 const SALT_ROUNDS = 12;
 const REFRESH_EXPIRES_DAYS = 7;
+const RESET_TOKEN_EXPIRES_MS = 60 * 60 * 1000; // 1h
 
 // ── Inscription ───────────────────────────────────────────────────
 export const register = async (req: Request, res: Response): Promise<void> => {
@@ -36,7 +39,60 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     },
   });
 
+  sendWelcomeEmail({ email: user.email, prenom: user.prenom }).catch(() => {});
+
   res.status(201).json({ user, accessToken, refreshToken });
+};
+
+// ── Mot de passe oublié ──────────────────────────────────────────
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body;
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  // Toujours renvoyer 200 pour ne pas révéler si l'email existe
+  if (user && user.isActive) {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiry = new Date(Date.now() + RESET_TOKEN_EXPIRES_MS);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken: token, resetTokenExpiry: expiry },
+    });
+    sendPasswordResetEmail({ email: user.email, prenom: user.prenom }, token).catch(() => {});
+  }
+
+  res.json({ message: 'Si cette adresse existe, un email a été envoyé.' });
+};
+
+// ── Réinitialisation mot de passe ────────────────────────────────
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword || newPassword.length < 8) {
+    res.status(400).json({ error: 'Lien invalide ou mot de passe trop court (8 caractères min)' });
+    return;
+  }
+
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: { gt: new Date() },
+    },
+  });
+
+  if (!user) {
+    res.status(400).json({ error: 'Lien invalide ou expiré' });
+    return;
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: await bcrypt.hash(newPassword, SALT_ROUNDS),
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+  });
+
+  res.json({ message: 'Mot de passe réinitialisé avec succès' });
 };
 
 // ── Connexion ─────────────────────────────────────────────────────

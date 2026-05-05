@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { register, login, refresh, logout, me, changePassword } from '../controllers/auth.controller';
+import { register, login, refresh, logout, me, changePassword, forgotPassword, resetPassword } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { validateRequest } from '../middleware/validate.middleware';
 
@@ -31,6 +31,23 @@ router.post(
 
 router.post('/refresh', refresh);
 router.post('/logout', logout);
+
+router.post(
+  '/forgot-password',
+  [body('email').isEmail().normalizeEmail()],
+  validateRequest,
+  forgotPassword
+);
+
+router.post(
+  '/reset-password',
+  [
+    body('token').notEmpty(),
+    body('newPassword').isLength({ min: 8 }).withMessage('Le mot de passe doit contenir au moins 8 caractères'),
+  ],
+  validateRequest,
+  resetPassword
+);
 
 router.get('/me', authenticate, me);
 
