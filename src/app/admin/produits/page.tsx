@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import AdminLayout from '@/components/layout/AdminLayout';
+import ImageUploader from '@/components/ui/ImageUploader';
 import { productApi, categoryApi, type Product, type Category } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 
@@ -271,19 +272,21 @@ export default function AdminProduits() {
 
               {/* Images */}
               <div>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">URLs des images</label>
-                {form.images.map((img, i) => (
-                  <div key={i} className="flex gap-2 mb-2">
-                    <input value={img} onChange={e => updateImage(i, e.target.value)}
-                      placeholder="https://..." className="flex-1 px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
-                    {form.images.length > 1 && (
-                      <button onClick={() => setForm(f => ({ ...f, images: f.images.filter((_, j) => j !== i) }))}
-                        className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-xl text-sm">✕</button>
-                    )}
-                  </div>
-                ))}
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Images du produit</label>
+                <div className="space-y-2">
+                  {form.images.map((img, i) => (
+                    <ImageUploader
+                      key={i}
+                      value={img}
+                      onChange={(url) => updateImage(i, url)}
+                      onRemove={form.images.length > 1
+                        ? () => setForm(f => ({ ...f, images: f.images.filter((_, j) => j !== i) }))
+                        : undefined}
+                    />
+                  ))}
+                </div>
                 <button onClick={() => setForm(f => ({ ...f, images: [...f.images, ''] }))}
-                  className="text-teal-500 text-sm font-medium hover:text-teal-600">+ Ajouter une image</button>
+                  className="text-teal-500 text-sm font-medium hover:text-teal-600 mt-2">+ Ajouter une image</button>
               </div>
 
               {/* Features */}
