@@ -48,11 +48,16 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
   });
 };
 
-// ── Détail produit (public) ───────────────────────────────────────
+// ── Détail produit (public) — accepte slug OU id ──────────────────
 export const getProduct = async (req: Request, res: Response): Promise<void> => {
   const { slug } = req.params;
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+
   const product = await prisma.product.findFirst({
-    where: { slug, isActive: true },
+    where: {
+      isActive: true,
+      OR: isUuid ? [{ id: slug }, { slug }] : [{ slug }],
+    },
     include: {
       category: { select: { name: true, slug: true } },
       reviews: {
