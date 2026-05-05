@@ -1,7 +1,8 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { products, getFeaturedProducts, getNewProducts } from '@/lib/data/products';
+import { productApi, type Product } from '@/lib/api';
 import ProductCard from '@/components/ui/ProductCard';
 import { formatPrice } from '@/lib/utils';
 
@@ -21,9 +22,21 @@ const TESTIMONIALS = [
 ];
 
 export default function HomePage() {
-  const featured = getFeaturedProducts().slice(0, 8);
-  const newArrivals = getNewProducts().slice(0, 4);
-  const promoProducts = products.filter(p => p.originalPrice).slice(0, 4);
+  const [featured, setFeatured] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [promoProducts, setPromoProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    productApi.list({ sort: 'rating_desc', limit: 8 })
+      .then(r => setFeatured(r.products))
+      .catch(() => {});
+    productApi.list({ badge: 'NOUVEAU', limit: 4 })
+      .then(r => setNewArrivals(r.products))
+      .catch(() => {});
+    productApi.list({ badge: 'PROMO', limit: 4 })
+      .then(r => setPromoProducts(r.products))
+      .catch(() => {});
+  }, []);
 
   return (
     <div>
@@ -113,19 +126,15 @@ export default function HomePage() {
           <p className="text-gray-500 mt-2 text-sm">Trouvez exactement ce dont vous avez besoin</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          {CATEGORIES.map(cat => {
-            const count = products.filter(p => p.category === cat.key).length;
-            return (
-              <Link key={cat.key} href={`/catalogue?cat=${cat.key}`}
-                className="group relative overflow-hidden rounded-2xl bg-gray-900 text-white p-4 sm:p-6 flex flex-col items-center text-center hover:scale-105 transition-transform shadow-sm">
-                <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-20 group-hover:opacity-30 transition-opacity`} />
-                <span className="text-3xl sm:text-4xl mb-2 relative z-10">{cat.icon}</span>
-                <h3 className="font-bold text-sm sm:text-base relative z-10">{cat.label}</h3>
-                <p className="text-gray-400 text-[10px] sm:text-xs mt-1 relative z-10 hidden sm:block">{cat.desc}</p>
-                <span className="mt-2 text-[10px] sm:text-xs bg-white/10 px-2 py-0.5 rounded-full relative z-10">{count} produits</span>
-              </Link>
-            );
-          })}
+          {CATEGORIES.map(cat => (
+            <Link key={cat.key} href={`/catalogue?cat=${cat.key}`}
+              className="group relative overflow-hidden rounded-2xl bg-gray-900 text-white p-4 sm:p-6 flex flex-col items-center text-center hover:scale-105 transition-transform shadow-sm">
+              <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-20 group-hover:opacity-30 transition-opacity`} />
+              <span className="text-3xl sm:text-4xl mb-2 relative z-10">{cat.icon}</span>
+              <h3 className="font-bold text-sm sm:text-base relative z-10">{cat.label}</h3>
+              <p className="text-gray-400 text-[10px] sm:text-xs mt-1 relative z-10 hidden sm:block">{cat.desc}</p>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -199,7 +208,7 @@ export default function HomePage() {
               {promoProducts.map(p => {
                 const disc = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
                 return (
-                  <Link key={p.id} href={`/produit/${p.id}`} className="bg-gray-800 hover:bg-gray-700 rounded-2xl p-3 sm:p-4 transition-colors group">
+                  <Link key={p.id} href={`/produit/${p.slug || p.id}`} className="bg-gray-800 hover:bg-gray-700 rounded-2xl p-3 sm:p-4 transition-colors group">
                     <div className="relative h-32 sm:h-40 rounded-xl overflow-hidden mb-3">
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
                       {disc > 0 && <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{disc}%</span>}
