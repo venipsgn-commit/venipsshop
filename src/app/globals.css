@@ -16,10 +16,6 @@ body {
   background-color: #f9fafb;
 }
 
-img, video {
-  max-width: 100%;
-  height: auto;
-}
 
 .line-clamp-2 {
   display: -webkit-box;
