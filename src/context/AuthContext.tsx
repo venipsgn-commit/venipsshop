@@ -1,6 +1,6 @@
 'use client';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { authApi, setTokens, clearTokens, getAccessToken, type User } from '@/lib/api';
+import { authApi, setAccessToken, clearAccessToken, tryRefresh, type User } from '@/lib/api';
 
 interface AuthCtx {
   user: User | null;
@@ -18,18 +18,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) { setLoading(false); return; }
-    authApi.me()
-      .then(u => setUser(u))
-      .catch(() => clearTokens())
+    // Tente de restaurer la session depuis le cookie httpOnly (venips_rt)
+    // Le cookie est invisible au JS — c'est le proxy /api/auth/refresh qui le lit
+    tryRefresh()
+      .then(ok => {
+        if (!ok) return null;
+        return authApi.me();
+      })
+      .then(u => { if (u) setUser(u); })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       const data = await authApi.login(email, password);
-      setTokens(data.accessToken, data.refreshToken);
+      setAccessToken(data.accessToken);
       setUser(data.user);
       return { ok: true };
     } catch (e: unknown) {
@@ -40,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (data: { nom: string; prenom: string; email: string; telephone: string; password: string }) => {
     try {
       const res = await authApi.register(data);
-      setTokens(res.accessToken, res.refreshToken);
+      setAccessToken(res.accessToken);
       setUser(res.user);
       return { ok: true };
     } catch (e: unknown) {
@@ -49,11 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    try {
-      const refresh = localStorage.getItem('venips_refresh_token');
-      if (refresh) await authApi.logout(refresh);
-    } catch {}
-    clearTokens();
+    await authApi.logout(); // efface le cookie httpOnly via le proxy + clearAccessToken()
     setUser(null);
   };
 
