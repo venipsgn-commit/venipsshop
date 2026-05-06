@@ -7,13 +7,42 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CartSidebar from '@/components/layout/CartSidebar';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://venips.com';
+
 export const metadata: Metadata = {
-  title: 'VenipShop – Ordinateurs, Téléphones & Accessoires',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'VenipShop – Ordinateurs, Téléphones & Accessoires en Guinée',
+    template: '%s | VenipShop',
+  },
   description: 'Boutique en ligne spécialisée en high-tech : ordinateurs, téléphones, accessoires, gaming. Livraison partout en Guinée.',
-  keywords: 'téléphone, ordinateur, accessoires, gaming, Conakry, Guinée, tech, Venips',
+  keywords: ['téléphone', 'ordinateur', 'accessoires', 'gaming', 'Conakry', 'Guinée', 'tech', 'Venips', 'high-tech'],
+  applicationName: 'VenipShop',
+  authors: [{ name: 'VenipShop' }],
+  alternates: { canonical: SITE_URL },
   icons: {
     icon: '/venips-logo.png',
     apple: '/venips-logo.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    siteName: 'VenipShop',
+    title: 'VenipShop – Ordinateurs, Téléphones & Accessoires en Guinée',
+    description: 'Boutique en ligne spécialisée en high-tech. Livraison partout en Guinée.',
+    url: SITE_URL,
+    images: [{ url: '/venips-logo.png', alt: 'VenipShop' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VenipShop – High-tech en Guinée',
+    description: 'Ordinateurs, téléphones, accessoires, gaming. Livraison partout en Guinée.',
+    images: ['/venips-logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
   },
 };
 
