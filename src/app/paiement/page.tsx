@@ -9,10 +9,7 @@ import { orderApi, promoApi } from '@/lib/api';
 import { formatPrice, formatPriceShort } from '@/lib/utils';
 import { pixel } from '@/lib/pixel';
 
-type Step = 'adresse' | 'paiement' | 'confirmation';
-type PayMethod = 'WAVE' | 'ORANGE_MONEY' | 'CARTE' | 'CASH';
-
-const FREE_DELIVERY = 1_000_000;
+type Step = 'adresse' | 'confirmation';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -20,7 +17,6 @@ export default function CheckoutPage() {
   const { user } = useAuth();
 
   const [step, setStep] = useState<Step>('adresse');
-  const [payMethod, setPayMethod] = useState<PayMethod>('WAVE');
   const [promoInput, setPromoInput] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [promoApplied, setPromoApplied] = useState('');
@@ -46,9 +42,8 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
-  const shippingCost = total >= FREE_DELIVERY ? 0 : 0; // Free delivery in Guinea
   const discountAmt = Math.round(total * promoDiscount / 100);
-  const grandTotal = total + shippingCost - discountAmt;
+  const grandTotal = total - discountAmt;
 
   if (items.length === 0 && !orderNumber) {
     return (
@@ -95,14 +90,13 @@ export default function CheckoutPage() {
     try {
       const order = await orderApi.create({
         items: items.map(i => ({ productId: i.product.id, quantity: i.quantity })),
-        paymentMethod: payMethod,
+        paymentMethod: 'CASH',
         promoCode: promoApplied || undefined,
         notes: `Livraison: ${addr.prenom} ${addr.nom}, ${addr.rue}, ${addr.commune ? addr.commune + ', ' : ''}${addr.ville} — Tél: ${addr.telephone}`,
       });
       pixel.purchase(order.orderNumber, grandTotal, items.reduce((s, i) => s + i.quantity, 0));
       clearCart();
       setOrderNumber(order.orderNumber);
-      setStep('confirmation');
     } catch (e: unknown) {
       setPlaceError(e instanceof Error ? e.message : 'Erreur lors de la commande');
     } finally {
@@ -111,18 +105,26 @@ export default function CheckoutPage() {
   };
 
   // Confirmation screen
-  if (step === 'confirmation' && orderNumber) {
+  if (orderNumber) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center max-w-lg mx-auto py-16">
         <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center text-4xl mb-6">✓</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Commande confirmée !</h1>
-        <p className="text-gray-500 mb-1">Commande <span className="font-semibold text-gray-900">{orderNumber}</span> passée avec succès.</p>
-        <p className="text-gray-400 text-sm mb-8">Vous recevrez une notification quand votre commande sera expédiée.</p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/compte/commandes" className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl font-bold transition-all">
+        <p className="text-gray-500 mb-1">
+          Commande <span className="font-semibold text-gray-900">{orderNumber}</span> passée avec succès.
+        </p>
+        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 my-6 text-left w-full">
+          <p className="font-bold text-green-800 mb-1">💵 Paiement à la livraison</p>
+          <p className="text-green-700 text-sm">
+            Préparez <span className="font-bold">{formatPrice(grandTotal)}</span> en espèces.
+            Notre livreur vous contactera au <span className="font-bold">{addr.telephone}</span> avant de passer.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3 w-full">
+          <Link href="/compte/commandes" className="flex-1 bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-xl font-bold transition-all text-center">
             Suivre ma commande
           </Link>
-          <Link href="/catalogue" className="border border-gray-200 hover:border-teal-500 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all">
+          <Link href="/catalogue" className="flex-1 border border-gray-200 hover:border-teal-500 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-all text-center">
             Continuer mes achats
           </Link>
         </div>
@@ -136,14 +138,16 @@ export default function CheckoutPage() {
 
       {/* Steps */}
       <div className="flex items-center gap-2 mb-8">
-        {(['adresse', 'paiement'] as const).map((s, i) => (
+        {(['adresse', 'confirmation'] as const).map((s, i) => (
           <div key={s} className="flex items-center gap-2">
-            {i > 0 && <div className={`h-px w-8 sm:w-16 ${step === 'paiement' ? 'bg-teal-500' : 'bg-gray-200'}`} />}
-            <div className={`flex items-center gap-2 ${step === s ? 'text-teal-500' : step === 'paiement' && s === 'adresse' ? 'text-green-500' : 'text-gray-400'}`}>
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold border-2 ${step === s ? 'border-teal-500 bg-teal-50' : step === 'paiement' && s === 'adresse' ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}>
-                {step === 'paiement' && s === 'adresse' ? '✓' : i + 1}
+            {i > 0 && <div className={`h-px w-8 sm:w-16 ${step === 'confirmation' ? 'bg-teal-500' : 'bg-gray-200'}`} />}
+            <div className={`flex items-center gap-2 ${step === s ? 'text-teal-500' : step === 'confirmation' && s === 'adresse' ? 'text-green-500' : 'text-gray-400'}`}>
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold border-2 ${step === s ? 'border-teal-500 bg-teal-50' : step === 'confirmation' && s === 'adresse' ? 'border-green-500 bg-green-50' : 'border-gray-200'}`}>
+                {step === 'confirmation' && s === 'adresse' ? '✓' : i + 1}
               </span>
-              <span className="hidden sm:block text-sm font-semibold capitalize">{s === 'adresse' ? 'Livraison' : 'Paiement'}</span>
+              <span className="hidden sm:block text-sm font-semibold capitalize">
+                {s === 'adresse' ? 'Livraison' : 'Confirmation'}
+              </span>
             </div>
           </div>
         ))}
@@ -151,18 +155,19 @@ export default function CheckoutPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
+
           {/* Step 1: Address */}
           {step === 'adresse' && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="font-extrabold text-gray-900 text-lg mb-5">Adresse de livraison</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { key: 'nom', label: 'Nom', placeholder: 'Diallo' },
-                  { key: 'prenom', label: 'Prénom', placeholder: 'Mamadou' },
-                  { key: 'rue', label: 'Adresse complète', placeholder: 'Quartier, Rue, Commune', full: true },
-                  { key: 'commune', label: 'Commune', placeholder: 'Kaloum, Ratoma...' },
-                  { key: 'ville', label: 'Ville', placeholder: 'Conakry' },
-                  { key: 'telephone', label: 'Téléphone', placeholder: '+224 628 xxx xxx' },
+                  { key: 'nom',     label: 'Nom',              placeholder: 'Diallo' },
+                  { key: 'prenom',  label: 'Prénom',           placeholder: 'Mamadou' },
+                  { key: 'rue',     label: 'Adresse complète', placeholder: 'Quartier, Rue, Commune', full: true },
+                  { key: 'commune', label: 'Commune',          placeholder: 'Kaloum, Ratoma...' },
+                  { key: 'ville',   label: 'Ville',            placeholder: 'Conakry' },
+                  { key: 'telephone', label: 'Téléphone',      placeholder: '+224 628 xxx xxx' },
                 ].map(f => (
                   <div key={f.key} className={(f as any).full ? 'sm:col-span-2' : ''}>
                     <label className="block text-sm font-semibold text-gray-700 mb-1.5">{f.label}</label>
@@ -182,49 +187,57 @@ export default function CheckoutPage() {
                   <Link href="/auth/connexion?redirect=/paiement" className="font-semibold underline">Connectez-vous</Link> pour un checkout plus rapide.
                 </div>
               )}
-              <button onClick={() => { if (validateAddr()) setStep('paiement'); }}
-                className="w-full mt-6 bg-teal-500 hover:bg-teal-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25">
-                Continuer vers le paiement →
+              <button
+                onClick={() => { if (validateAddr()) setStep('confirmation'); }}
+                className="w-full mt-6 bg-teal-500 hover:bg-teal-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25"
+              >
+                Continuer →
               </button>
             </div>
           )}
 
-          {/* Step 2: Payment */}
-          {step === 'paiement' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-              <h2 className="font-extrabold text-gray-900 text-lg mb-5">Méthode de paiement</h2>
-              <div className="space-y-3 mb-6">
-                {[
-                  { key: 'WAVE' as PayMethod, label: 'Wave', desc: 'Paiement instantané via Wave', icon: '🌊', color: 'bg-blue-500' },
-                  { key: 'ORANGE_MONEY' as PayMethod, label: 'Orange Money', desc: 'Paiement via Orange Money', icon: '🟠', color: 'bg-orange-500' },
-                  { key: 'CASH' as PayMethod, label: 'Paiement à la livraison', desc: 'Payez en espèces à la réception', icon: '💵', color: 'bg-green-600' },
-                  { key: 'CARTE' as PayMethod, label: 'Carte bancaire', desc: 'Visa / Mastercard', icon: '💳', color: 'bg-gray-700' },
-                ].map(m => (
-                  <button key={m.key} onClick={() => setPayMethod(m.key)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${payMethod === m.key ? 'border-teal-500 bg-teal-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                    <span className={`w-10 h-10 rounded-xl ${m.color} flex items-center justify-center text-xl flex-shrink-0`}>{m.icon}</span>
-                    <div>
-                      <p className="font-bold text-gray-900 text-sm">{m.label}</p>
-                      <p className="text-xs text-gray-500">{m.desc}</p>
-                    </div>
-                    <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${payMethod === m.key ? 'border-teal-500' : 'border-gray-300'}`}>
-                      {payMethod === m.key && <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />}
-                    </div>
-                  </button>
-                ))}
+          {/* Step 2: Confirmation */}
+          {step === 'confirmation' && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+              <h2 className="font-extrabold text-gray-900 text-lg">Confirmer la commande</h2>
+
+              {/* Cash on delivery info */}
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex gap-4 items-start">
+                <span className="text-3xl">💵</span>
+                <div>
+                  <p className="font-bold text-green-800">Paiement à la livraison</p>
+                  <p className="text-green-700 text-sm mt-0.5">
+                    Vous payez en espèces quand notre livreur arrive chez vous.
+                    Préparez le montant exact : <span className="font-bold">{formatPrice(grandTotal)}</span>.
+                  </p>
+                </div>
+              </div>
+
+              {/* Address recap */}
+              <div className="bg-gray-50 rounded-2xl p-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Livraison à</p>
+                <p className="font-semibold text-gray-900">{addr.prenom} {addr.nom}</p>
+                <p className="text-sm text-gray-600">{addr.rue}{addr.commune ? `, ${addr.commune}` : ''}, {addr.ville}</p>
+                <p className="text-sm text-gray-600">{addr.telephone}</p>
+                <button onClick={() => setStep('adresse')} className="text-xs text-teal-500 hover:text-teal-600 font-medium mt-2">
+                  Modifier l'adresse
+                </button>
               </div>
 
               {placeError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{placeError}</div>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{placeError}</div>
               )}
 
-              <button onClick={() => setStep('adresse')} className="text-sm text-gray-500 hover:text-gray-700 mb-4 block">← Retour</button>
-
-              <button onClick={placeOrder} disabled={placing}
-                className="w-full bg-teal-500 hover:bg-teal-600 disabled:opacity-60 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25 text-base">
+              <button
+                onClick={placeOrder}
+                disabled={placing}
+                className="w-full bg-teal-500 hover:bg-teal-600 disabled:opacity-60 text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/25 text-base"
+              >
                 {placing ? 'Traitement en cours...' : `Confirmer la commande – ${formatPrice(grandTotal)}`}
               </button>
-              <p className="text-xs text-gray-400 text-center mt-3">🔒 Paiement sécurisé. Vos données sont protégées.</p>
+              <p className="text-xs text-gray-400 text-center">
+                En confirmant, vous acceptez nos <Link href="/cgv" className="underline hover:text-teal-500">conditions générales de vente</Link>.
+              </p>
             </div>
           )}
         </div>
@@ -258,11 +271,17 @@ export default function CheckoutPage() {
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <input value={promoInput} onChange={e => setPromoInput(e.target.value.toUpperCase())}
+                  <input
+                    value={promoInput}
+                    onChange={e => setPromoInput(e.target.value.toUpperCase())}
                     placeholder="Ex: VENIPS10"
-                    className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono uppercase" />
-                  <button onClick={applyPromo} disabled={promoLoading}
-                    className="bg-gray-900 hover:bg-gray-700 disabled:opacity-60 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors">
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono uppercase"
+                  />
+                  <button
+                    onClick={applyPromo}
+                    disabled={promoLoading}
+                    className="bg-gray-900 hover:bg-gray-700 disabled:opacity-60 text-white px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+                  >
                     {promoLoading ? '...' : 'OK'}
                   </button>
                 </div>
@@ -272,11 +291,13 @@ export default function CheckoutPage() {
 
             <div className="space-y-2 text-sm border-t border-gray-100 pt-4">
               <div className="flex justify-between text-gray-600">
-                <span>Sous-total</span><span className="font-semibold">{formatPrice(total)}</span>
+                <span>Sous-total</span>
+                <span className="font-semibold">{formatPrice(total)}</span>
               </div>
               {discountAmt > 0 && (
                 <div className="flex justify-between text-green-600">
-                  <span>Réduction ({promoDiscount}%)</span><span className="font-semibold">-{formatPrice(discountAmt)}</span>
+                  <span>Réduction ({promoDiscount}%)</span>
+                  <span className="font-semibold">-{formatPrice(discountAmt)}</span>
                 </div>
               )}
               <div className="flex justify-between text-gray-600">
@@ -284,8 +305,10 @@ export default function CheckoutPage() {
                 <span className="text-green-600 font-semibold">Gratuite</span>
               </div>
               <div className="flex justify-between font-extrabold text-gray-900 text-base pt-2 border-t border-gray-100">
-                <span>Total</span><span className="text-teal-500">{formatPrice(grandTotal)}</span>
+                <span>Total à payer</span>
+                <span className="text-teal-500">{formatPrice(grandTotal)}</span>
               </div>
+              <p className="text-xs text-gray-400 text-center pt-1">💵 Paiement en espèces à la livraison</p>
             </div>
           </div>
         </div>
