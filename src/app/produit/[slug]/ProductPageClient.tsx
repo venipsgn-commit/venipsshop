@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { productApi, type Product, type Review } from '@/lib/api';
@@ -8,10 +8,15 @@ import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useAuth } from '@/context/AuthContext';
 import ProductCard from '@/components/ui/ProductCard';
+import { pixel } from '@/lib/pixel';
 
 export default function ProductPageClient({ product, related }: { product: Product; related: Product[] }) {
   const { addItem } = useCart();
   const { has: isInWishlist, toggle: toggleWishlist } = useWishlist();
+
+  useEffect(() => {
+    pixel.viewContent({ id: product.id, name: product.name, price: product.price });
+  }, [product.id, product.name, product.price]);
 
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);

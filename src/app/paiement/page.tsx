@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { orderApi, promoApi } from '@/lib/api';
 import { formatPrice, formatPriceShort } from '@/lib/utils';
+import { pixel } from '@/lib/pixel';
 
 type Step = 'adresse' | 'paiement' | 'confirmation';
 type PayMethod = 'WAVE' | 'ORANGE_MONEY' | 'CARTE' | 'CASH';
@@ -98,6 +99,7 @@ export default function CheckoutPage() {
         promoCode: promoApplied || undefined,
         notes: `Livraison: ${addr.prenom} ${addr.nom}, ${addr.rue}, ${addr.commune ? addr.commune + ', ' : ''}${addr.ville} — Tél: ${addr.telephone}`,
       });
+      pixel.purchase(order.orderNumber, grandTotal, items.reduce((s, i) => s + i.quantity, 0));
       clearCart();
       setOrderNumber(order.orderNumber);
       setStep('confirmation');

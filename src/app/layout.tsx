@@ -6,6 +6,7 @@ import { WishlistProvider } from '@/context/WishlistContext';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CartSidebar from '@/components/layout/CartSidebar';
+import FacebookPixel from '@/components/analytics/FacebookPixel';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://venips.com';
 
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body className="bg-white min-h-screen font-sans antialiased">
+        <FacebookPixel />
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
