@@ -28,7 +28,9 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
     if (maxPrice) where.price.lte = parseInt(maxPrice);
   }
 
-  const [field, direction] = sort.split('_');
+  const SORT_WHITELIST = new Set(['createdAt', 'price', 'rating', 'name', 'stock']);
+  const [rawField, direction] = sort.split('_');
+  const field = SORT_WHITELIST.has(rawField) ? rawField : 'createdAt';
   const orderBy: any = { [field]: direction === 'asc' ? 'asc' : 'desc' };
 
   const [products, total] = await Promise.all([
@@ -96,10 +98,29 @@ export const createProduct = async (req: AuthRequest, res: Response): Promise<vo
 // ── Modifier produit (admin) ──────────────────────────────────────
 export const updateProduct = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
-  const data = req.body;
-  delete data.slug; // never update slug directly
+  const { name, description, shortDesc, price, originalPrice, stock, categoryId, brand, badge, images, features, specs, isActive } = req.body;
 
-  const product = await prisma.product.update({ where: { id }, data });
+  // Construire l'objet data uniquement avec les champs autorisés (pas slug, id, rating, reviewCount…)
+  const data: Record<string, unknown> = {};
+  if (name !== undefined) data.name = name;
+  if (description !== undefined) data.description = description;
+  if (shortDesc !== undefined) data.shortDesc = shortDesc;
+  if (price !== undefined) data.price = Number(price);
+  if (originalPrice !== undefined) data.originalPrice = originalPrice === null ? null : Number(originalPrice);
+  if (stock !== undefined) data.stock = Number(stock);
+  if (categoryId !== undefined) data.categoryId = categoryId;
+  if (brand !== undefined) data.brand = brand;
+  if (badge !== undefined) data.badge = badge;
+  if (images !== undefined) data.images = images;
+  if (features !== undefined) data.features = features;
+  if (specs !== undefined) data.specs = specs;
+  if (isActive !== undefined) data.isActive = Boolean(isActive);
+
+  const product = await prisma.product.update({
+    where: { id },
+    data,
+    include: { category: { select: { name: true, slug: true } } },
+  });
   res.json(product);
 };
 

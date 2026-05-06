@@ -1,6 +1,15 @@
 import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+function esc(str: string): string {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
 const FROM = process.env.EMAIL_FROM || 'Venips <noreply@venips.com>';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@venips.gn';
 const SITE_URL = process.env.FRONTEND_URL || 'https://venips.com';
@@ -43,7 +52,7 @@ const layout = (title: string, body: string) => `
 
 export async function sendWelcomeEmail(user: { email: string; prenom: string }) {
   const body = `
-    <p>Bonjour <strong>${user.prenom}</strong>,</p>
+    <p>Bonjour <strong>${esc(user.prenom)}</strong>,</p>
     <p>Bienvenue sur <strong>Venips</strong> ! Ton compte a bien été créé.</p>
     <p>Tu peux dès maintenant explorer notre catalogue de produits high-tech : téléphones, ordinateurs, accessoires, gaming, et plus encore.</p>
     <p style="text-align:center;margin:30px 0;">
@@ -66,11 +75,11 @@ export async function sendOrderConfirmationEmail(
     </tr>`).join('');
 
   const body = `
-    <p>Bonjour <strong>${user.prenom}</strong>,</p>
+    <p>Bonjour <strong>${esc(user.prenom)}</strong>,</p>
     <p>Merci pour ta commande ! Nous l'avons bien reçue et elle est en cours de traitement.</p>
     <div style="background:#f7fafc;border-radius:12px;padding:20px;margin:20px 0;">
       <p style="margin:0;color:#718096;font-size:13px;">N° de commande</p>
-      <p style="margin:4px 0 0;font-weight:700;font-size:18px;color:#1a202c;">${order.orderNumber}</p>
+      <p style="margin:4px 0 0;font-weight:700;font-size:18px;color:#1a202c;">${esc(order.orderNumber)}</p>
     </div>
     <table width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
       ${itemsHtml}
@@ -79,7 +88,7 @@ export async function sendOrderConfirmationEmail(
       <tr><td style="padding:6px 0;color:#718096;">Livraison</td><td style="padding:6px 0;text-align:right;color:#718096;">${order.shippingCost === 0 ? 'Gratuite' : fmt(order.shippingCost)}</td></tr>
       <tr><td style="padding:14px 0 0;font-weight:800;font-size:18px;border-top:2px solid #1a202c;">TOTAL</td><td style="padding:14px 0 0;text-align:right;font-weight:800;font-size:18px;border-top:2px solid #1a202c;color:#00A0A0;">${fmt(order.total)}</td></tr>
     </table>
-    <p><strong>Mode de paiement :</strong> ${order.paymentMethod}</p>
+    <p><strong>Mode de paiement :</strong> ${esc(order.paymentMethod)}</p>
     <p>Nous te contacterons rapidement pour confirmer la livraison. Tu peux suivre ta commande dans ton espace client.</p>
     <p style="text-align:center;margin:30px 0;">
       <a href="${SITE_URL}/compte/commandes" style="background:#00A0A0;color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;">Voir ma commande</a>
@@ -89,17 +98,17 @@ export async function sendOrderConfirmationEmail(
 
   // Notify admin
   const adminBody = `
-    <p>Nouvelle commande de <strong>${user.prenom}</strong> (${user.email}).</p>
-    <p><strong>N° :</strong> ${order.orderNumber}<br><strong>Total :</strong> ${fmt(order.total)}<br><strong>Paiement :</strong> ${order.paymentMethod}</p>
+    <p>Nouvelle commande de <strong>${esc(user.prenom)}</strong> (${esc(user.email)}).</p>
+    <p><strong>N° :</strong> ${esc(order.orderNumber)}<br><strong>Total :</strong> ${fmt(order.total)}<br><strong>Paiement :</strong> ${esc(order.paymentMethod)}</p>
     <table width="100%" cellpadding="0" cellspacing="0">${itemsHtml}</table>
   `;
   await send(ADMIN_EMAIL, `🛒 Nouvelle commande ${order.orderNumber}`, layout('Nouvelle commande', adminBody));
 }
 
 export async function sendPasswordResetEmail(user: { email: string; prenom: string }, token: string) {
-  const url = `${SITE_URL}/auth/reset-password?token=${token}`;
+  const url = `${SITE_URL}/auth/reset-password?token=${encodeURIComponent(token)}`;
   const body = `
-    <p>Bonjour <strong>${user.prenom}</strong>,</p>
+    <p>Bonjour <strong>${esc(user.prenom)}</strong>,</p>
     <p>Tu as demandé à réinitialiser ton mot de passe Venips. Clique sur le bouton ci-dessous pour en créer un nouveau.</p>
     <p style="text-align:center;margin:30px 0;">
       <a href="${url}" style="background:linear-gradient(135deg,#22c55e,#15803d);color:#fff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;display:inline-block;">Réinitialiser mon mot de passe</a>

@@ -13,6 +13,7 @@ import orderRoutes   from './routes/order.routes';
 import userRoutes    from './routes/user.routes';
 import categoryRoutes from './routes/category.routes';
 import promoRoutes   from './routes/promo.routes';
+import uploadRoutes  from './routes/upload.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const app = express();
@@ -64,6 +65,7 @@ app.use('/api/v1/orders',     orderRoutes);
 app.use('/api/v1/users',      userRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/promo',      promoRoutes);
+app.use('/api/v1/upload',     uploadRoutes);
 
 // ── 404 ───────────────────────────────────
 app.use((_, res) => {
