@@ -23,7 +23,9 @@ const PORT = process.env.PORT || 4000;
 app.use(helmet());
 const ALLOWED_ORIGINS = new Set(
   [
-    process.env.FRONTEND_URL,          // https://venips.com (ou custom sur Railway)
+    process.env.FRONTEND_URL,          // priorité : var Railway
+    'https://venips.com',              // production principale
+    'https://www.venips.com',
     'http://localhost:3000',
     'https://venipsshop.vercel.app',
   ].filter(Boolean) as string[]

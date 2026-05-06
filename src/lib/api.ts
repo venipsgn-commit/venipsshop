@@ -107,6 +107,12 @@ export const productApi = {
     return request<{ products: Product[]; pagination: Pagination }>(`/products${qs ? '?' + qs : ''}`);
   },
 
+  // Admin : retourne tous les produits y compris inactifs
+  listAdmin: (params: Record<string, string | number> = {}) => {
+    const qs = new URLSearchParams(params as Record<string, string>).toString();
+    return request<{ products: Product[]; pagination: Pagination }>(`/products/admin/all${qs ? '?' + qs : ''}`);
+  },
+
   get: (slug: string) => request<Product>(`/products/${slug}`),
 
   create: (data: Partial<Product>) =>

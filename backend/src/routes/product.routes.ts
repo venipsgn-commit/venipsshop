@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body, query } from 'express-validator';
-import { getProducts, getProduct, createProduct, updateProduct, deleteProduct, addReview, toggleWishlist, getWishlist } from '../controllers/product.controller';
+import { getProducts, getProductsAdmin, getProduct, createProduct, updateProduct, deleteProduct, addReview, toggleWishlist, getWishlist } from '../controllers/product.controller';
 import { authenticate, requireAdmin } from '../middleware/auth.middleware';
 import { validateRequest } from '../middleware/validate.middleware';
 
@@ -8,6 +8,10 @@ const router = Router();
 
 // Public
 router.get('/', getProducts);
+
+// Admin — liste complète (actifs + inactifs), doit être avant /:slug
+router.get('/admin/all', authenticate, requireAdmin, getProductsAdmin);
+
 router.get('/:slug', getProduct);
 
 // Admin

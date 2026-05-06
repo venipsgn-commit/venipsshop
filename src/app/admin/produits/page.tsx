@@ -23,12 +23,15 @@ export default function AdminProduits() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setError(null);
     Promise.all([
-      productApi.list({ limit: 100 }).then(r => setProducts(r.products)),
+      productApi.listAdmin({ limit: 200 }).then(r => setProducts(r.products)),
       categoryApi.list().then(setCategories),
-    ]).finally(() => setLoading(false));
+    ]).catch(e => setError(e instanceof Error ? e.message : 'Erreur de chargement'))
+      .finally(() => setLoading(false));
   }, []);
 
   const filtered = products.filter(p => {
@@ -87,8 +90,17 @@ export default function AdminProduits() {
   const handleDelete = async (id: string) => {
     try {
       await productApi.delete(id);
-      setProducts(prev => prev.filter(p => p.id !== id));
+      setProducts(prev => prev.map(p => p.id === id ? { ...p, isActive: false } : p));
       setDeleteConfirm(null);
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'Erreur');
+    }
+  };
+
+  const handleReactivate = async (id: string) => {
+    try {
+      const updated = await productApi.update(id, { isActive: true });
+      setProducts(prev => prev.map(p => p.id === id ? updated : p));
     } catch (e: unknown) {
       alert(e instanceof Error ? e.message : 'Erreur');
     }
@@ -138,6 +150,13 @@ export default function AdminProduits() {
           </div>
         </div>
 
+        {/* Error */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-2xl px-4 py-3 text-sm">
+            ⚠️ Impossible de charger les produits : {error}
+          </div>
+        )}
+
         {/* Products grid */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -150,7 +169,7 @@ export default function AdminProduits() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map(p => (
-              <div key={p.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+              <div key={p.id} className={`bg-white rounded-2xl border shadow-sm overflow-hidden hover:shadow-md transition-shadow ${p.isActive ? 'border-gray-100' : 'border-orange-200 opacity-70'}`}>
                 <div className="relative h-40 bg-gray-50">
                   {p.images[0] ? (
                     <Image src={p.images[0]} alt={p.name} fill className="object-contain p-3" unoptimized />
@@ -159,6 +178,9 @@ export default function AdminProduits() {
                   )}
                   {p.badge && (
                     <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{p.badge}</span>
+                  )}
+                  {!p.isActive && (
+                    <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">DÉSACTIVÉ</span>
                   )}
                   <span className={`absolute top-2 right-2 text-xs font-semibold px-2 py-0.5 rounded-full ${p.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {p.stock > 0 ? `${p.stock} en stock` : 'Rupture'}
@@ -173,10 +195,17 @@ export default function AdminProduits() {
                       {p.originalPrice && <p className="text-xs text-gray-400 line-through">{formatPrice(p.originalPrice)}</p>}
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => openEdit(p)}
-                        className="p-2 hover:bg-teal-50 rounded-xl transition-colors text-teal-500" title="Modifier">
-                        ✏️
-                      </button>
+                      {!p.isActive ? (
+                        <button onClick={() => handleReactivate(p.id)}
+                          className="p-2 hover:bg-green-50 rounded-xl transition-colors text-green-500" title="Réactiver">
+                          ✅
+                        </button>
+                      ) : (
+                        <button onClick={() => openEdit(p)}
+                          className="p-2 hover:bg-teal-50 rounded-xl transition-colors text-teal-500" title="Modifier">
+                          ✏️
+                        </button>
+                      )}
                       <button onClick={() => setDeleteConfirm(p.id)}
                         className="p-2 hover:bg-red-50 rounded-xl transition-colors text-red-500" title="Supprimer">
                         🗑️

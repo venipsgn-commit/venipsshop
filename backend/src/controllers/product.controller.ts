@@ -50,6 +50,43 @@ export const getProducts = async (req: Request, res: Response): Promise<void> =>
   });
 };
 
+// ── Liste produits (admin) — tous les produits, actifs ou non ────────
+export const getProductsAdmin = async (req: AuthRequest, res: Response): Promise<void> => {
+  const {
+    page = '1',
+    limit = '100',
+    search,
+    sort = 'createdAt_desc',
+  } = req.query as Record<string, string>;
+
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const take = parseInt(limit);
+
+  const where: any = {};
+  if (search) where.name = { contains: search, mode: 'insensitive' };
+
+  const SORT_WHITELIST = new Set(['createdAt', 'price', 'rating', 'name', 'stock']);
+  const [rawField, direction] = sort.split('_');
+  const field = SORT_WHITELIST.has(rawField) ? rawField : 'createdAt';
+  const orderBy: any = { [field]: direction === 'asc' ? 'asc' : 'desc' };
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: { category: { select: { name: true, slug: true } } },
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  res.json({
+    products,
+    pagination: { page: parseInt(page), limit: take, total, pages: Math.ceil(total / take) },
+  });
+};
+
 // ── Détail produit (public) — accepte slug OU id ──────────────────
 export const getProduct = async (req: Request, res: Response): Promise<void> => {
   const { slug } = req.params;
