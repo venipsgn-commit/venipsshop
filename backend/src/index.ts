@@ -20,20 +20,20 @@ const PORT = process.env.PORT || 4000;
 
 // ── Sécurité ──────────────────────────────
 app.use(helmet());
+const ALLOWED_ORIGINS = new Set(
+  [
+    process.env.FRONTEND_URL,          // https://venips.com (ou custom sur Railway)
+    'http://localhost:3000',
+    'https://venipsshop.vercel.app',
+  ].filter(Boolean) as string[]
+);
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile, curl, etc.)
+    // Pas d'origin = appel serveur-à-serveur, mobile natif ou curl — on laisse passer
     if (!origin) return callback(null, true);
-    const allowed = [
-      process.env.FRONTEND_URL,
-      'http://localhost:3000',
-      'https://venipsshop.vercel.app',
-    ].filter(Boolean);
-    // Allow any vercel.app or railway.app subdomain
-    if (allowed.includes(origin) || origin.endsWith('.vercel.app') || origin.endsWith('.railway.app')) {
-      return callback(null, true);
-    }
-    callback(null, true); // permissive for now — restrict after go-live
+    if (ALLOWED_ORIGINS.has(origin)) return callback(null, true);
+    callback(new Error(`CORS: origine non autorisée — ${origin}`));
   },
   credentials: true,
 }));
@@ -47,8 +47,8 @@ app.use(rateLimit({
 
 // ── Middleware ────────────────────────────
 app.use(compression());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
