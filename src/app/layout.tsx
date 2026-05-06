@@ -13,13 +13,18 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://venips.com';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'VenipShop – Ordinateurs, Téléphones & Accessoires en Guinée',
-    template: '%s | VenipShop',
+    default: 'Venips – Téléphones, Ordinateurs & Électronique en Guinée | Conakry',
+    template: '%s | Venips Guinée',
   },
-  description: 'Boutique en ligne spécialisée en high-tech : ordinateurs, téléphones, accessoires, gaming. Livraison partout en Guinée.',
-  keywords: ['téléphone', 'ordinateur', 'accessoires', 'gaming', 'Conakry', 'Guinée', 'tech', 'Venips', 'high-tech'],
-  applicationName: 'VenipShop',
-  authors: [{ name: 'VenipShop' }],
+  description: 'Boutique en ligne high-tech à Conakry : téléphones, ordinateurs, accessoires, gaming. Livraison partout en Guinée. Paiement Wave, Orange Money, carte bancaire.',
+  keywords: [
+    'téléphone Conakry', 'ordinateur Guinée', 'boutique électronique Guinée',
+    'achat en ligne Guinée', 'livraison Conakry', 'iPhone Guinée', 'Samsung Guinée',
+    'paiement Wave Guinée', 'Orange Money achat', 'high-tech Guinée', 'Venips',
+    'smartphone pas cher Guinée', 'accessoires téléphone Conakry', 'gaming Guinée',
+  ],
+  applicationName: 'Venips',
+  authors: [{ name: 'Venips', url: SITE_URL }],
   alternates: { canonical: SITE_URL },
   icons: {
     icon: '/venips-logo.png',
@@ -27,23 +32,29 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'fr_FR',
-    siteName: 'VenipShop',
-    title: 'VenipShop – Ordinateurs, Téléphones & Accessoires en Guinée',
-    description: 'Boutique en ligne spécialisée en high-tech. Livraison partout en Guinée.',
+    locale: 'fr_GN',
+    siteName: 'Venips',
+    title: 'Venips – Électronique en Guinée | Conakry',
+    description: 'Téléphones, ordinateurs, accessoires high-tech. Livraison partout en Guinée. Paiement Wave & Orange Money.',
     url: SITE_URL,
-    images: [{ url: '/venips-logo.png', alt: 'VenipShop' }],
+    images: [{ url: '/venips-logo.png', alt: 'Venips – Boutique électronique Guinée' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'VenipShop – High-tech en Guinée',
-    description: 'Ordinateurs, téléphones, accessoires, gaming. Livraison partout en Guinée.',
+    title: 'Venips – High-tech en Guinée',
+    description: 'Téléphones, ordinateurs, gaming. Livraison partout en Guinée. Paiement Wave & Orange Money.',
     images: ['/venips-logo.png'],
   },
   robots: {
     index: true,
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+  },
+  other: {
+    'geo.region': 'GN-C',
+    'geo.placename': 'Conakry, Guinée',
+    'geo.position': '9.5370;-13.6773',
+    'ICBM': '9.5370, -13.6773',
   },
 };
 
