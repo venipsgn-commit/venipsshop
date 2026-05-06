@@ -14,6 +14,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/catalogue`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${SITE_URL}/auth/connexion`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${SITE_URL}/auth/inscription`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/cgv`, changeFrequency: 'yearly', priority: 0.4 },
+    { url: `${SITE_URL}/confidentialite`, changeFrequency: 'yearly', priority: 0.4 },
+    { url: `${SITE_URL}/cookies`, changeFrequency: 'yearly', priority: 0.4 },
   ];
 
   let products: Product[] = [];
