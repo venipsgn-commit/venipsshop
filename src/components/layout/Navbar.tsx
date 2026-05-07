@@ -22,7 +22,14 @@ export default function Navbar() {
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const dropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const h = (e: MouseEvent) => { if (dropRef.current && !dropRef.current.contains(e.target as Node)) setDropOpen(false); };
@@ -36,7 +43,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
+    <header className={`bg-gray-900 text-white sticky top-0 z-50 transition-shadow duration-300 ${scrolled ? 'shadow-2xl shadow-black/40' : 'shadow-lg'}`}>
       {/* Top bar */}
       <div className="border-b border-gray-800 hidden sm:block">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-8 text-xs text-gray-400">
