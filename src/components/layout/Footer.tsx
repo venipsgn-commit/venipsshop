@@ -72,7 +72,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Mon Compte</h4>
             <ul className="space-y-2 text-sm">
-              {[['Connexion','/auth/connexion'],['Inscription','/auth/inscription'],['Mes commandes','/compte/commandes'],['Ma wishlist','/compte/wishlist'],['Mon profil','/compte/profil']].map(([l,h]) => (
+              {[['Connexion','/auth/connexion'],['Inscription','/auth/inscription'],['Mes commandes','/compte/commandes'],['Ma wishlist','/compte/wishlist'],['À propos','/a-propos']].map(([l,h]) => (
                 <li key={h}><Link href={h} className="hover:text-teal-400 transition-colors">{l}</Link></li>
               ))}
             </ul>

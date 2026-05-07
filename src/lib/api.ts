@@ -157,6 +157,21 @@ export const orderApi = {
     request<Order>(`/orders/${id}/status`, {
       method: 'PUT', body: JSON.stringify({ status, paymentStatus }),
     }),
+
+  exportCsv: async () => {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    const token = getAccessToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${BASE_URL}/orders/export/csv`, { headers });
+    if (!res.ok) throw new Error('Export échoué');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `commandes-venips-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
 };
 
 // ── Users ─────────────────────────────────────────────────────────

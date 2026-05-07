@@ -7,6 +7,8 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CartSidebar from '@/components/layout/CartSidebar';
 import FacebookPixel from '@/components/analytics/FacebookPixel';
+import WhatsAppButton from '@/components/ui/WhatsAppButton';
+import PromoBanner from '@/components/ui/PromoBanner';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://venips.com';
 
@@ -66,10 +68,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
+              <PromoBanner />
               <Navbar />
               <CartSidebar />
               <main>{children}</main>
               <Footer />
+              <WhatsAppButton />
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>

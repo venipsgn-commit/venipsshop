@@ -220,3 +220,42 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
   const order = await prisma.order.update({ where: { id }, data, include: { items: true, address: true } });
   res.json(order);
 };
+
+// ── Admin: export CSV ─────────────────────────────────────────────
+export const exportOrdersCsv = async (req: AuthRequest, res: Response): Promise<void> => {
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      items: true,
+      user: { select: { prenom: true, nom: true, email: true, telephone: true } },
+    },
+  });
+
+  const esc = (v: string | null | undefined) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const fmt = (n: number) => n.toLocaleString('fr-FR');
+
+  const header = ['N° Commande', 'Date', 'Client', 'Email', 'Téléphone', 'Produits', 'Sous-total', 'Réduction', 'Total', 'Statut', 'Paiement'].join(';');
+
+  const rows = orders.map(o => {
+    const client = o.user ? `${o.user.prenom} ${o.user.nom}` : 'Invité';
+    const produits = o.items.map(i => `${i.name} x${i.quantity}`).join(' | ');
+    return [
+      esc(o.orderNumber),
+      esc(new Date(o.createdAt).toLocaleDateString('fr-FR')),
+      esc(client),
+      esc(o.user?.email),
+      esc(o.user?.telephone),
+      esc(produits),
+      fmt(o.subtotal),
+      fmt(o.discount),
+      fmt(o.total),
+      esc(o.status),
+      esc(o.paymentMethod),
+    ].join(';');
+  });
+
+  const csv = '﻿' + [header, ...rows].join('\r\n'); // BOM pour Excel
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="commandes-venips-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.send(csv);
+};
