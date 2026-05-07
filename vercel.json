@@ -2,9 +2,5 @@
   "framework": "nextjs",
   "buildCommand": "next build",
   "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "https://venipsshop-production.up.railway.app/api/v1",
-    "NEXT_PUBLIC_SITE_URL": "https://venips.com"
-  }
+  "installCommand": "npm install"
 }
