@@ -192,17 +192,20 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
 // ── Connexion sociale ─────────────────────────────────────────────
 export const socialLogin = async (req: Request, res: Response): Promise<void> => {
   const { provider, token } = req.body;
-  let email: string, prenom: string, nom: string, providerId: string;
+  let email = '';
+  let prenom = 'Utilisateur';
+  let nom = '';
+  let providerId = '';
 
   try {
     if (provider === 'google') {
       const r = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
-      const d = await r.json();
+      const d = await r.json() as Record<string, string>;
       if (!r.ok || d.error_description) { res.status(401).json({ error: 'Token Google invalide' }); return; }
       email = d.email; prenom = d.given_name || 'Utilisateur'; nom = d.family_name || ''; providerId = d.sub;
     } else if (provider === 'facebook') {
       const r = await fetch(`https://graph.facebook.com/me?fields=id,name,email,first_name,last_name&access_token=${token}`);
-      const d = await r.json();
+      const d = await r.json() as Record<string, string>;
       if (!r.ok || d.error) { res.status(401).json({ error: 'Token Facebook invalide' }); return; }
       email = d.email; prenom = d.first_name || d.name?.split(' ')[0] || 'Utilisateur'; nom = d.last_name || ''; providerId = d.id;
     } else if (provider === 'apple') {
