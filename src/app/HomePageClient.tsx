@@ -52,16 +52,25 @@ export default function HomePageClient() {
   const [promoProducts, setPromoProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const fallback8 = shuffle(fallbackProducts.slice(0, 12).map(toProduct)).slice(0, 8);
-    const fallback4 = fallbackProducts.slice(0, 4).map(toProduct);
+    const allFallback = shuffle(fallbackProducts.map(toProduct));
     const fallbackPromo = fallbackProducts.filter(p => p.originalPrice).slice(0, 6).map(toProduct);
 
-    productApi.list({ sort: 'createdAt_desc', limit: 20 })
-      .then(r => setFeatured(r.products.length ? shuffle(r.products).slice(0, 8) : fallback8))
-      .catch(() => setFeatured(fallback8));
-    productApi.list({ sort: 'createdAt_desc', limit: 4 })
-      .then(r => setNewArrivals(r.products.length ? r.products : fallback4))
-      .catch(() => setNewArrivals(fallback4));
+    // Fetch tous les produits pour un vrai mélange aléatoire
+    productApi.list({ sort: 'createdAt_desc', limit: 200 })
+      .then(r => {
+        if (!r.products.length) {
+          setFeatured(allFallback.slice(0, 8));
+          setNewArrivals(allFallback.slice(0, 4));
+          return;
+        }
+        const all = shuffle(r.products);
+        setFeatured(all.slice(0, 8));
+        setNewArrivals(all.slice(8, 12));
+      })
+      .catch(() => {
+        setFeatured(allFallback.slice(0, 8));
+        setNewArrivals(allFallback.slice(0, 4));
+      });
     productApi.list({ badge: 'PROMO', limit: 6 })
       .then(r => setPromoProducts(r.products.length ? r.products : fallbackPromo))
       .catch(() => setPromoProducts(fallbackPromo));
