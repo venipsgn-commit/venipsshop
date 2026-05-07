@@ -22,6 +22,15 @@ function toProduct(p: any): Product {
   };
 }
 
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 const CATEGORIES = [
   { key: 'telephones',  label: 'Téléphones',  icon: '📱', desc: 'Smartphones dernière génération', color: 'from-blue-500 to-blue-700' },
   { key: 'ordinateurs', label: 'Ordinateurs', icon: '💻', desc: 'Laptops & PC de bureau',          color: 'from-violet-500 to-violet-700' },
@@ -43,17 +52,19 @@ export default function HomePageClient() {
   const [promoProducts, setPromoProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const fallback8 = fallbackProducts.slice(0, 8).map(toProduct);
+    const fallback8 = shuffle(fallbackProducts.slice(0, 12).map(toProduct)).slice(0, 8);
     const fallback4 = fallbackProducts.slice(0, 4).map(toProduct);
-    productApi.list({ sort: 'createdAt_desc', limit: 8 })
-      .then(r => setFeatured(r.products.length ? r.products : fallback8))
+    const fallbackPromo = fallbackProducts.filter(p => p.originalPrice).slice(0, 6).map(toProduct);
+
+    productApi.list({ sort: 'createdAt_desc', limit: 20 })
+      .then(r => setFeatured(r.products.length ? shuffle(r.products).slice(0, 8) : fallback8))
       .catch(() => setFeatured(fallback8));
     productApi.list({ sort: 'createdAt_desc', limit: 4 })
       .then(r => setNewArrivals(r.products.length ? r.products : fallback4))
       .catch(() => setNewArrivals(fallback4));
-    productApi.list({ badge: 'PROMO', limit: 4 })
-      .then(r => setPromoProducts(r.products))
-      .catch(() => {});
+    productApi.list({ badge: 'PROMO', limit: 6 })
+      .then(r => setPromoProducts(r.products.length ? r.products : fallbackPromo))
+      .catch(() => setPromoProducts(fallbackPromo));
   }, []);
 
   return (
@@ -213,33 +224,57 @@ export default function HomePageClient() {
 
       {/* ─── PROMOTIONS ─── */}
       {promoProducts.length > 0 && (
-        <section className="bg-gray-900 py-14">
+        <section className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-2xl font-extrabold text-white">Promotions</h2>
-                <p className="text-gray-400 text-sm mt-1">Offres à durée limitée</p>
+            {/* Header promo */}
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-full">
+                  <span className="text-lg">🔥</span>
+                  <span className="font-extrabold text-sm uppercase tracking-wide">Promotions</span>
+                </div>
+                <p className="text-gray-500 text-sm hidden sm:block">Offres à durée limitée — Ne ratez pas !</p>
               </div>
-              <Link href="/catalogue?badge=Promo" className="text-sm font-semibold text-teal-400 hover:text-teal-300">Voir tout →</Link>
+              <Link href="/catalogue?badge=Promo" className="text-sm font-semibold text-red-500 hover:text-red-600 transition-colors">
+                Voir tout →
+              </Link>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+
+            {/* Ligne scrollable horizontale */}
+            <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide" style={{scrollbarWidth:'none'}}>
               {promoProducts.map(p => {
                 const disc = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
                 return (
-                  <Link key={p.id} href={`/produit/${p.slug || p.id}`} className="bg-gray-800 hover:bg-gray-700 rounded-2xl p-3 sm:p-4 transition-colors group">
-                    <div className="relative h-32 sm:h-40 rounded-xl overflow-hidden mb-3">
+                  <Link key={p.id} href={`/produit/${p.slug || p.id}`}
+                    className="flex-none w-44 sm:w-52 snap-start bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
+                    <div className="relative h-36 sm:h-44 overflow-hidden bg-gray-50">
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
-                      {disc > 0 && <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">-{disc}%</span>}
+                      {disc > 0 && (
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-extrabold px-2 py-1 rounded-lg shadow">
+                          -{disc}%
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs font-semibold text-teal-400 uppercase mb-0.5">{p.brand}</p>
-                    <p className="text-white text-sm font-semibold line-clamp-2 mb-2">{p.name}</p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-teal-400 font-bold text-sm">{formatPrice(p.price)}</span>
-                      {p.originalPrice && <span className="text-gray-500 text-xs line-through">{formatPrice(p.originalPrice)}</span>}
+                    <div className="p-3">
+                      <p className="text-[10px] font-bold text-red-500 uppercase tracking-wide mb-0.5">{p.brand}</p>
+                      <p className="text-gray-900 text-xs font-semibold line-clamp-2 mb-2 leading-snug">{p.name}</p>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-red-500 font-extrabold text-sm">{formatPrice(p.price)}</span>
+                        {p.originalPrice && (
+                          <span className="text-gray-400 text-xs line-through">{formatPrice(p.originalPrice)}</span>
+                        )}
+                      </div>
                     </div>
                   </Link>
                 );
               })}
+
+              {/* CTA final */}
+              <Link href="/catalogue?badge=Promo"
+                className="flex-none w-36 sm:w-44 snap-start bg-red-50 border-2 border-dashed border-red-200 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-red-100 transition-colors p-4 text-center">
+                <span className="text-3xl">🛍️</span>
+                <p className="text-red-500 font-bold text-sm">Voir toutes les promos</p>
+              </Link>
             </div>
           </div>
         </section>
