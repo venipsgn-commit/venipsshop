@@ -27,10 +27,10 @@ export default function HomePageClient() {
   const [promoProducts, setPromoProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    productApi.list({ sort: 'rating_desc', limit: 8 })
+    productApi.list({ sort: 'createdAt_desc', limit: 8 })
       .then(r => setFeatured(r.products))
       .catch(() => {});
-    productApi.list({ badge: 'NOUVEAU', limit: 4 })
+    productApi.list({ sort: 'createdAt_desc', limit: 4 })
       .then(r => setNewArrivals(r.products))
       .catch(() => {});
     productApi.list({ badge: 'PROMO', limit: 4 })
@@ -181,8 +181,8 @@ export default function HomePageClient() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-14">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-extrabold text-gray-900">Produits Populaires</h2>
-            <p className="text-gray-500 text-sm mt-1">Les meilleures ventes du moment</p>
+            <h2 className="text-2xl font-extrabold text-gray-900">Derniers produits</h2>
+            <p className="text-gray-500 text-sm mt-1">Les derniers ajouts en boutique</p>
           </div>
           <Link href="/catalogue" className="text-sm font-semibold text-teal-500 hover:text-teal-600 transition-colors">
             Voir tout →
