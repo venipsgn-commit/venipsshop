@@ -52,25 +52,20 @@ export default function HomePageClient() {
   const [promoProducts, setPromoProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const allFallback = shuffle(fallbackProducts.map(toProduct));
-    const fallbackPromo = fallbackProducts.filter(p => p.originalPrice).slice(0, 6).map(toProduct);
+    const fallbackShuffled = shuffle(fallbackProducts.map(toProduct));
+    const fallbackRecent   = fallbackProducts.slice(0, 4).map(toProduct);
+    const fallbackPromo    = fallbackProducts.filter(p => p.originalPrice).slice(0, 6).map(toProduct);
 
-    // Fetch tous les produits pour un vrai mélange aléatoire
+    // Nouveautés = les 4 PLUS RÉCENTS (ordre chronologique, pas de mélange)
+    productApi.list({ sort: 'createdAt_desc', limit: 4 })
+      .then(r => setNewArrivals(r.products.length ? r.products : fallbackRecent))
+      .catch(() => setNewArrivals(fallbackRecent));
+
+    // "À découvrir" = tous les produits mélangés aléatoirement
     productApi.list({ sort: 'createdAt_desc', limit: 200 })
-      .then(r => {
-        if (!r.products.length) {
-          setFeatured(allFallback.slice(0, 8));
-          setNewArrivals(allFallback.slice(0, 4));
-          return;
-        }
-        const all = shuffle(r.products);
-        setFeatured(all.slice(0, 8));
-        setNewArrivals(all.slice(8, 12));
-      })
-      .catch(() => {
-        setFeatured(allFallback.slice(0, 8));
-        setNewArrivals(allFallback.slice(0, 4));
-      });
+      .then(r => setFeatured(r.products.length ? shuffle(r.products).slice(0, 8) : fallbackShuffled.slice(0, 8)))
+      .catch(() => setFeatured(fallbackShuffled.slice(0, 8)));
+
     productApi.list({ badge: 'PROMO', limit: 6 })
       .then(r => setPromoProducts(r.products.length ? r.products : fallbackPromo))
       .catch(() => setPromoProducts(fallbackPromo));
@@ -219,8 +214,8 @@ export default function HomePageClient() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-14">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-extrabold text-gray-900">Derniers produits</h2>
-            <p className="text-gray-500 text-sm mt-1">Les derniers ajouts en boutique</p>
+            <h2 className="text-2xl font-extrabold text-gray-900">À découvrir</h2>
+            <p className="text-gray-500 text-sm mt-1">Une sélection différente à chaque visite</p>
           </div>
           <Link href="/catalogue" className="text-sm font-semibold text-teal-500 hover:text-teal-600 transition-colors">
             Voir tout →
