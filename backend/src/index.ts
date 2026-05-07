@@ -33,9 +33,10 @@ const ALLOWED_ORIGINS = new Set(
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Pas d'origin = appel serveur-à-serveur, mobile natif ou curl — on laisse passer
     if (!origin) return callback(null, true);
     if (ALLOWED_ORIGINS.has(origin)) return callback(null, true);
+    // Autoriser tous les déploiements Vercel preview
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
     callback(new Error(`CORS: origine non autorisée — ${origin}`));
   },
   credentials: true,
