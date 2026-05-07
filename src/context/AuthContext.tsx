@@ -9,6 +9,7 @@ interface AuthCtx {
   register: (data: { nom: string; prenom: string; email: string; telephone: string; password: string }) => Promise<{ ok: boolean; error?: string }>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
+  socialLogin: (provider: string, token: string, extra?: { firstName?: string; lastName?: string }) => Promise<{ ok: boolean; error?: string }>;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -65,7 +66,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   };
 
-  return <Ctx.Provider value={{ user, loading, login, register, logout, updateProfile }}>{children}</Ctx.Provider>;
+  const socialLogin = async (provider: string, token: string, extra?: { firstName?: string; lastName?: string }) => {
+    try {
+      const res = await fetch('/api/auth/social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider, token, ...extra }),
+      });
+      const data = await res.json();
+      if (!res.ok) return { ok: false, error: data.error || 'Erreur de connexion' };
+      setAccessToken(data.accessToken);
+      setUser(data.user);
+      return { ok: true };
+    } catch {
+      return { ok: false, error: 'Erreur réseau' };
+    }
+  };
+
+  return <Ctx.Provider value={{ user, loading, login, register, logout, updateProfile, socialLogin }}>{children}</Ctx.Provider>;
 }
 
 export const useAuth = () => {

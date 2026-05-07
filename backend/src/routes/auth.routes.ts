@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import rateLimit from 'express-rate-limit';
-import { register, login, refresh, logout, me, changePassword, forgotPassword, resetPassword } from '../controllers/auth.controller';
+import { register, login, refresh, logout, me, changePassword, forgotPassword, resetPassword, socialLogin } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { validateRequest } from '../middleware/validate.middleware';
 
@@ -63,6 +63,7 @@ router.post(
 
 router.post('/refresh', refresh);
 router.post('/logout', logout);
+router.post('/social', socialLogin);
 
 router.post(
   '/forgot-password',

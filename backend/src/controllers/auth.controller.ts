@@ -189,6 +189,66 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
   res.json({ message: 'Mot de passe réinitialisé avec succès' });
 };
 
+// ── Connexion sociale ─────────────────────────────────────────────
+export const socialLogin = async (req: Request, res: Response): Promise<void> => {
+  const { provider, token } = req.body;
+  let email: string, prenom: string, nom: string, providerId: string;
+
+  try {
+    if (provider === 'google') {
+      const r = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
+      const d = await r.json();
+      if (!r.ok || d.error_description) { res.status(401).json({ error: 'Token Google invalide' }); return; }
+      email = d.email; prenom = d.given_name || 'Utilisateur'; nom = d.family_name || ''; providerId = d.sub;
+    } else if (provider === 'facebook') {
+      const r = await fetch(`https://graph.facebook.com/me?fields=id,name,email,first_name,last_name&access_token=${token}`);
+      const d = await r.json();
+      if (!r.ok || d.error) { res.status(401).json({ error: 'Token Facebook invalide' }); return; }
+      email = d.email; prenom = d.first_name || d.name?.split(' ')[0] || 'Utilisateur'; nom = d.last_name || ''; providerId = d.id;
+    } else if (provider === 'apple') {
+      // Apple sends user info only on first sign-in, decode the identityToken (JWT) without verification for email
+      const parts = token.split('.');
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+      email = payload.email || `apple_${payload.sub}@privaterelay.appleid.com`;
+      prenom = req.body.firstName || 'Utilisateur'; nom = req.body.lastName || ''; providerId = payload.sub;
+    } else {
+      res.status(400).json({ error: 'Fournisseur non supporté' }); return;
+    }
+  } catch {
+    res.status(401).json({ error: 'Erreur de vérification du token' }); return;
+  }
+
+  // Find or create user
+  let user = await prisma.user.findFirst({
+    where: { OR: [{ email }, { provider, providerId }] },
+    select: { id: true, email: true, prenom: true, nom: true, role: true },
+  });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email,
+        prenom,
+        nom: nom || '-',
+        password: crypto.randomBytes(32).toString('hex'),
+        provider,
+        providerId,
+      },
+      select: { id: true, email: true, prenom: true, nom: true, role: true },
+    });
+    sendWelcomeEmail({ email: user.email, prenom: user.prenom }).catch(() => {});
+  }
+
+  const payload2 = { userId: user.id, email: user.email, role: user.role };
+  const accessToken  = generateAccessToken(payload2);
+  const refreshToken = generateRefreshToken(payload2);
+  await prisma.refreshToken.create({
+    data: { token: refreshToken, userId: user.id, expiresAt: new Date(Date.now() + 7 * 86400000) }
+  });
+
+  res.json({ user, accessToken, refreshToken });
+};
+
 // ── Changement mot de passe ───────────────────────────────────────
 export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
   const { currentPassword, newPassword } = req.body;
