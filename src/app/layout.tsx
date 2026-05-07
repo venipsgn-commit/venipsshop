@@ -71,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <PromoBanner />
               <Navbar />
               <CartSidebar />
-              <main>{children}</main>
+              <main className="pt-14 sm:pt-[96px]">{children}</main>
               <Footer />
               <WhatsAppButton />
             </WishlistProvider>

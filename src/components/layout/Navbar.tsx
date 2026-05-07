@@ -22,11 +22,18 @@ export default function Navbar() {
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   const dropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => {
+      const y = window.scrollY;
+      // Cache quand on scroll vers le bas (après 80px), réapparaît quand on scroll vers le haut
+      if (y > lastY.current && y > 80) setHidden(true);
+      else setHidden(false);
+      lastY.current = y;
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -43,7 +50,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className={`bg-gray-900 text-white sticky top-0 z-50 transition-shadow duration-300 ${scrolled ? 'shadow-2xl shadow-black/40' : 'shadow-lg'}`}>
+    <header className={`bg-gray-900 text-white fixed top-0 left-0 right-0 z-50 shadow-lg transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`}>
       {/* Top bar */}
       <div className="border-b border-gray-800 hidden sm:block">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-8 text-xs text-gray-400">
