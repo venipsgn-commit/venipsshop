@@ -98,7 +98,7 @@ export default function AdminDashboard() {
                           {new Date(o.createdAt).toLocaleDateString('fr-FR')}
                         </td>
                         <td className="px-5 py-3">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st.color}-100 text-${st.color}-700`}>
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${st.classes}`}>
                             {st.label}
                           </span>
                         </td>

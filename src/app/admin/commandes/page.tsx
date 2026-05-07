@@ -86,7 +86,7 @@ export default function AdminCommandes() {
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-bold text-gray-900 text-sm">{order.orderNumber}</p>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold bg-${st.color}-100 text-${st.color}-700`}>{st.label}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${st.classes}`}>{st.label}</span>
                         </div>
                         <p className="text-xs text-gray-400 mt-0.5">
                           {order.user ? `${order.user.prenom} ${order.user.nom}` : '—'}
