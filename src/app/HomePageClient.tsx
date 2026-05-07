@@ -3,8 +3,24 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { productApi, type Product } from '@/lib/api';
+import { products as fallbackProducts } from '@/lib/data/products';
 import ProductCard from '@/components/ui/ProductCard';
 import { formatPrice } from '@/lib/utils';
+
+function toProduct(p: any): Product {
+  return {
+    id: p.id, name: p.name, slug: p.slug || p.id,
+    description: p.description, shortDesc: p.shortDesc,
+    price: p.price, originalPrice: p.originalPrice || null,
+    stock: p.stock, categoryId: p.category,
+    category: { name: p.category, slug: p.category },
+    brand: p.brand, badge: p.badge,
+    images: p.images, features: p.features || [],
+    specs: p.specs || {}, rating: p.rating || 0,
+    reviewCount: p.reviews?.length || 0,
+    isActive: true, createdAt: new Date().toISOString(),
+  };
+}
 
 const CATEGORIES = [
   { key: 'telephones',  label: 'Téléphones',  icon: '📱', desc: 'Smartphones dernière génération', color: 'from-blue-500 to-blue-700' },
@@ -27,9 +43,10 @@ export default function HomePageClient() {
   const [promoProducts, setPromoProducts] = useState<Product[]>([]);
 
   useEffect(() => {
+    const fallback = fallbackProducts.slice(0, 8).map(toProduct);
     productApi.list({ sort: 'createdAt_desc', limit: 8 })
-      .then(r => setFeatured(r.products))
-      .catch(() => {});
+      .then(r => setFeatured(r.products.length ? r.products : fallback))
+      .catch(() => setFeatured(fallback));
     productApi.list({ sort: 'createdAt_desc', limit: 4 })
       .then(r => setNewArrivals(r.products))
       .catch(() => {});
