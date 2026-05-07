@@ -17,7 +17,7 @@ import uploadRoutes  from './routes/upload.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = parseInt(process.env.PORT || '8080', 10);
 
 // ── Sécurité ──────────────────────────────
 app.use(helmet());

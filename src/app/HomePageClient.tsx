@@ -43,13 +43,14 @@ export default function HomePageClient() {
   const [promoProducts, setPromoProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const fallback = fallbackProducts.slice(0, 8).map(toProduct);
+    const fallback8 = fallbackProducts.slice(0, 8).map(toProduct);
+    const fallback4 = fallbackProducts.slice(0, 4).map(toProduct);
     productApi.list({ sort: 'createdAt_desc', limit: 8 })
-      .then(r => setFeatured(r.products.length ? r.products : fallback))
-      .catch(() => setFeatured(fallback));
+      .then(r => setFeatured(r.products.length ? r.products : fallback8))
+      .catch(() => setFeatured(fallback8));
     productApi.list({ sort: 'createdAt_desc', limit: 4 })
-      .then(r => setNewArrivals(r.products))
-      .catch(() => {});
+      .then(r => setNewArrivals(r.products.length ? r.products : fallback4))
+      .catch(() => setNewArrivals(fallback4));
     productApi.list({ badge: 'PROMO', limit: 4 })
       .then(r => setPromoProducts(r.products))
       .catch(() => {});
