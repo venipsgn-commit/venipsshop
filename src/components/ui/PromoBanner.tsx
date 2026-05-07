@@ -8,8 +8,9 @@ export default function PromoBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const dismissed = sessionStorage.getItem(BANNER_KEY);
-    if (!dismissed) setVisible(true);
+    Promise.resolve(sessionStorage.getItem(BANNER_KEY)).then((dismissed) => {
+      setVisible(!dismissed);
+    });
   }, []);
 
   const dismiss = () => {
