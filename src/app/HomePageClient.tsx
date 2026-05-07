@@ -52,19 +52,22 @@ export default function HomePageClient() {
   const [promoProducts, setPromoProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const fallbackShuffled = shuffle(fallbackProducts.map(toProduct));
-    const fallbackRecent   = fallbackProducts.slice(0, 4).map(toProduct);
-    const fallbackPromo    = fallbackProducts.filter(p => p.originalPrice).slice(0, 6).map(toProduct);
+    const fallbackAll   = fallbackProducts.map(toProduct);
+    const fallbackPromo = fallbackProducts.filter(p => p.originalPrice).slice(0, 6).map(toProduct);
 
-    // Nouveautés = les 4 PLUS RÉCENTS (ordre chronologique, pas de mélange)
-    productApi.list({ sort: 'createdAt_desc', limit: 4 })
-      .then(r => setNewArrivals(r.products.length ? r.products : fallbackRecent))
-      .catch(() => setNewArrivals(fallbackRecent));
-
-    // "À découvrir" = tous les produits mélangés aléatoirement
+    // 1 seul appel API pour tous les produits
     productApi.list({ sort: 'createdAt_desc', limit: 200 })
-      .then(r => setFeatured(r.products.length ? shuffle(r.products).slice(0, 8) : fallbackShuffled.slice(0, 8)))
-      .catch(() => setFeatured(fallbackShuffled.slice(0, 8)));
+      .then(r => {
+        const all = r.products.length ? r.products : fallbackAll;
+        // Nouveautés = les 4 premiers (les plus récents, PAS mélangés)
+        setNewArrivals(all.slice(0, 4));
+        // À découvrir = le RESTE mélangé aléatoirement (aucun doublon avec Nouveautés)
+        setFeatured(shuffle(all.slice(4)).slice(0, 8));
+      })
+      .catch(() => {
+        setNewArrivals(fallbackAll.slice(0, 4));
+        setFeatured(shuffle(fallbackAll.slice(4)).slice(0, 8));
+      });
 
     productApi.list({ badge: 'PROMO', limit: 6 })
       .then(r => setPromoProducts(r.products.length ? r.products : fallbackPromo))
