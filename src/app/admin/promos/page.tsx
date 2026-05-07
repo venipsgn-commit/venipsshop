@@ -42,13 +42,13 @@ export default function AdminPromos() {
     setSaving(true);
     setError('');
     try {
-      const payload = {
-        ...form,
+      const payload: Partial<PromoCode> = {
         code: form.code.toUpperCase().trim(),
         discount: Number(form.discount),
         minOrder: Number(form.minOrder ?? 0),
-        maxUses: form.maxUses ? Number(form.maxUses) : null,
-        expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : null,
+        isActive: form.isActive,
+        ...(form.maxUses ? { maxUses: Number(form.maxUses) } : {}),
+        ...(form.expiresAt ? { expiresAt: new Date(form.expiresAt).toISOString() } : {}),
       };
       if (editing) {
         const updated = await promoApi.update(editing.id, payload);
