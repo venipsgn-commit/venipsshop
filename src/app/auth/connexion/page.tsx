@@ -76,27 +76,27 @@ function ConnexionForm() {
   const handleFacebook = async () => {
     setError('');
     try {
-      await loadScript('https://connect.facebook.net/fr_FR/sdk.js');
       const appId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
       if (!appId) { setError('Facebook App ID non configuré'); return; }
+
+      await loadScript('https://connect.facebook.net/fr_FR/sdk.js');
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const FB = (window as any).FB;
-      if (!FB.getAuthResponse()) {
-        FB.init({ appId, cookie: true, xfbml: false, version: 'v18.0' });
-      }
-      FB.login((loginResponse: { authResponse?: { accessToken: string } }) => {
-        if (!loginResponse.authResponse) {
+
+      FB.init({ appId, cookie: true, xfbml: true, version: 'v18.0' });
+
+      const checkLoginState = (response: { status: string; authResponse?: { accessToken: string } }) => {
+        if (response.status === 'connected' && response.authResponse?.accessToken) {
+          socialLogin('facebook', response.authResponse.accessToken).then(res => {
+            if (res.ok) router.push(params.get('redirect') ?? '/');
+            else setError(res.error ?? 'Erreur de connexion Facebook');
+          });
+        } else {
           setError('Connexion Facebook annulée');
-          return;
         }
-        socialLogin('facebook', loginResponse.authResponse.accessToken).then(res => {
-          if (res.ok) {
-            router.push(params.get('redirect') ?? '/');
-          } else {
-            setError(res.error ?? 'Erreur de connexion Facebook');
-          }
-        });
-      }, { scope: 'email,public_profile' });
+      };
+
+      FB.login(checkLoginState, { scope: 'public_profile,email' });
     } catch {
       setError('Erreur lors de la connexion Facebook');
     }
