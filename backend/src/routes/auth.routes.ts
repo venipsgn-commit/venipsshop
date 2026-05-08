@@ -61,7 +61,6 @@ router.post(
   login
 );
 
-router.post('/setup-admin', setupAdmin);
 router.post('/refresh', refresh);
 router.post('/logout', logout);
 router.post('/social', socialLogin);
