@@ -50,6 +50,7 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '8080', 10);
 
 // ── Sécurité ──────────────────────────────
+app.set('trust proxy', 1);
 app.use(helmet());
 const ALLOWED_ORIGINS = new Set(
   [
