@@ -199,9 +199,11 @@ export const socialLogin = async (req: Request, res: Response): Promise<void> =>
 
   try {
     if (provider === 'google') {
-      const r = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
+      const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const d = await r.json() as Record<string, string>;
-      if (!r.ok || d.error_description) { res.status(401).json({ error: 'Token Google invalide' }); return; }
+      if (!r.ok || d.error) { res.status(401).json({ error: 'Token Google invalide' }); return; }
       email = d.email; prenom = d.given_name || 'Utilisateur'; nom = d.family_name || ''; providerId = d.sub;
     } else if (provider === 'facebook') {
       const r = await fetch(`https://graph.facebook.com/me?fields=id,name,email,first_name,last_name&access_token=${token}`);
