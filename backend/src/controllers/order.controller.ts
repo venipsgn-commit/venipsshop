@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../utils/prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { sendOrderConfirmationEmail } from '../utils/email';
 
 function generateOrderNumber(): string {
   const date = new Date();
@@ -34,13 +35,25 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
     subtotal += product.price * item.quantity;
   }
 
-  // Promo code
+  // Promo code — validation préliminaire hors transaction
   let discount = 0;
+  let promoId: string | null = null;
   if (promoCode) {
     const promo = await prisma.promoCode.findUnique({ where: { code: promoCode } });
-    if (promo && promo.isActive && (!promo.expiresAt || promo.expiresAt > new Date()) && subtotal >= promo.minOrder && (!promo.maxUses || promo.currentUses < promo.maxUses)) {
-      discount = Math.round(subtotal * promo.discount / 100);
-      await prisma.promoCode.update({ where: { code: promoCode }, data: { currentUses: { increment: 1 } } });
+    const validBasic = promo &&
+      promo.isActive &&
+      (!promo.expiresAt || promo.expiresAt > new Date()) &&
+      subtotal >= promo.minOrder;
+
+    if (validBasic) {
+      // Vérifier que ce user n'a pas déjà utilisé ce code
+      const alreadyUsed = await prisma.promoRedemption.findUnique({
+        where: { userId_promoCodeId: { userId, promoCodeId: promo.id } },
+      });
+      if (!alreadyUsed) {
+        discount = Math.round(subtotal * promo.discount / 100);
+        promoId = promo.id;
+      }
     }
   }
 
@@ -48,6 +61,22 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
   const total = subtotal - discount + shippingCost;
 
   const order = await prisma.$transaction(async (tx) => {
+    // Si promo applicable, incrémenter de façon atomique avec garde sur maxUses
+    if (promoId) {
+      const promoForOrder = await tx.promoCode.findUnique({ where: { id: promoId } });
+      if (!promoForOrder || (promoForOrder.maxUses !== null && promoForOrder.currentUses >= promoForOrder.maxUses)) {
+        // Épuisé entre la vérification et la transaction — annuler la remise
+        discount = 0;
+        promoId = null;
+      } else {
+        await tx.promoCode.update({
+          where: { id: promoId },
+          data: { currentUses: { increment: 1 } },
+        });
+        await tx.promoRedemption.create({ data: { userId, promoCodeId: promoId } });
+      }
+    }
+
     const newOrder = await tx.order.create({
       data: {
         orderNumber: generateOrderNumber(),
@@ -56,9 +85,9 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
         subtotal,
         shippingCost,
         discount,
-        total,
+        total: subtotal - discount + shippingCost,
         paymentMethod,
-        promoCode: promoCode || null,
+        promoCode: promoId ? promoCode : null,
         notes: notes || null,
         items: { create: orderItems },
       },
@@ -75,6 +104,21 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
 
     return newOrder;
   });
+
+  // Send confirmation email (fire-and-forget)
+  prisma.user.findUnique({ where: { id: userId }, select: { email: true, prenom: true } })
+    .then(u => {
+      if (u) sendOrderConfirmationEmail(u, {
+        orderNumber: order.orderNumber,
+        total: order.total,
+        subtotal: order.subtotal,
+        discount: order.discount,
+        shippingCost: order.shippingCost,
+        paymentMethod: order.paymentMethod,
+        items: order.items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+      }).catch(() => {});
+    })
+    .catch(() => {});
 
   res.status(201).json(order);
 };
@@ -175,4 +219,43 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
 
   const order = await prisma.order.update({ where: { id }, data, include: { items: true, address: true } });
   res.json(order);
+};
+
+// ── Admin: export CSV ─────────────────────────────────────────────
+export const exportOrdersCsv = async (req: AuthRequest, res: Response): Promise<void> => {
+  const orders = await prisma.order.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      items: true,
+      user: { select: { prenom: true, nom: true, email: true, telephone: true } },
+    },
+  });
+
+  const esc = (v: string | null | undefined) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const fmt = (n: number) => n.toLocaleString('fr-FR');
+
+  const header = ['N° Commande', 'Date', 'Client', 'Email', 'Téléphone', 'Produits', 'Sous-total', 'Réduction', 'Total', 'Statut', 'Paiement'].join(';');
+
+  const rows = orders.map(o => {
+    const client = o.user ? `${o.user.prenom} ${o.user.nom}` : 'Invité';
+    const produits = o.items.map(i => `${i.name} x${i.quantity}`).join(' | ');
+    return [
+      esc(o.orderNumber),
+      esc(new Date(o.createdAt).toLocaleDateString('fr-FR')),
+      esc(client),
+      esc(o.user?.email),
+      esc(o.user?.telephone),
+      esc(produits),
+      fmt(o.subtotal),
+      fmt(o.discount),
+      fmt(o.total),
+      esc(o.status),
+      esc(o.paymentMethod),
+    ].join(';');
+  });
+
+  const csv = '﻿' + [header, ...rows].join('\r\n'); // BOM pour Excel
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="commandes-venips-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.send(csv);
 };

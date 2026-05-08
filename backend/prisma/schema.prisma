@@ -23,16 +23,22 @@ model User {
   prenom    String
   nom       String
   telephone String?
+  provider    String?
+  providerId  String?
   role      Role     @default(USER)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  addresses Address[]
-  orders    Order[]
-  wishlist  WishlistItem[]
-  reviews   Review[]
-  refreshTokens RefreshToken[]
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+
+  addresses        Address[]
+  orders           Order[]
+  wishlist         WishlistItem[]
+  reviews          Review[]
+  refreshTokens    RefreshToken[]
+  promoRedemptions PromoRedemption[]
 
   @@map("users")
 }
@@ -234,5 +240,19 @@ model PromoCode {
   expiresAt    DateTime?
   createdAt    DateTime @default(now())
 
+  redemptions PromoRedemption[]
+
   @@map("promo_codes")
+}
+
+model PromoRedemption {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  promoCodeId String
+  promoCode   PromoCode @relation(fields: [promoCodeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, promoCodeId])
+  @@map("promo_redemptions")
 }

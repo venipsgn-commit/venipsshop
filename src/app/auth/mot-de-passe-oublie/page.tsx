@@ -1,14 +1,26 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
+import { authApi } from '@/lib/api';
 
 export default function MotDePasseOubliePage() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    setError('');
+    try {
+      await authApi.forgotPassword(email);
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,8 +50,9 @@ export default function MotDePasseOubliePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Adresse email</label>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="vous@exemple.com" className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm" />
               </div>
-              <button type="submit" className="w-full bg-teal-500 hover:bg-teal-600 text-white py-3 rounded-xl font-semibold transition-colors text-sm">
-                Envoyer le lien
+              {error && <p className="text-sm text-red-500">{error}</p>}
+              <button type="submit" disabled={loading} className="w-full bg-teal-500 hover:bg-teal-600 disabled:opacity-60 text-white py-3 rounded-xl font-semibold transition-colors text-sm">
+                {loading ? 'Envoi...' : 'Envoyer le lien'}
               </button>
               <p className="text-center text-sm">
                 <Link href="/auth/connexion" className="text-gray-500 hover:text-teal-500">← Retour à la connexion</Link>

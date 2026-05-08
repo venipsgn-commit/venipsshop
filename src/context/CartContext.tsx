@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useContext, useEffect, useReducer } from 'react';
 import type { CartItem, Product } from '@/lib/types';
+import { pixel } from '@/lib/pixel';
 
 interface State { items: CartItem[]; isOpen: boolean; }
 type Action =
@@ -66,7 +67,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return (
     <Ctx.Provider value={{
       items: state.items, isOpen: state.isOpen,
-      addItem: p => dispatch({ type: 'ADD', product: p }),
+      addItem: p => {
+        dispatch({ type: 'ADD', product: p });
+        pixel.addToCart({ id: p.id, name: p.name, price: p.price });
+      },
       removeItem: id => dispatch({ type: 'REMOVE', id }),
       setQty: (id, qty) => dispatch({ type: 'SET_QTY', id, qty }),
       clearCart: () => dispatch({ type: 'CLEAR' }),

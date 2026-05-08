@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "railway:build": "cd backend && npm install && npx prisma generate && npm run build",
-    "railway:seed": "cd backend && npx ts-node prisma/seed.ts",
+    "railway:build": "cd backend && npm install --include=dev && npx prisma generate && npm run build",
     "railway:start": "cd backend && npx prisma db push --accept-data-loss && node dist/index.js"
   },
   "dependencies": {

@@ -41,9 +41,17 @@ export default function AdminCommandes() {
   return (
     <AdminLayout>
       <div className="space-y-5">
-        <h1 className="text-2xl font-extrabold text-gray-900">
-          Gestion des commandes <span className="text-gray-400 font-normal text-lg">({filtered.length})</span>
-        </h1>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h1 className="text-2xl font-extrabold text-gray-900">
+            Gestion des commandes <span className="text-gray-400 font-normal text-lg">({filtered.length})</span>
+          </h1>
+          <button
+            onClick={() => orderApi.exportCsv().catch(() => alert('Erreur export'))}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:border-teal-400 hover:text-teal-600 transition-colors"
+          >
+            ⬇️ Exporter CSV
+          </button>
+        </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3">
           <input value={search} onChange={e => setSearch(e.target.value)}
@@ -86,7 +94,7 @@ export default function AdminCommandes() {
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="font-bold text-gray-900 text-sm">{order.orderNumber}</p>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold bg-${st.color}-100 text-${st.color}-700`}>{st.label}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${st.classes}`}>{st.label}</span>
                         </div>
                         <p className="text-xs text-gray-400 mt-0.5">
                           {order.user ? `${order.user.prenom} ${order.user.nom}` : '—'}

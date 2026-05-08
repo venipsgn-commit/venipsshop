@@ -89,7 +89,7 @@ export default function CompteHome() {
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold bg-${st.color}-100 text-${st.color}-700`}>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${st.classes}`}>
                         {st.label}
                       </span>
                       <span className="font-bold text-gray-900 text-sm">{formatPrice(order.total)}</span>

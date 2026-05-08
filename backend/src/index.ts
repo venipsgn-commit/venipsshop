@@ -15,6 +15,7 @@ import orderRoutes   from './routes/order.routes';
 import userRoutes    from './routes/user.routes';
 import categoryRoutes from './routes/category.routes';
 import promoRoutes   from './routes/promo.routes';
+import uploadRoutes  from './routes/upload.routes';
 import { errorHandler } from './middleware/error.middleware';
 
 // ── Création automatique du compte admin ──
@@ -46,24 +47,27 @@ async function setupAdmin() {
 }
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = parseInt(process.env.PORT || '8080', 10);
 
 // ── Sécurité ──────────────────────────────
 app.use(helmet());
+const ALLOWED_ORIGINS = new Set(
+  [
+    process.env.FRONTEND_URL,          // priorité : var Railway
+    'https://venips.com',              // production principale
+    'https://www.venips.com',
+    'http://localhost:3000',
+    'https://venipsshop.vercel.app',
+  ].filter(Boolean) as string[]
+);
+
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile, curl, etc.)
     if (!origin) return callback(null, true);
-    const allowed = [
-      process.env.FRONTEND_URL,
-      'http://localhost:3000',
-      'https://venipsshop.vercel.app',
-    ].filter(Boolean);
-    // Allow any vercel.app or railway.app subdomain
-    if (allowed.includes(origin) || origin.endsWith('.vercel.app') || origin.endsWith('.railway.app')) {
-      return callback(null, true);
-    }
-    callback(null, true); // permissive for now — restrict after go-live
+    if (ALLOWED_ORIGINS.has(origin)) return callback(null, true);
+    // Autoriser tous les déploiements Vercel preview
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    callback(new Error(`CORS: origine non autorisée — ${origin}`));
   },
   credentials: true,
 }));
@@ -77,8 +81,8 @@ app.use(rateLimit({
 
 // ── Middleware ────────────────────────────
 app.use(compression());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 
@@ -94,6 +98,7 @@ app.use('/api/v1/orders',     orderRoutes);
 app.use('/api/v1/users',      userRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/promo',      promoRoutes);
+app.use('/api/v1/upload',     uploadRoutes);
 
 // ── 404 ───────────────────────────────────
 app.use((_, res) => {

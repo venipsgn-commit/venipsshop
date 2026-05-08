@@ -1,21 +1,13 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://venipsshop-production.up.railway.app/api/v1';
 
-// ── Token management ──────────────────────────────────────────────
-export const getAccessToken = (): string | null =>
-  typeof window !== 'undefined' ? localStorage.getItem('venips_access_token') : null;
+// ── Access token en mémoire (pas localStorage) ────────────────────
+// Le refresh token est dans un cookie httpOnly géré par /api/auth/*
+// → inaccessible au JavaScript, même en cas de XSS
+let _accessToken: string | null = null;
 
-export const getRefreshToken = (): string | null =>
-  typeof window !== 'undefined' ? localStorage.getItem('venips_refresh_token') : null;
-
-export const setTokens = (access: string, refresh: string) => {
-  localStorage.setItem('venips_access_token', access);
-  localStorage.setItem('venips_refresh_token', refresh);
-};
-
-export const clearTokens = () => {
-  localStorage.removeItem('venips_access_token');
-  localStorage.removeItem('venips_refresh_token');
-};
+export const getAccessToken  = (): string | null => _accessToken;
+export const setAccessToken  = (t: string | null) => { _accessToken = t; };
+export const clearAccessToken = () => { _accessToken = null; };
 
 // ── Core fetch wrapper ────────────────────────────────────────────
 async function request<T>(
@@ -23,21 +15,20 @@ async function request<T>(
   options: RequestInit = {},
   retry = true
 ): Promise<T> {
-  const token = getAccessToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (_accessToken) headers['Authorization'] = `Bearer ${_accessToken}`;
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 
-  // Auto-refresh on 401
+  // Auto-refresh sur 401 via le proxy Next.js (cookie httpOnly)
   if (res.status === 401 && retry) {
     const refreshed = await tryRefresh();
     if (refreshed) return request<T>(path, options, false);
-    clearTokens();
-    window.location.href = '/auth/connexion';
+    clearAccessToken();
+    if (typeof window !== 'undefined') window.location.href = '/auth/connexion';
     throw new Error('Session expirée');
   }
 
@@ -49,44 +40,63 @@ async function request<T>(
   return res.json();
 }
 
-async function tryRefresh(): Promise<boolean> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return false;
+// Appel le proxy Next.js — le cookie httpOnly est envoyé automatiquement
+export async function tryRefresh(): Promise<boolean> {
   try {
-    const res = await fetch(`${BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
+    const res = await fetch('/api/auth/refresh', { method: 'POST' });
     if (!res.ok) return false;
     const data = await res.json();
-    setTokens(data.accessToken, data.refreshToken);
+    setAccessToken(data.accessToken);
     return true;
   } catch {
     return false;
   }
 }
 
-// ── Auth ──────────────────────────────────────────────────────────
+// ── Auth (via proxy Next.js, jamais directement au backend) ───────
 export const authApi = {
-  register: (data: { email: string; password: string; prenom: string; nom: string; telephone?: string }) =>
-    request<{ user: User; accessToken: string; refreshToken: string }>('/auth/register', {
-      method: 'POST', body: JSON.stringify(data),
-    }),
+  login: async (email: string, password: string) => {
+    const res = await fetch('/api/auth/login', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur de connexion');
+    return data as { user: User; accessToken: string };
+  },
 
-  login: (email: string, password: string) =>
-    request<{ user: User; accessToken: string; refreshToken: string }>('/auth/login', {
-      method: 'POST', body: JSON.stringify({ email, password }),
-    }),
+  register: async (body: { email: string; password: string; prenom: string; nom: string; telephone?: string }) => {
+    const res = await fetch('/api/auth/register', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur d\'inscription');
+    return data as { user: User; accessToken: string };
+  },
 
-  logout: (refreshToken: string) =>
-    request<void>('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) }),
+  logout: async () => {
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    clearAccessToken();
+  },
 
   me: () => request<User>('/auth/me'),
 
   changePassword: (currentPassword: string, newPassword: string) =>
     request<void>('/auth/change-password', {
       method: 'PUT', body: JSON.stringify({ currentPassword, newPassword }),
+    }),
+
+  forgotPassword: (email: string) =>
+    request<{ message: string }>('/auth/forgot-password', {
+      method: 'POST', body: JSON.stringify({ email }),
+    }),
+
+  resetPassword: (token: string, newPassword: string) =>
+    request<{ message: string }>('/auth/reset-password', {
+      method: 'POST', body: JSON.stringify({ token, newPassword }),
     }),
 };
 
@@ -95,6 +105,12 @@ export const productApi = {
   list: (params: Record<string, string | number> = {}) => {
     const qs = new URLSearchParams(params as Record<string, string>).toString();
     return request<{ products: Product[]; pagination: Pagination }>(`/products${qs ? '?' + qs : ''}`);
+  },
+
+  // Admin : retourne tous les produits y compris inactifs
+  listAdmin: (params: Record<string, string | number> = {}) => {
+    const qs = new URLSearchParams(params as Record<string, string>).toString();
+    return request<{ products: Product[]; pagination: Pagination }>(`/products/admin/all${qs ? '?' + qs : ''}`);
   },
 
   get: (slug: string) => request<Product>(`/products/${slug}`),
@@ -141,6 +157,21 @@ export const orderApi = {
     request<Order>(`/orders/${id}/status`, {
       method: 'PUT', body: JSON.stringify({ status, paymentStatus }),
     }),
+
+  exportCsv: async () => {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    const token = getAccessToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${BASE_URL}/orders/export/csv`, { headers });
+    if (!res.ok) throw new Error('Export échoué');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `commandes-venips-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
 };
 
 // ── Users ─────────────────────────────────────────────────────────

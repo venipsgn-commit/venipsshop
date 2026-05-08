@@ -39,14 +39,25 @@ export const addAddress = async (req: AuthRequest, res: Response): Promise<void>
 export const updateAddress = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
   const userId = req.user!.userId;
-  const data = req.body;
+  const { label, prenom, nom, telephone, rue, commune, ville, pays, isDefault } = req.body;
 
   const address = await prisma.address.findFirst({ where: { id, userId } });
   if (!address) { res.status(404).json({ error: 'Adresse introuvable' }); return; }
 
-  if (data.isDefault) {
+  if (isDefault) {
     await prisma.address.updateMany({ where: { userId }, data: { isDefault: false } });
   }
+
+  const data: Record<string, unknown> = {};
+  if (label !== undefined) data.label = label;
+  if (prenom !== undefined) data.prenom = prenom;
+  if (nom !== undefined) data.nom = nom;
+  if (telephone !== undefined) data.telephone = telephone;
+  if (rue !== undefined) data.rue = rue;
+  if (commune !== undefined) data.commune = commune;
+  if (ville !== undefined) data.ville = ville;
+  if (pays !== undefined) data.pays = pays;
+  if (isDefault !== undefined) data.isDefault = Boolean(isDefault);
 
   const updated = await prisma.address.update({ where: { id }, data });
   res.json(updated);

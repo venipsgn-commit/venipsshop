@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { createOrder, getMyOrders, getOrder, cancelOrder, getAllOrders, updateOrderStatus } from '../controllers/order.controller';
+import { createOrder, getMyOrders, getOrder, cancelOrder, getAllOrders, updateOrderStatus, exportOrdersCsv } from '../controllers/order.controller';
 import { authenticate, requireAdmin } from '../middleware/auth.middleware';
 import { validateRequest } from '../middleware/validate.middleware';
 
@@ -26,6 +26,7 @@ router.get('/:id', getOrder);
 router.post('/:id/cancel', cancelOrder);
 
 // Admin routes
+router.get('/export/csv', requireAdmin, exportOrdersCsv);
 router.get('/', requireAdmin, getAllOrders);
 router.put(
   '/:id/status',
