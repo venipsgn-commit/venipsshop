@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useWishlist } from '@/context/WishlistContext';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 const NAV = [
   { label: 'Téléphones',    href: '/catalogue?cat=telephones',   icon: '📱' },
@@ -89,6 +90,9 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-1 ml-auto flex-shrink-0">
+            {/* Theme toggle */}
+            <ThemeToggle />
+
             {/* Wishlist */}
             <Link href="/compte/wishlist" className="relative p-2 hover:bg-gray-800 rounded-lg transition-colors hidden sm:flex" aria-label="Wishlist">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
