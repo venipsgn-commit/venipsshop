@@ -63,7 +63,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body className="bg-white min-h-screen font-sans antialiased">
+      <body className="min-h-screen font-sans antialiased">
         <FacebookPixel />
         <AuthProvider>
           <CartProvider>
