@@ -16,14 +16,18 @@ export default function WishlistPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const idsKey = ids.join(',');
+
   useEffect(() => {
-    if (!user || ids.length === 0) { setProducts([]); return; }
+    if (!user) return;
+    if (ids.length === 0) { setProducts([]); return; }
     setLoading(true);
     productApi.getWishlist()
       .then(setProducts)
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [user, ids.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, idsKey]);
 
   if (!user) return null;
 
