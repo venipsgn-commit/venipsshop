@@ -84,19 +84,19 @@ function CatalogueContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Catalogue</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm">{total} produit{total > 1 ? 's' : ''} trouvé{total > 1 ? 's' : ''}</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Catalogue</h1>
+        <p className="text-gray-500 dark:text-slate-400 text-sm">{total} produit{total > 1 ? 's' : ''} trouvé{total > 1 ? 's' : ''}</p>
       </div>
 
       {/* Category tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
         <button onClick={() => handleCatChange('all')}
-          className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${cat === 'all' ? 'bg-teal-500 text-white' : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 hover:bg-teal-50 dark:hover:bg-teal-900/20 border border-gray-200 dark:border-gray-700'}`}>
+          className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${cat === 'all' ? 'bg-teal-500 text-white' : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-teal-900/20 border border-gray-200 dark:border-slate-600'}`}>
           Tout
         </button>
         {categories.map(c => (
           <button key={c.id} onClick={() => handleCatChange(c.slug)}
-            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${cat === c.slug ? 'bg-teal-500 text-white' : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 hover:bg-teal-50 dark:hover:bg-teal-900/20 border border-gray-200 dark:border-gray-700'}`}>
+            className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${cat === c.slug ? 'bg-teal-500 text-white' : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 hover:bg-teal-50 dark:hover:bg-teal-900/20 border border-gray-200 dark:border-slate-600'}`}>
             {c.icon} {c.name}
           </button>
         ))}
@@ -105,14 +105,14 @@ function CatalogueContent() {
       <div className="flex gap-6">
         {/* Sidebar filters - desktop */}
         <div className="hidden lg:block w-60 flex-shrink-0">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 space-y-6 sticky top-24">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 p-5 space-y-6 sticky top-24">
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">Recherche</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3 text-sm">Recherche</h3>
               <input value={q} onChange={e => handleSearch(e.target.value)} placeholder="Nom, marque..."
-                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">
+              <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3 text-sm">
                 Prix max: {maxPrice >= 20000000 ? 'Tous' : `${Math.round(maxPrice/1000)}K GNF`}
               </h3>
               <input type="range" min={100000} max={20000000} step={100000} value={maxPrice}
@@ -121,12 +121,12 @@ function CatalogueContent() {
             </div>
             {allBrands.length > 0 && (
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 text-sm">Marques</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-slate-100 mb-3 text-sm">Marques</h3>
                 <div className="space-y-2">
                   {allBrands.map(b => (
                     <label key={b} className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={selectedBrands.includes(b)} onChange={() => toggleBrand(b)} className="accent-teal-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">{b}</span>
+                      <span className="text-sm text-gray-700 dark:text-slate-200">{b}</span>
                     </label>
                   ))}
                 </div>
@@ -144,11 +144,11 @@ function CatalogueContent() {
         {/* Main content */}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-4 gap-3">
-            <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-gray-900 dark:text-white">
+            <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 dark:text-slate-100">
               ⚙️ Filtres
             </button>
             <select value={sort} onChange={e => handleSort(e.target.value)}
-              className="ml-auto px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-xl text-sm bg-white dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500">
+              className="ml-auto px-3 py-2 border border-gray-200 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500">
               <option value="createdAt_desc">Nouveautés</option>
               <option value="price_asc">Prix croissant</option>
               <option value="price_desc">Prix décroissant</option>
@@ -158,11 +158,11 @@ function CatalogueContent() {
 
           {/* Mobile filters */}
           {showFilters && (
-            <div className="lg:hidden bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 mb-4 space-y-4">
+            <div className="lg:hidden bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 p-5 mb-4 space-y-4">
               <input value={q} onChange={e => handleSearch(e.target.value)} placeholder="Rechercher..."
-                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
               <div>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                <p className="text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">
                   Prix max: {maxPrice >= 20000000 ? 'Tous' : `${Math.round(maxPrice/1000)}K GNF`}
                 </p>
                 <input type="range" min={100000} max={20000000} step={100000} value={maxPrice}
@@ -171,7 +171,7 @@ function CatalogueContent() {
               <div className="flex flex-wrap gap-2">
                 {allBrands.map(b => (
                   <button key={b} onClick={() => toggleBrand(b)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${selectedBrands.includes(b) ? 'bg-teal-500 text-white border-teal-500' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700'}`}>
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${selectedBrands.includes(b) ? 'bg-teal-500 text-white border-teal-500' : 'bg-white dark:bg-slate-700 text-gray-700 dark:text-slate-200 border-gray-200 dark:border-slate-600'}`}>
                     {b}
                   </button>
                 ))}
@@ -188,8 +188,8 @@ function CatalogueContent() {
           ) : filtered.length === 0 ? (
             <div className="text-center py-20">
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Aucun produit trouvé</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-6">Essayez de modifier vos filtres</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-slate-100 mb-2">Aucun produit trouvé</h3>
+              <p className="text-gray-500 dark:text-slate-400 mb-6">Essayez de modifier vos filtres</p>
               <button onClick={() => { handleCatChange('all'); handleSearch(''); setSelectedBrands([]); setMaxPrice(20000000); }}
                 className="bg-teal-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-teal-600 transition-colors">
                 Voir tous les produits
@@ -204,12 +204,12 @@ function CatalogueContent() {
               {totalPages > 1 && (
                 <div className="flex justify-center gap-2 mt-8">
                   <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:text-gray-200 text-sm font-medium disabled:opacity-40 hover:border-teal-400 transition-colors">
+                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-600 dark:text-slate-200 text-sm font-medium disabled:opacity-40 hover:border-teal-400 transition-colors">
                     ← Précédent
                   </button>
-                  <span className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300">{page} / {totalPages}</span>
+                  <span className="px-4 py-2 text-sm text-gray-600 dark:text-slate-300">{page} / {totalPages}</span>
                   <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 dark:text-gray-200 text-sm font-medium disabled:opacity-40 hover:border-teal-400 transition-colors">
+                    className="px-4 py-2 rounded-xl border border-gray-200 dark:border-slate-600 dark:text-slate-200 text-sm font-medium disabled:opacity-40 hover:border-teal-400 transition-colors">
                     Suivant →
                   </button>
                 </div>
@@ -226,9 +226,9 @@ export default function CatalogueClient() {
   return (
     <Suspense fallback={
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-pulse">
-        <div className="h-8 bg-gray-200 dark:bg-gray-800 rounded w-48 mb-6" />
+        <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded w-48 mb-6" />
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
-          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-64 bg-gray-200 dark:bg-gray-800 rounded-2xl" />)}
+          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-64 bg-gray-200 dark:bg-slate-700 rounded-2xl" />)}
         </div>
       </div>
     }>

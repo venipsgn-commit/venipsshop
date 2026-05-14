@@ -142,13 +142,13 @@ export default function HomePageClient() {
       </section>
 
       {/* ─── STATS ─── */}
-      <section className="bg-white dark:bg-black border-b border-gray-100 dark:border-gray-800">
+      <section className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[['500+','Produits disponibles'],['50+','Marques référencées'],['10 000+','Clients satisfaits'],['4.8★','Note moyenne']].map(([val,lbl]) => (
               <div key={lbl} className="py-2">
                 <p className="text-2xl sm:text-3xl font-extrabold text-teal-500">{val}</p>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">{lbl}</p>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-0.5">{lbl}</p>
               </div>
             ))}
           </div>
@@ -158,8 +158,8 @@ export default function HomePageClient() {
       {/* ─── CATEGORIES ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">Nos Catégories</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Trouvez exactement ce dont vous avez besoin</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-slate-100">Nos Catégories</h2>
+          <p className="text-gray-500 dark:text-slate-400 mt-2 text-sm">Trouvez exactement ce dont vous avez besoin</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {CATEGORIES.map(cat => (
@@ -176,12 +176,12 @@ export default function HomePageClient() {
 
       {/* ─── NOUVEAUTÉS ─── */}
       {newArrivals.length > 0 && (
-        <section className="bg-white dark:bg-black py-14">
+        <section className="bg-white dark:bg-slate-900 py-14">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">Nouveautés</h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Les derniers arrivages en stock</p>
+                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-slate-100">Nouveautés</h2>
+                <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">Les derniers arrivages en stock</p>
               </div>
               <Link href="/catalogue?badge=Nouveau" className="text-sm font-semibold text-teal-500 hover:text-teal-600 transition-colors">
                 Voir tout →
@@ -217,8 +217,8 @@ export default function HomePageClient() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-14">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">À découvrir</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Une sélection différente à chaque visite</p>
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-slate-100">À découvrir</h2>
+            <p className="text-gray-500 dark:text-slate-400 text-sm mt-1">Une sélection différente à chaque visite</p>
           </div>
           <Link href="/catalogue" className="text-sm font-semibold text-teal-500 hover:text-teal-600 transition-colors">
             Voir tout →
@@ -253,8 +253,8 @@ export default function HomePageClient() {
                 const disc = p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0;
                 return (
                   <Link key={p.id} href={`/produit/${p.slug || p.id}`}
-                    className="flex-none w-44 sm:w-52 snap-start bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
-                    <div className="relative h-36 sm:h-44 overflow-hidden bg-gray-50 dark:bg-gray-800">
+                    className="flex-none w-44 sm:w-52 snap-start bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group overflow-hidden">
+                    <div className="relative h-36 sm:h-44 overflow-hidden bg-gray-50 dark:bg-slate-700">
                       <Image src={p.images[0]} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />
                       {disc > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-extrabold px-2 py-1 rounded-lg shadow">
@@ -264,7 +264,7 @@ export default function HomePageClient() {
                     </div>
                     <div className="p-3">
                       <p className="text-[10px] font-bold text-red-500 uppercase tracking-wide mb-0.5">{p.brand}</p>
-                      <p className="text-gray-900 dark:text-white text-xs font-semibold line-clamp-2 mb-2 leading-snug">{p.name}</p>
+                      <p className="text-gray-900 dark:text-slate-100 text-xs font-semibold line-clamp-2 mb-2 leading-snug">{p.name}</p>
                       <div className="flex flex-col gap-0.5">
                         <span className="text-red-500 font-extrabold text-sm">{formatPrice(p.price)}</span>
                         {p.originalPrice && (
@@ -290,24 +290,24 @@ export default function HomePageClient() {
       {/* ─── AVIS CLIENTS ─── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">Ce que disent nos clients</h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">Plus de 10 000 clients satisfaits</p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-slate-100">Ce que disent nos clients</h2>
+          <p className="text-gray-500 dark:text-slate-400 mt-2 text-sm">Plus de 10 000 clients satisfaits</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {TESTIMONIALS.map(t => (
-            <div key={t.name} className="bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800">
+            <div key={t.name} className="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-slate-700">
               <div className="flex gap-0.5 mb-3">
                 {[1,2,3,4,5].map(s => (
-                  <svg key={s} className={`w-4 h-4 ${s <= t.note ? 'text-yellow-400' : 'text-gray-200 dark:text-gray-700'}`} fill="currentColor" viewBox="0 0 20 20">
+                  <svg key={s} className={`w-4 h-4 ${s <= t.note ? 'text-yellow-400' : 'text-gray-200 dark:text-slate-700'}`} fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                   </svg>
                 ))}
               </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
+              <p className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{t.avatar}</div>
                 <div>
-                  <p className="font-semibold text-sm text-gray-900 dark:text-white">{t.name}</p>
+                  <p className="font-semibold text-sm text-gray-900 dark:text-slate-100">{t.name}</p>
                   <p className="text-xs text-gray-400">{t.role}</p>
                 </div>
               </div>
@@ -317,7 +317,7 @@ export default function HomePageClient() {
       </section>
 
       {/* ─── FEATURES ─── */}
-      <section className="bg-white dark:bg-black border-t border-gray-100 dark:border-gray-800 py-12">
+      <section className="bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-700 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -329,8 +329,8 @@ export default function HomePageClient() {
               <div key={f.title} className="flex items-start gap-4">
                 <span className="text-3xl flex-shrink-0">{f.icon}</span>
                 <div>
-                  <p className="font-bold text-gray-900 dark:text-white text-sm">{f.title}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{f.desc}</p>
+                  <p className="font-bold text-gray-900 dark:text-slate-100 text-sm">{f.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5 leading-relaxed">{f.desc}</p>
                 </div>
               </div>
             ))}
@@ -339,12 +339,12 @@ export default function HomePageClient() {
       </section>
 
       {/* ─── NEWSLETTER ─── */}
-      <section className="bg-gray-50 dark:bg-gray-950 py-14 border-t border-gray-100 dark:border-gray-800">
+      <section className="bg-gray-50 dark:bg-slate-950 py-14 border-t border-gray-100 dark:border-slate-700">
         <div className="max-w-xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white mb-2">Restez informé des offres</h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Recevez nos meilleures promotions directement dans votre boîte mail.</p>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-slate-100 mb-2">Restez informé des offres</h2>
+          <p className="text-gray-500 dark:text-slate-400 text-sm mb-6">Recevez nos meilleures promotions directement dans votre boîte mail.</p>
           <form onSubmit={e => e.preventDefault()} className="flex gap-2">
-            <input type="email" placeholder="Votre adresse email" className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm" />
+            <input type="email" placeholder="Votre adresse email" className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 text-sm" />
             <button type="submit" className="text-white px-5 py-3 rounded-xl font-semibold transition-colors text-sm whitespace-nowrap" style={{background: 'linear-gradient(135deg, #22c55e, #15803d)'}}>S&apos;abonner</button>
           </form>
         </div>
