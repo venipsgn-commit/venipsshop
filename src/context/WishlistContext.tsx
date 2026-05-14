@@ -15,12 +15,36 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [ids, setIds] = useState<string[]>([]);
 
-  // Load wishlist from API when logged in, localStorage otherwise
   useEffect(() => {
     if (user) {
-      productApi.getWishlist()
-        .then(products => setIds(products.map(p => p.id)))
-        .catch(() => setIds([]));
+      // Récupérer les IDs locaux éventuellement ajoutés sans être connecté
+      let localIds: string[] = [];
+      try {
+        const stored = JSON.parse(localStorage.getItem('vshop_wishlist') ?? '[]');
+        if (Array.isArray(stored)) localIds = stored;
+      } catch {}
+
+      const load = async () => {
+        const products = await productApi.getWishlist();
+        const serverIds = products.map(p => p.id);
+
+        // Synchroniser les items localStorage vers le backend
+        if (localIds.length > 0) {
+          const toSync = localIds.filter(id => !serverIds.includes(id));
+          if (toSync.length > 0) {
+            await Promise.all(toSync.map(id => productApi.toggleWishlist(id).catch(() => {})));
+            localStorage.removeItem('vshop_wishlist');
+            const updated = await productApi.getWishlist();
+            setIds(updated.map(p => p.id));
+            return;
+          }
+          localStorage.removeItem('vshop_wishlist');
+        }
+
+        setIds(serverIds);
+      };
+
+      load().catch(() => setIds([]));
     } else {
       try { setIds(JSON.parse(localStorage.getItem('vshop_wishlist') ?? '[]')); }
       catch { setIds([]); }
