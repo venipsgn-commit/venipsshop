@@ -109,10 +109,15 @@ app.use((_, res) => {
 // ── Gestion erreurs globale ───────────────
 app.use(errorHandler);
 
-app.listen(PORT, async () => {
-  console.log(`🚀 Venips API démarrée sur http://localhost:${PORT}`);
-  console.log(`📦 Environment: ${process.env.NODE_ENV}`);
-  await setupAdmin();
-});
+// En serverless (Vercel), on n'ouvre pas de port : la plateforme invoque
+// directement l'app exportée. On ne démarre le serveur HTTP qu'en dehors
+// de Vercel (local, Railway, Render…).
+if (!process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    console.log(`🚀 Venips API démarrée sur http://localhost:${PORT}`);
+    console.log(`📦 Environment: ${process.env.NODE_ENV}`);
+    await setupAdmin();
+  });
+}
 
 export default app;
